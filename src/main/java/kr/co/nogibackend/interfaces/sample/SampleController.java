@@ -1,5 +1,10 @@
 package kr.co.nogibackend.interfaces.sample;
 
+import static kr.co.nogibackend.response.code.CommonResponseCode.*;
+import static kr.co.nogibackend.response.code.GitResponseCode.*;
+import static kr.co.nogibackend.response.code.NotionResponseCode.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -12,7 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.nogibackend.application.sample.SampleFacade;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.sample.SampleService;
+import kr.co.nogibackend.interfaces.notion.NotionClient;
+import kr.co.nogibackend.interfaces.notion.response.DemoResponse;
+import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -22,6 +31,7 @@ public class SampleController {
 
 	private final SampleService sampleService;
 	private final SampleFacade sampleFacade;
+	private final NotionClient notionClient;
 
 	@GetMapping
 	public ResponseEntity<List<SampleDto.Response>> findAll() {
@@ -53,6 +63,47 @@ public class SampleController {
 	public ResponseEntity<Void> delete(@PathVariable Long id) {
 		sampleService.delete(id);
 		return ResponseEntity.ok().build();
+	}
+
+	@GetMapping("/demo")
+	public ResponseEntity<?> findDemo() {
+		int i = 6;
+
+		if (i == 1) {
+			// 성공 응답
+			return Response.success();
+		} else if (i == 2) {
+			// 성공 응답 with 값
+			List<String> list = new ArrayList<>();
+			list.add("test1");
+			list.add("test2");
+			return Response.success(list);
+		} else if (i == 3) {
+			// 실패 응답
+			return Response.fail(F_NULL_POINT);
+		} else if (i == 4) {
+			// 실패 응답 with 값
+			List<String> list = new ArrayList<>();
+			list.add("test1");
+			list.add("test2");
+			return Response.fail(F_NULL_POINT, list);
+		} else if (i == 5) {
+			// 공통 exception
+			throw new GlobalException(F_SAMPLE_NOTION);
+		} else {
+			// 공통 exception with 값
+			List<String> list = new ArrayList<>();
+			list.add("test1");
+			list.add("test2");
+			throw new GlobalException(F_SAMPLE_GIT, list);
+		}
+	}
+
+	@GetMapping("/demo/client")
+	public ResponseEntity<?> getFeignClient() {
+		ResponseEntity<List<DemoResponse>> aa = notionClient.getDemo();
+		System.out.println("ResponseEntity<List<Demo>> :: " + aa);
+		return null;
 	}
 
 }
