@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 import kr.co.nogibackend.application.sample.SampleFacade;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.sample.SampleService;
+import kr.co.nogibackend.interfaces.notion.NotionClient;
+import kr.co.nogibackend.interfaces.notion.response.DemoResponse;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +31,7 @@ public class SampleController {
 
 	private final SampleService sampleService;
 	private final SampleFacade sampleFacade;
+	private final NotionClient notionClient;
 
 	@GetMapping
 	public ResponseEntity<List<SampleDto.Response>> findAll() {
@@ -94,6 +97,13 @@ public class SampleController {
 			list.add("test2");
 			throw new GlobalException(F_SAMPLE_GIT, list);
 		}
+	}
+
+	@GetMapping("/demo/client")
+	public ResponseEntity<?> getFeignClient() {
+		ResponseEntity<List<DemoResponse>> aa = notionClient.getDemo();
+		System.out.println("ResponseEntity<List<Demo>> :: " + aa);
+		return null;
 	}
 
 }

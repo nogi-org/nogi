@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.2'
+    id 'org.springframework.boot' version '3.2.2'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -31,8 +31,25 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    // OpenFeign
+//    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.0.3'
+    // feign
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    // implementation "io.github.openfeign:feign-httpclient:12.4"
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
+dependencyManagement {
+
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+
 }
