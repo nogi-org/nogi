@@ -8,10 +8,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NotionTTTCategoryProperty {
+public class NotionNogiCategoryProperty extends NotionNogiProperty {
 
-  private String id;
-  private String type;
-  private NotionSelectResponse select;
+	private NotionSelectResponse select;
 
 }

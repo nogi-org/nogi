@@ -9,10 +9,10 @@ import lombok.ToString;
 @ToString
 public class NotionRichTextContent {
 
-  private String type;
-  private NotionTextResponse text;
-  private NotionAnnotationsContent annotations;
-  private String plain_text;
-  private String href;
+	private String type;
+	private NotionTextContent text;
+	private NotionAnnotationsContent annotations;
+	private String plain_text;
+	private String href;
 
 }

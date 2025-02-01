@@ -7,10 +7,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NotionHeadingContent {
+public class NotionTodoContent {
 
 	private List<NotionRichTextContent> rich_text;
-	private boolean is_toggleable;
+	private boolean checked;
 	private String color;
 
 }

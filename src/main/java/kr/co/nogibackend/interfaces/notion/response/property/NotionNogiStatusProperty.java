@@ -8,9 +8,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NotionTTTStatusResponse {
+public class NotionNogiStatusProperty extends NotionNogiProperty {
 
-  private String id;
-  private String type;
-  private NotionStatusResponse select;
+	private NotionStatusResponse select;
+    
 }

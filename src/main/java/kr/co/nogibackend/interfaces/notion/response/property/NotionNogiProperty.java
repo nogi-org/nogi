@@ -11,11 +11,9 @@ https://developers.notion.com/reference/property-object#date
 @Getter
 @Setter
 @ToString
-public class NotionNogiProperties {
+public class NotionNogiProperty {
 
-	private NotionNogiCommitDateProperty nogiCommitDate;
-	private NotionNogiStatusProperty nogiStatus;
-	private NotionNogiCategoryProperty nogiCategory;
-	private NotionNogiTitleProperty nogiTitle;
+	private String id;
+	private String type;
 
 }

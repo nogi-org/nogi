@@ -5,7 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NotionExternalResponse {
+public class NotionLinkContent {
 
-  private String url;
+	private String url;
+
 }
