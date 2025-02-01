@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.co.nogibackend.config.openfeign.NotionFeignClientConfig;
 import kr.co.nogibackend.interfaces.notion.response.DemoResponse;
@@ -39,7 +40,8 @@ public interface NotionClient {
 	@GetMapping("/blocks/{pageId}/children?page_size=100")
 	ResponseEntity<NotionResponse<NotionBlockResponse>> getBlocksFromPage(
 		@RequestHeader("Authorization") String authToken,
-		@PathVariable(value = "pageId") String pageId
+		@PathVariable(value = "pageId") String pageId,
+		@RequestParam(value = "start_cursor", required = false) String startCursor
 	);
 
 	//  @PatchMapping("/pages/{pageId}")

@@ -56,34 +56,30 @@ public class NotionService {
 	}
 
 	private List<NotionBlockResponse> getBlocksOfPages(User user, List<NotionPageResponse> pages) {
-		List<NotionBlockResponse> blocks = new ArrayList<>();
+		List<NotionBlockResponse> responses = new ArrayList<>();
 		for (NotionPageResponse page : pages) {
-			// boolean hasMore = true;
-			NotionResponse<NotionBlockResponse> body =
-				notionClient
-					.getBlocksFromPage(user.getNotionAuthToken(), page.getId())
-					.getBody();
+			// next_cursor 로 다음꺼 가져온다.
+			NotionResponse<NotionBlockResponse> blocks =
+				this.getBlocks(user.getNotionAuthToken(), page.getId(), "18da9cc8-1056-80d8-be24-c6d3b288e35a");
+			System.out.println("blocks body========> : " + blocks);
 
-			// hasMore = body.isHas_more() ? true : false;
-			System.out.println("has more : " + body.isHas_more());
-
+			// 한번 조회 시 최대 100까지 조회 가능해서 next 여부 확인 후 조회
+			// boolean hasMore = blocks.isHas_more();
 			// while (hasMore) {
-			// 	NotionResponse<NotionBlockResponse> body1 =
-			// 		notionClient
-			// 			.getBlocksFromPage(user.getNotionAuthToken(), page.getId())
-			// 			.getBody();
-			// 	blocks.addAll(body1.getResults());
-			// 	hasMore = body1.isHas_more() ? true : false;
+			// 	NotionResponse<NotionBlockResponse> moreBlocks =
+			// 		this.getBlocks(user.getNotionAuthToken(), page.getId());
+			// 	responses.addAll(moreBlocks.getResults());
+			// 	hasMore = moreBlocks.isHas_more();
 			// }
 		}
-		return blocks;
+		return responses;
 	}
 
-	private NotionResponse<NotionBlockResponse> getBlocks(String authToken, String pageId) {
+	private NotionResponse<NotionBlockResponse> getBlocks(String authToken, String pageId, String startCursor) {
 		try {
 			return
 				notionClient
-					.getBlocksFromPage(authToken, pageId)
+					.getBlocksFromPage(authToken, pageId, startCursor)
 					.getBody();
 		} catch (Exception error) {
 			// todo: 에러 핸들링 하기(notice 역할 만들고 작업하기)
