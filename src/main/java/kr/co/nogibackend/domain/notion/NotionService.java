@@ -10,12 +10,11 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.co.nogibackend.domain.user.User;
-import kr.co.nogibackend.interfaces.notion.NotionClient;
-import kr.co.nogibackend.interfaces.notion.request.NotionRequestMaker;
-import kr.co.nogibackend.interfaces.notion.response.NotionBlockResponse;
-import kr.co.nogibackend.interfaces.notion.response.NotionPageResponse;
-import kr.co.nogibackend.interfaces.notion.response.NotionResponse;
+import kr.co.nogibackend.domain.notion.dto.command.NotionEndTilCommand;
+import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -25,15 +24,20 @@ public class NotionService {
 
 	private final NotionClient notionClient;
 
-	public void startTIL(List<User> users) {
+	public void startTIL(List<NotionStartTilCommand> commands) {
 	}
 
-	public String startTIL(User user) {
+	public String startTIL(NotionStartTilCommand command) {
 		// 대기 상태 TIL 페이지 조회
-		List<NotionPageResponse> pages = this.getPendingPages(user);
+		List<NotionPageInfo> pages = this.getPendingPages(
+			command.getNotionAuthToken(),
+			command.getNotionDatabaseId()
+		);
 
 		// 페이지의 블럭 조회
-		List<NotionBlockResponse> blocks = this.getBlocksOfPages(user, pages);
+		List<NotionBlockInfo> blocks = this.getBlocksOfPages(
+			command.getNotionAuthToken(), pages
+		);
 		System.out.println("조회된 블락 개수 : " + blocks.size());
 		System.out.println("조회된 블락 : " + blocks);
 		// System.out.println("요청한 페이지ID : " + page.getId() + ", 블럭의 페이지ID : " + body.getResults()
@@ -49,19 +53,19 @@ public class NotionService {
 		return null;
 	}
 
-	public void endTIL(List<User> users) {
+	public void endTIL(List<NotionEndTilCommand> users) {
 	}
 
-	public void endTIL(User user) {
+	public void endTIL(NotionEndTilCommand user) {
 	}
 
-	private List<NotionBlockResponse> getBlocksOfPages(User user, List<NotionPageResponse> pages) {
-		List<NotionBlockResponse> blocks = new ArrayList<>();
-		for (NotionPageResponse page : pages) {
+	public List<NotionBlockInfo> getBlocksOfPages(String notionAuthToken, List<NotionPageInfo> pages) {
+		List<NotionBlockInfo> blocks = new ArrayList<>();
+		for (NotionPageInfo page : pages) {
 			// boolean hasMore = true;
-			NotionResponse<NotionBlockResponse> body =
+			NotionInfo<NotionBlockInfo> body =
 				notionClient
-					.getBlocksFromPage(user.getNotionAuthToken(), page.getId())
+					.getBlocksFromPage(notionAuthToken, page.getId())
 					.getBody();
 
 			// hasMore = body.isHas_more() ? true : false;
@@ -79,7 +83,7 @@ public class NotionService {
 		return blocks;
 	}
 
-	private NotionResponse<NotionBlockResponse> getBlocks(String authToken, String pageId) {
+	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId) {
 		try {
 			return
 				notionClient
@@ -88,16 +92,19 @@ public class NotionService {
 		} catch (Exception error) {
 			// todo: 에러 핸들링 하기(notice 역할 만들고 작업하기)
 			System.out.println(error.getMessage());
-			return NotionResponse.empty();
+			return NotionInfo.empty();
 		}
 	}
 
-	private List<NotionPageResponse> getPendingPages(User user) {
+	public List<NotionPageInfo> getPendingPages(
+		String authToken,
+		String databaseId
+	) {
 		try {
 			Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_PENDING);
 			return
 				notionClient
-					.getPagesFromDatabase(user.getNotionAuthToken(), user.getNotionDatabaseId(), filter)
+					.getPagesFromDatabase(authToken, databaseId, filter)
 					.getBody()
 					.getResults();
 		} catch (Exception error) {

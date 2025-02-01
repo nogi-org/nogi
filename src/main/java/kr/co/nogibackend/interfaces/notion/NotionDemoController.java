@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.nogibackend.domain.notion.NotionService;
+import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,12 @@ public class NotionDemoController {
 		@RequestParam("databaseId") String databaseId
 	) {
 		User user = User.builder().notionAuthToken(authToken).notionDatabaseId(databaseId).build();
-		return Response.success(notionService.startTIL(user));
+		return Response.success(
+			NotionStartTilCommand.builder()
+				.notionAuthToken(user.getNotionAuthToken())
+				.notionDatabaseId(user.getNotionDatabaseId())
+				.build()
+		);
 	}
 
 }
