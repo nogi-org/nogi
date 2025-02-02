@@ -15,6 +15,7 @@ import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.result.NotionStartTilResult;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,7 +28,7 @@ public class NotionService {
 	public void startTIL(List<NotionStartTilCommand> commands) {
 	}
 
-	public String startTIL(NotionStartTilCommand command) {
+	public List<NotionStartTilResult> startTIL(NotionStartTilCommand command) {
 		// 대기 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages = this.getPendingPages(
 			command.getNotionAuthToken(),
