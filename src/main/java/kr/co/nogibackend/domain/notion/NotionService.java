@@ -2,6 +2,9 @@ package kr.co.nogibackend.domain.notion;
 
 import static kr.co.nogibackend.domain.notion.NotionPropertyValue.*;
 
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +51,15 @@ public class NotionService {
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
 			// 블럭 조회
-			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPages(command.getNotionAuthToken(), page);
+			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPage(command.getNotionAuthToken(), page);
 
 			// 블럭 인코딩
-			NotionBlockConversionInfo encoding = this.convertMarkdownBase64(page, blocks.getResults());
+			NotionBlockConversionInfo encoding = this.convertMarkdown(page, blocks.getResults());
 
 			// result 로 빌드
 			NotionStartTILResult result = NotionStartTILResult.of(command.getUserId(), page, encoding);
 			results.add(result);
 		}
-
 		return results;
 	}
 
@@ -70,7 +72,7 @@ public class NotionService {
 	public void endTIL(NotionEndTilCommand user) {
 	}
 
-	private NotionInfo<NotionBlockInfo> getBlocksOfPages(String notionAuthToken, NotionPageInfo page) {
+	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
 		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null);
 
 		// hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
@@ -106,12 +108,12 @@ public class NotionService {
 	todo:
 	2. 이미지 처리
 	 */
-	private NotionBlockConversionInfo convertMarkdownBase64(NotionPageInfo page, List<NotionBlockInfo> blocks) {
+	private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page, List<NotionBlockInfo> blocks) {
 		StringBuilder markDown = new StringBuilder();
 		List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
+		boolean isSuccess = true;
 
 		for (NotionBlockInfo block : blocks) {
-
 			switch (block.getType()) {
 				case "heading_1":
 					markDown
@@ -119,7 +121,6 @@ public class NotionService {
 						.append(NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
 						.append("\n");
 					break;
-
 				case "heading_2":
 					markDown
 						.append("## ")
@@ -184,37 +185,89 @@ public class NotionService {
 						.append("   " + "\n");
 					break;
 
-				// todo: 실패 시 알림
 				case "image":
-					// 이미지 캡션
-					String caption =
-						block.getImage().getCaption().isEmpty()
-							? "TIL_IMAGE"
-							: NotionRichTextContent.mergePlainText(block.getImage().getCaption(), true);
+					try {
+						System.out.println("==================== Markdown Image Convert Start ====================");
+						// 이미지 캡션
+						String caption =
+							block.getImage().getCaption().isEmpty()
+								? "TIL_IMAGE"
+								: NotionRichTextContent.mergePlainText(block.getImage().getCaption(), true);
 
-					// String Url 을 Url 형태로
-					// 	UriComponentsBuilder uriComponentsBuilder =
-					// 		UriComponentsBuilder.fromUriString(block.getImage().getFile().getUrl());
-					//
-					// 	// 이미지 파일 이름 생성
-					// 	String[] split = uriComponentsBuilder.build().getPath().split("/");
-					// 	String fileName = page.convertTitle() + "_" + i + "_" + split[3];
-					//
-					// 	// 이후 카테고리 하위 image 디렉토리에 이미지파일 생성한다고 가정하고 경로 설정
-					// 	String path = page.getTilImagePath();
-					// 	markDown
-					// 		.append("![" + caption + "](" + path + "image/" + fileName + ")")
-					// 		.append("\n");
+						// 공백과 특수 문자 인코딩
+						String encodedUrl =
+							URLEncoder.encode(block.getImage().getFile().getUrl(), StandardCharsets.UTF_8);
+						/*
+						import feign.Feign;
+import feign.RequestLine;
+import feign.jackson.JacksonDecoder;
+import feign.jackson.JacksonEncoder;
+import org.springframework.stereotype.Service;
 
-					// todo: 이미지 byte 로 받아와야함
+public interface DynamicFeign {
+    @RequestLine("GET /endpoint")
+    String getData();
+}
 
-					// 	image.add(
-					// 		ImageOfNotionBlockDto
-					// 			.builder()
-					// 			.fileName(fileName)
-					// 			.uriBuilder(uriComponentsBuilder)
-					// 			.build()
-					// 	);
+@Service
+public class DynamicFeignService {
+
+    public DynamicFeign createClient(String baseUrl) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(DynamicFeign.class, baseUrl);
+    }
+
+    public String fetchDataFromDynamicUrl(String dynamicUrl) {
+        DynamicFeign client = createClient(dynamicUrl);
+        return client.getData();
+    }
+}
+
+
+
+
+
+						 */
+						// 공백이나 특수 문자가 처리된 후 URI로 변환
+						URI uri = new URI(encodedUrl);
+						System.out.println("URI ::::::: " + uri);
+
+						// byte[] blockImage = notionClient.getBlockImage(uri, "asfaf");
+						// System.out.println("blockImage ::::::+++++++ " + blockImage);
+
+						// UriComponentsBuilder uriComponentsBuilder =
+						// 	UriComponentsBuilder.fromUriString(block.getImage().getFile().getUrl());
+
+						// String Url 을 Url 형태로
+						// 	UriComponentsBuilder uriComponentsBuilder =
+						// 		UriComponentsBuilder.fromUriString(block.getImage().getFile().getUrl());
+						//
+						// 	// 이미지 파일 이름 생성
+						// 	String[] split = uriComponentsBuilder.build().getPath().split("/");
+						// 	String fileName = page.convertTitle() + "_" + i + "_" + split[3];
+						//
+						// 	// 이후 카테고리 하위 image 디렉토리에 이미지파일 생성한다고 가정하고 경로 설정
+						// 	String path = page.getTilImagePath();
+						// 	markDown
+						// 		.append("![" + caption + "](" + path + "image/" + fileName + ")")
+						// 		.append("\n");
+
+						// todo: 이미지 byte 로 받아와야함
+
+						// 	image.add(
+						// 		ImageOfNotionBlockDto
+						// 			.builder()
+						// 			.fileName(fileName)
+						// 			.uriBuilder(uriComponentsBuilder)
+						// 			.build()
+						// 	);
+					} catch (Exception error) {
+						System.out.println("Notion Block Convert To Markdown Error : " + error.getMessage());
+						isSuccess = false;
+						new NotionBlockConversionInfo(markDown.toString(), images, isSuccess);
+					}
 					break;
 
 				default:
@@ -224,7 +277,7 @@ public class NotionService {
 
 		System.out.println("============== Markdown ============== \n" + markDown);
 		return
-			new NotionBlockConversionInfo(markDown.toString(), images);
+			new NotionBlockConversionInfo(markDown.toString(), images, isSuccess);
 	}
 
 }

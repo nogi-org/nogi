@@ -13,7 +13,7 @@ import lombok.ToString;
 public class NotionImageContent {
 
 	private String type;
-	private NotionFileProperty external;
+	private NotionFileProperty file;
 	private List<NotionRichTextContent> caption;
 
 }

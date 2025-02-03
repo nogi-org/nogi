@@ -1,5 +1,6 @@
 package kr.co.nogibackend.infra.notion;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class NotionClientImpl implements NotionClient {
 
 	private final NotionFeignClient notionFeignClient;
+	private final NotionImageFeignClient notionImageFeignClient;
 
 	@Override
 	public NotionInfo<NotionPageInfo> getPagesFromDatabase(
@@ -50,6 +52,11 @@ public class NotionClientImpl implements NotionClient {
 			System.out.println(error.getMessage());
 			return NotionInfo.empty();
 		}
+	}
+
+	@Override
+	public byte[] getBlockImage(URI baseUri, String path) {
+		return notionImageFeignClient.getBlockImage(baseUri, path);
 	}
 
 }

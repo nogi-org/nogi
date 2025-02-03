@@ -16,7 +16,9 @@ public record NotionStartTILResult(
 	String title,// 제목(ex 파일명.md 에서 파일명으로 사용할 값)
 
 	String content,// markdown 파일(base64 인코딩된 파일 내용)
-	List<ImageOfNotionBlock> images// 이미지 경로 정보
+	List<ImageOfNotionBlock> images,// 이미지 경로 정보
+
+	boolean isSuccess //성공, 실패
 ) {
 
 	public static NotionStartTILResult of(
@@ -32,6 +34,7 @@ public record NotionStartTILResult(
 			, page.getProperties().getNogiTitle().getTitle().get(0).getPlain_text()
 			, encoding.content()
 			, encoding.images()
+			, encoding.isSuccess()
 		);
 	}
 
