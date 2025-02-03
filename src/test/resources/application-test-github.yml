@@ -1,0 +1,2 @@
+github:
+  token: ${TEST_GITHUB_TOKEN}

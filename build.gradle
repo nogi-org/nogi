@@ -26,6 +26,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    testImplementation 'org.projectlombok:lombok:1.18.26'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
@@ -33,6 +34,10 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    // dotenv
+    testImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
+
 }
 
 tasks.named('test') {
