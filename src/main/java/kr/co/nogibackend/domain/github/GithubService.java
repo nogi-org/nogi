@@ -32,7 +32,9 @@ public class GithubService {
 		String repo,
 		String branch,
 		String token,
-		Map<String, String> files) {
+		Map<String, String> files,
+		String commitDate // 추가된 매개변수 (ISO-8601 형식: yyyy-MM-dd'T'HH:mm:ssZ)
+	) {
 
 		// 1️⃣ 현재 브랜치의 HEAD 커밋 가져오기
 		String latestCommitSha = getLatestCommitSha(owner, repo, branch, token);
@@ -58,10 +60,23 @@ public class GithubService {
 		GithubTreeResponse treeResponse = githubFeignClient.createTree(owner, repo,
 			new GithubTreeRequest(latestCommitSha, treeEntries), token);
 
-		// 4️⃣ 새로운 Commit 생성
+		// 4️⃣ 새로운 Commit 생성 (커밋 날짜 지정)
+		GithubCommitRequest.AuthorCommitter authorCommitter = new GithubCommitRequest.AuthorCommitter(
+			"5wontaek", // GitHub에서 설정된 사용자 이름
+			"onetaekoh@gmail.com", // GitHub 이메일
+			commitDate // 커밋 날짜 (ISO-8601 형식)
+		);
+
 		GithubCommitResponse commitResponse = githubFeignClient.createCommit(owner, repo,
-			new GithubCommitRequest("Batch commit multiple files", treeResponse.sha(), List.of(latestCommitSha)),
-			token);
+			new GithubCommitRequest(
+				"Batch commit multiple files",
+				treeResponse.sha(),
+				List.of(latestCommitSha),
+				authorCommitter, // author 정보 추가
+				authorCommitter  // committer 정보 추가
+			),
+			token
+		);
 
 		// 5️⃣ 브랜치 업데이트 (HEAD 이동)
 		githubFeignClient.updateBranch(owner, repo, branch, new GithubUpdateReferenceRequest(commitResponse.sha()),

@@ -2,6 +2,9 @@ package kr.co.nogibackend.infra.github;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +39,7 @@ class GithubFeignClientIntegrationTest {
 	@Value("${github.token}")
 	private String token;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo";
+	private final String repo = "nogi-test-repo3";
 	private String barerToken;// beforeEach 에서 초기화
 	private static Dotenv dotenv;// .env 파일 로드
 
@@ -120,7 +123,8 @@ class GithubFeignClientIntegrationTest {
 			repo,
 			"main",
 			barerToken,
-			files
+			files,
+			"2025-01-31T16:13:30+12:00"
 		);
 	}
 
@@ -131,5 +135,43 @@ class GithubFeignClientIntegrationTest {
 		ClassPathResource resource = new ClassPathResource(imagePath);
 		byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
 		return Base64.getEncoder().encodeToString(imageBytes);
+	}
+
+	@Test
+	void testUploadMarkdownFilesWithDateRange() {
+		// ✅ 시작 날짜 설정 (2024-01-01 ~ 2024-06-30)
+		LocalDate startDate = LocalDate.of(2024, 12, 31);
+		LocalDate endDate = LocalDate.of(2025, 2, 1);
+
+		// ✅ 날짜를 하루씩 증가시키면서 반복
+		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+			// 📌 날짜를 12:00 PM (정오)로 설정
+			String commitDate = date.atTime(12, 0).atOffset(ZoneOffset.of("+09:00"))
+				.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+
+			// 📝 Markdown 파일 (이미지 없이)
+			String mdContent = String.format("""
+				# Hello GitHub
+				This is a test markdown file for date %s.
+
+				This commit was created at exactly 12:00 PM on %s.
+				""", date, date);
+
+			// ✅ 업로드할 파일 목록 생성 (이미지 제외)
+			Map<String, String> files = new HashMap<>();
+			files.put("Java/daily_commit_" + date + ".md", mdContent);
+
+			// ✅ GitHub API를 사용하여 파일 업로드
+			githubService.uploadMultipleFiles(
+				owner,
+				repo,
+				"main",
+				barerToken,
+				files,
+				commitDate // 날짜별 커밋 적용
+			);
+
+			System.out.println("✅ 커밋 완료: " + date + " 12:00 PM");
+		}
 	}
 }

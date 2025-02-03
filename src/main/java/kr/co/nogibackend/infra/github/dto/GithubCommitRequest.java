@@ -6,6 +6,10 @@ import java.util.List;
 public record GithubCommitRequest(
 	String message,
 	String tree,
-	List<String> parents
+	List<String> parents,
+	AuthorCommitter author,
+	AuthorCommitter committer
 ) {
+	public record AuthorCommitter(String name, String email, String date) {
+	}
 }
