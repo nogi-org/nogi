@@ -3,6 +3,7 @@ package kr.co.nogibackend.domain.notion;
 import static kr.co.nogibackend.domain.notion.NotionPropertyValue.*;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -11,10 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTilCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
-import kr.co.nogibackend.domain.notion.dto.result.NotionStartTilResult;
+import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,28 +29,36 @@ public class NotionService {
 	/*
 	Notion 에 대기 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
 	 */
-	public List<NotionStartTilResult> startTIL(List<NotionStartTilCommand> commands) {
-		return null;
+	public List<NotionStartTILResult> startTIL(List<NotionStartTilCommand> commands) {
+		return
+			commands
+				.stream()
+				.map(this::startTIL)
+				.flatMap(List::stream)
+				.toList();
 	}
 
-	public NotionStartTilResult startTIL(NotionStartTilCommand command) {
+	public List<NotionStartTILResult> startTIL(NotionStartTilCommand command) {
+		// todo: command validation check 추가 (실패 시 무시 및 로그)
+
 		// 대기 상태 TIL 페이지 조회
-		List<NotionPageInfo> pages = this.getPendingPages(
-			command.getNotionAuthToken(),
-			command.getNotionDatabaseId()
-		);
-		System.out.println("pages ::: > " + pages.size());
+		List<NotionPageInfo> pages =
+			this.getPendingPages(command.getNotionAuthToken(), command.getNotionDatabaseId());
 
-		// 페이지의 블럭 조회
-		// todo: result 로 반환해야될듯
-		List<NotionBlockInfo> blocks = this.getBlocksOfPages(command.getNotionAuthToken(), pages);
-		System.out.println("조회된 블락 개수 : " + blocks.size());
+		List<NotionStartTILResult> results = new ArrayList<>();
+		for (NotionPageInfo page : pages) {
+			// 블럭 조회
+			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPages(command.getNotionAuthToken(), page);
 
-		// 블럭 -> 마크다운 가공
-		this.convertMarkdownBase64(blocks);
+			// 블럭 인코딩
+			NotionBlockConversionInfo encoding = this.convertMarkdownBase64(page, blocks.getResults());
 
-		// result 로 반환
-		return null;
+			// result 가공하기
+			NotionStartTILResult result = NotionStartTILResult.of(command.getUserId(), page, encoding);
+			results.add(result);
+		}
+
+		return results;
 	}
 
 	/*
@@ -60,29 +70,22 @@ public class NotionService {
 	public void endTIL(NotionEndTilCommand user) {
 	}
 
-	private List<NotionBlockInfo> getBlocksOfPages(String notionAuthToken, List<NotionPageInfo> pages) {
-		List<NotionBlockInfo> responses = new ArrayList<>();
+	private NotionInfo<NotionBlockInfo> getBlocksOfPages(String notionAuthToken, NotionPageInfo page) {
+		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null);
 
-		for (NotionPageInfo page : pages) {
-			NotionInfo<NotionBlockInfo> blocks =
-				this.getBlocks(notionAuthToken, page.getId(), null);
-			responses.addAll(blocks.getResults());
-			System.out.println("처음 블락 가져온후 ------->>>>>> : " + responses.size());
+		// hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
+		boolean hasMore = blocks.isHas_more();
+		String nextCursor = blocks.getNext_cursor();
+		System.out.println("has more : " + hasMore);
 
-			// hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
-			boolean hasMore = blocks.isHas_more();
-			String nextCursor = blocks.getNext_cursor();
-			System.out.println("has more : " + hasMore);
-
-			while (hasMore) {
-				NotionInfo<NotionBlockInfo> nextBlocks =
-					this.getBlocks(notionAuthToken, page.getId(), nextCursor);
-				responses.addAll(nextBlocks.getResults());
-				hasMore = nextBlocks.isHas_more();
-				nextCursor = nextBlocks.getNext_cursor();
-			}
+		while (hasMore) {
+			NotionInfo<NotionBlockInfo> nextBlocks = this.getBlocks(notionAuthToken, page.getId(), nextCursor);
+			blocks.getResults().addAll(nextBlocks.getResults());
+			hasMore = nextBlocks.isHas_more();
+			nextCursor = nextBlocks.getNext_cursor();
 		}
-		return responses;
+
+		return blocks;
 	}
 
 	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId, String startCursor) {
@@ -90,10 +93,7 @@ public class NotionService {
 			notionClient.getBlocksFromPage(authToken, pageId, startCursor);
 	}
 
-	private List<NotionPageInfo> getPendingPages(
-		String authToken,
-		String databaseId
-	) {
+	private List<NotionPageInfo> getPendingPages(String authToken, String databaseId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
 		Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_PENDING);
 		return
@@ -102,13 +102,11 @@ public class NotionService {
 				.getResults();
 	}
 
-	private void convertMarkdownBase64(List<NotionBlockInfo> blocks) {
+	private NotionBlockConversionInfo convertMarkdownBase64(NotionPageInfo page, List<NotionBlockInfo> blocks) {
 		StringBuilder markDown = new StringBuilder();
-		// List<ImageOfNotionBlockDto> image = new ArrayList<>();
+		List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
 
 		for (int i = 0; i < blocks.size(); i++) {
-
-			// System.out.println("Block ::: " + blocks.get(i));
 
 			switch (blocks.get(i).getType()) {
 				// todo: reich text 가 배열이라 순회하면서 만들어주기
@@ -136,7 +134,7 @@ public class NotionService {
 					break;
 
 				case "paragraph":
-					if (blocks.get(i).getParagraph().getRich_text().size() == 0) {
+					if (blocks.get(i).getParagraph().getRich_text().isEmpty()) {
 						markDown
 							.append("\n");
 					} else {
@@ -167,7 +165,6 @@ public class NotionService {
 						.append("```" + "\n");
 					break;
 
-				// todo: 이미지를 byte 로 받아와야함
 				// case "image":
 				// 	// 이미지 캡션
 				// 	String caption =
@@ -188,7 +185,9 @@ public class NotionService {
 				// 	markDown
 				// 		.append("![" + caption + "](" + path + "image/" + fileName + ")")
 				// 		.append("\n");
-				//
+
+				// todo: 이미지 byte 로 받아와야함
+
 				// 	image.add(
 				// 		ImageOfNotionBlockDto
 				// 			.builder()
@@ -217,13 +216,9 @@ public class NotionService {
 			}
 		}
 
-		// return
-		// 	NotionPageBlockConvertDto
-		// 		.builder()
-		// 		.images(image)
-		// 		.content(Base64.getEncoder().encodeToString(markDown.toString().getBytes()))
-		// 		.page(page)
-		// 		.build();
+		System.out.println("============== Markdown ============== \n" + markDown);
+		return
+			new NotionBlockConversionInfo(Base64.getEncoder().encodeToString(markDown.toString().getBytes()), images);
 	}
 
 }
