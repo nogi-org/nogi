@@ -55,8 +55,8 @@ public class NotionClientImpl implements NotionClient {
 	}
 
 	@Override
-	public byte[] getBlockImage(URI baseUri, String path) {
-		return notionImageFeignClient.getBlockImage(baseUri, path);
+	public byte[] getBlockImage(URI baseUri) {
+		return notionImageFeignClient.getBlockImage(baseUri);
 	}
 
 }

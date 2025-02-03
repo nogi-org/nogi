@@ -6,6 +6,7 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -193,49 +194,20 @@ public class NotionService {
 							block.getImage().getCaption().isEmpty()
 								? "TIL_IMAGE"
 								: NotionRichTextContent.mergePlainText(block.getImage().getCaption(), true);
+						System.out.println("caption ::: " + caption);
 
 						// 공백과 특수 문자 인코딩
 						String encodedUrl =
 							URLEncoder.encode(block.getImage().getFile().getUrl(), StandardCharsets.UTF_8);
-						/*
-						import feign.Feign;
-import feign.RequestLine;
-import feign.jackson.JacksonDecoder;
-import feign.jackson.JacksonEncoder;
-import org.springframework.stereotype.Service;
 
-public interface DynamicFeign {
-    @RequestLine("GET /endpoint")
-    String getData();
-}
-
-@Service
-public class DynamicFeignService {
-
-    public DynamicFeign createClient(String baseUrl) {
-        return Feign.builder()
-                .encoder(new JacksonEncoder())
-                .decoder(new JacksonDecoder())
-                .target(DynamicFeign.class, baseUrl);
-    }
-
-    public String fetchDataFromDynamicUrl(String dynamicUrl) {
-        DynamicFeign client = createClient(dynamicUrl);
-        return client.getData();
-    }
-}
-
-
-
-
-
-						 */
 						// 공백이나 특수 문자가 처리된 후 URI로 변환
-						URI uri = new URI(encodedUrl);
+						// URI uri = new URI(
+						// 	"https://img.freepik.com/free-vector/background-chuseok-festival_23-2147867420.jpg");
+						URI uri = new URI(block.getImage().getFile().getUrl());
 						System.out.println("URI ::::::: " + uri);
 
-						// byte[] blockImage = notionClient.getBlockImage(uri, "asfaf");
-						// System.out.println("blockImage ::::::+++++++ " + blockImage);
+						byte[] blockImage = notionClient.getBlockImage(uri);
+						System.out.println("blockImage ::::::+++++++ " + Arrays.toString(blockImage));
 
 						// UriComponentsBuilder uriComponentsBuilder =
 						// 	UriComponentsBuilder.fromUriString(block.getImage().getFile().getUrl());

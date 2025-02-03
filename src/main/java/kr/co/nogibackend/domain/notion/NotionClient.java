@@ -13,6 +13,6 @@ public interface NotionClient {
 
 	NotionInfo<NotionBlockInfo> getBlocksFromPage(String authToken, String pageId, String startCursor);
 
-	byte[] getBlockImage(URI baseUri, String path);
+	byte[] getBlockImage(URI baseUri);
 
 }
