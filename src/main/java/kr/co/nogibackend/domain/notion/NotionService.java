@@ -3,7 +3,6 @@ package kr.co.nogibackend.domain.notion;
 import static kr.co.nogibackend.domain.notion.NotionPropertyValue.*;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -225,7 +224,7 @@ public class NotionService {
 
 		System.out.println("============== Markdown ============== \n" + markDown);
 		return
-			new NotionBlockConversionInfo(Base64.getEncoder().encodeToString(markDown.toString().getBytes()), images);
+			new NotionBlockConversionInfo(markDown.toString(), images);
 	}
 
 }
