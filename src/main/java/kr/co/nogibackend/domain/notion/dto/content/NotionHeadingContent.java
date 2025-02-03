@@ -14,5 +14,5 @@ public class NotionHeadingContent {
 	private List<NotionRichTextContent> rich_text;
 	private boolean is_toggleable;
 	private String color;
-
+	
 }
