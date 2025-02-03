@@ -43,9 +43,14 @@ public class GithubService {
 			String path = entry.getKey();
 			String content = entry.getValue();
 
+			// 파일 확장자로 Base64 인코딩 여부 결정
+			boolean isBinary =
+				path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".gif");
+
 			// 파일을 Blob으로 업로드하여 SHA 값 받기
-			GithubBlobResponse blobResponse = githubFeignClient.createBlob(owner, repo, GithubBlobRequest.of(content),
-				token);
+			GithubBlobResponse blobResponse = githubFeignClient.createBlob(owner, repo,
+				new GithubBlobRequest(content, isBinary ? "base64" : "utf-8"), token);
+
 			treeEntries.add(new GithubTreeRequest.TreeEntry(path, "100644", "blob", blobResponse.sha()));
 		}
 
