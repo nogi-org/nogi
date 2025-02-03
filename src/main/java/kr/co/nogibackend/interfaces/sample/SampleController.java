@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.nogibackend.application.sample.SampleFacade;
 import kr.co.nogibackend.config.exception.GlobalException;
-import kr.co.nogibackend.domain.notion.dto.info.DemoInfo;
 import kr.co.nogibackend.domain.sample.SampleService;
 import kr.co.nogibackend.infra.notion.NotionFeignClient;
 import kr.co.nogibackend.response.service.Response;
@@ -97,13 +96,6 @@ public class SampleController {
 			list.add("test2");
 			throw new GlobalException(F_SAMPLE_GIT, list);
 		}
-	}
-
-	@GetMapping("/demo/client")
-	public ResponseEntity<?> getFeignClient() {
-		ResponseEntity<List<DemoInfo>> aa = notionFeignClient.getDemo();
-		System.out.println("ResponseEntity<List<Demo>> :: " + aa);
-		return null;
 	}
 
 }

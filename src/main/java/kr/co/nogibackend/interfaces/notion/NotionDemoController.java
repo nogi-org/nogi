@@ -26,10 +26,11 @@ public class NotionDemoController {
 	) {
 		User user = User.builder().notionAuthToken(authToken).notionDatabaseId(databaseId).build();
 		return Response.success(
-			NotionStartTilCommand.builder()
+			notionService.startTIL(NotionStartTilCommand
+				.builder()
 				.notionAuthToken(user.getNotionAuthToken())
 				.notionDatabaseId(user.getNotionDatabaseId())
-				.build()
+				.build())
 		);
 	}
 
