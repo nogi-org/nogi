@@ -34,7 +34,8 @@ dependencies {
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     // OpenFeign
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-
+    // FeignClient PATCH for
+    implementation 'io.github.openfeign:feign-httpclient:11.8'
     // dotenv
     testImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
 

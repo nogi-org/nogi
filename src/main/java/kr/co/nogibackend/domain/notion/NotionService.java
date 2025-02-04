@@ -11,8 +11,8 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.co.nogibackend.domain.notion.dto.command.NotionEndTilCommand;
-import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
+import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
+import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
@@ -33,7 +33,7 @@ public class NotionService {
 	/*
 	Notion 에 대기 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
 	 */
-	public List<NotionStartTILResult> startTIL(List<NotionStartTilCommand> commands) {
+	public List<NotionStartTILResult> startTIL(List<NotionStartTILCommand> commands) {
 		return
 			commands
 				.stream()
@@ -42,12 +42,12 @@ public class NotionService {
 				.toList();
 	}
 
-	public List<NotionStartTILResult> startTIL(NotionStartTilCommand command) {
+	public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
 		// todo: command validation check 추가 (실패 시 무시 및 로그)
 
 		// 대기 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages =
-			this.getPendingPages(command.getNotionAuthToken(), command.getNotionDatabaseId());
+			this.getCompletedPages(command.getNotionAuthToken(), command.getNotionDatabaseId());
 
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
@@ -67,10 +67,20 @@ public class NotionService {
 	/*
 	Github 에 commit 된 TIL 을 Notion 에 완료, 실패 여부 반영
 	 */
-	public void endTIL(List<NotionEndTilCommand> users) {
+	public void endTIL(List<NotionEndTILCommand> commands) {
+		// return
+		// 	commands
+		// 		.stream()
+		// 		.map(this::endTIL)
+		// 		.flatMap(List::stream)
+		// 		.toList();
 	}
 
-	public void endTIL(NotionEndTilCommand user) {
+	// todo: 에러 핸들링, result 반환하기, isSuccess 를 객체로 만들어서 reason 필드가 필요할듯.
+	public String endTIL(NotionEndTILCommand command) {
+		Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(command.isSuccess());
+		notionClient.updatePageStatus(command.getNotionAuthToken(), command.getNotionPageId(), request);
+		return null;
 	}
 
 	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
@@ -94,9 +104,9 @@ public class NotionService {
 		return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
 	}
 
-	private List<NotionPageInfo> getPendingPages(String authToken, String databaseId) {
+	private List<NotionPageInfo> getCompletedPages(String authToken, String databaseId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
-		Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_PENDING);
+		Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
 		return
 			notionClient
 				.getPagesFromDatabase(authToken, databaseId, filter)

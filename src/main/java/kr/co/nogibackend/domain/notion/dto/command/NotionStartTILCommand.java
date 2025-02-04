@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class NotionStartTilCommand {
+public class NotionStartTILCommand {
 
 	private Long userId;
 	private String notionAuthToken;

@@ -3,6 +3,7 @@ package kr.co.nogibackend.infra.notion;
 import java.net.URI;
 import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import kr.co.nogibackend.domain.notion.NotionClient;
@@ -10,7 +11,9 @@ import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotionClientImpl implements NotionClient {
@@ -58,6 +61,16 @@ public class NotionClientImpl implements NotionClient {
 	public byte[] getBlockImage(URI baseUri) {
 		// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
 		return notionImageFeignClient.getBlockImage(baseUri);
+	}
+
+	@Override
+	public ResponseEntity<NotionPageInfo> updatePageStatus(
+		String authToken
+		, String pageId
+		, Map<String, Object> request
+	) {
+		// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
+		return notionFeignClient.updatePageStatus(authToken, pageId, request);
 	}
 
 }
