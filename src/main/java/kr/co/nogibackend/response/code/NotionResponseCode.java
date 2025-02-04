@@ -9,7 +9,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum NotionResponseCode implements ResponseCode {
 
-	F_SAMPLE_NOTION(HttpStatus.BAD_REQUEST, "NOTION-0", "샘플 노션 에러");
+	F_FILE_URL_PARSING(HttpStatus.INTERNAL_SERVER_ERROR, "NOTION-0", "노션 File URL Parsing 실패");
 
 	public final HttpStatus status;
 	public final String code;

@@ -6,6 +6,7 @@ import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 
 public record NotionBlockConversionInfo(
 	String content,
-	List<NotionStartTILResult.ImageOfNotionBlock> images
+	List<NotionStartTILResult.ImageOfNotionBlock> images,
+	boolean isSuccess
 ) {
 }

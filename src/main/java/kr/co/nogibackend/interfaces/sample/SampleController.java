@@ -88,7 +88,7 @@ public class SampleController {
 			return Response.fail(F_NULL_POINT, list);
 		} else if (i == 5) {
 			// 공통 exception
-			throw new GlobalException(F_SAMPLE_NOTION);
+			throw new GlobalException(F_FILE_URL_PARSING);
 		} else {
 			// 공통 exception with 값
 			List<String> list = new ArrayList<>();
