@@ -1,5 +1,6 @@
 package kr.co.nogibackend.infra.notion;
 
+import java.net.URI;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 public class NotionClientImpl implements NotionClient {
 
 	private final NotionFeignClient notionFeignClient;
+	private final NotionImageFeignClient notionImageFeignClient;
 
 	@Override
 	public NotionInfo<NotionPageInfo> getPagesFromDatabase(
@@ -28,7 +30,7 @@ public class NotionClientImpl implements NotionClient {
 					.getPagesFromDatabase(authToken, databaseId, request)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 에러 핸들링 하기(notice 역할 만들고 작업하기)
+			// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
 			System.out.println(error.getMessage());
 			return NotionInfo.empty();
 		}
@@ -46,10 +48,16 @@ public class NotionClientImpl implements NotionClient {
 					.getBlocksFromPage(authToken, pageId, startCursor)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 에러 핸들링 하기(notice 역할 만들고 작업하기)
+			// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
 			System.out.println(error.getMessage());
 			return NotionInfo.empty();
 		}
+	}
+
+	@Override
+	public byte[] getBlockImage(URI baseUri) {
+		// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
+		return notionImageFeignClient.getBlockImage(baseUri);
 	}
 
 }

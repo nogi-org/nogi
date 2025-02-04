@@ -2,6 +2,7 @@ package kr.co.nogibackend.domain.notion;
 
 import static kr.co.nogibackend.domain.notion.NotionPropertyValue.*;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -12,13 +13,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTilCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
+import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -48,16 +52,15 @@ public class NotionService {
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
 			// 블럭 조회
-			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPages(command.getNotionAuthToken(), page);
+			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPage(command.getNotionAuthToken(), page);
 
 			// 블럭 인코딩
-			NotionBlockConversionInfo encoding = this.convertMarkdownBase64(page, blocks.getResults());
+			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults());
 
-			// result 가공하기
-			NotionStartTILResult result = NotionStartTILResult.of(command.getUserId(), page, encoding);
+			// result 로 빌드
+			NotionStartTILResult result = NotionStartTILResult.of(command.getUserId(), page, encodingOfBlock);
 			results.add(result);
 		}
-
 		return results;
 	}
 
@@ -70,13 +73,12 @@ public class NotionService {
 	public void endTIL(NotionEndTilCommand user) {
 	}
 
-	private NotionInfo<NotionBlockInfo> getBlocksOfPages(String notionAuthToken, NotionPageInfo page) {
+	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
 		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null);
 
 		// hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
 		boolean hasMore = blocks.isHas_more();
 		String nextCursor = blocks.getNext_cursor();
-		System.out.println("has more : " + hasMore);
 
 		while (hasMore) {
 			NotionInfo<NotionBlockInfo> nextBlocks = this.getBlocks(notionAuthToken, page.getId(), nextCursor);
@@ -89,8 +91,7 @@ public class NotionService {
 	}
 
 	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId, String startCursor) {
-		return
-			notionClient.getBlocksFromPage(authToken, pageId, startCursor);
+		return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
 	}
 
 	private List<NotionPageInfo> getPendingPages(String authToken, String databaseId) {
@@ -102,123 +103,129 @@ public class NotionService {
 				.getResults();
 	}
 
-	private NotionBlockConversionInfo convertMarkdownBase64(NotionPageInfo page, List<NotionBlockInfo> blocks) {
+	private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page, List<NotionBlockInfo> blocks) {
 		StringBuilder markDown = new StringBuilder();
 		List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
 
-		for (int i = 0; i < blocks.size(); i++) {
-
-			switch (blocks.get(i).getType()) {
-				// todo: reich text 가 배열이라 순회하면서 만들어주기
-				case "heading_1":
-					System.out.println("blocks.get(i).getHeading_1() : " + blocks.get(i).getHeading_1());
-
-					markDown
-						.append("# ")
-						.append(blocks.get(i).getHeading_1().getRich_text().get(0).getPlain_text())
-						.append("\n");
-					break;
-
-				case "heading_2":
-					markDown
-						.append("## ")
-						.append(blocks.get(i).getHeading_2().getRich_text().get(0).getPlain_text())
-						.append("\n");
-					break;
-
-				case "heading_3":
-					markDown
-						.append("### ")
-						.append(blocks.get(i).getHeading_3().getRich_text().get(0).getPlain_text())
-						.append("\n");
-					break;
-
-				case "paragraph":
-					if (blocks.get(i).getParagraph().getRich_text().isEmpty()) {
+		for (NotionBlockInfo block : blocks) {
+			try {
+				switch (block.getType()) {
+					case "heading_1":
 						markDown
+							.append("# ")
+							.append(NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
 							.append("\n");
-					} else {
+						break;
+					case "heading_2":
 						markDown
-							.append(blocks.get(i).getParagraph().getRich_text().get(0).getPlain_text())
-							.append("<br>");
-					}
-					break;
+							.append("## ")
+							.append(NotionRichTextContent.mergePlainText(block.getHeading_2().getRich_text(), true))
+							.append("\n");
+						break;
 
-				case "bulleted_list_item":
-					markDown
-						.append("* ")
-						.append(blocks.get(i).getBulleted_list_item().getRich_text().get(0).getPlain_text())
-						.append("\n");
-					break;
+					case "heading_3":
+						markDown
+							.append("### ")
+							.append(NotionRichTextContent.mergePlainText(block.getHeading_3().getRich_text(), true))
+							.append("\n");
+						break;
 
-				case "numbered_list_item":
-					markDown
-						.append("1. ")
-						.append(blocks.get(i).getNumbered_list_item().getRich_text().get(0).getPlain_text()
-							+ "\n");
-					break;
+					case "paragraph":
+						if (block.getParagraph().getRich_text().isEmpty()) {
+							markDown
+								.append("\n");
+						} else {
+							markDown
+								.append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(), true))
+								.append("<br>");
+						}
+						break;
 
-				case "code":
-					markDown
-						.append("```" + blocks.get(i).getCode().getLanguage() + "\n")
-						.append(blocks.get(i).getCode().getRich_text().get(0).getPlain_text() + "\n")
-						.append("```" + "\n");
-					break;
+					case "bulleted_list_item":
+						markDown
+							.append("* ")
+							.append(
+								NotionRichTextContent.mergePlainText(block.getBulleted_list_item().getRich_text(),
+									true))
+							.append("\n");
+						break;
 
-				// case "image":
-				// 	// 이미지 캡션
-				// 	String caption =
-				// 		blocks.get(i).getImage().getCaption().size() == 0
-				// 			? "TIL_IMAGE"
-				// 			: blocks.get(i).getImage().getCaption().get(0).getPlain_text();
-				//
-				// 	// String Url 을 Url 형태로
-				// 	UriComponentsBuilder uriComponentsBuilder =
-				// 		UriComponentsBuilder.fromUriString(blocks.get(i).getImage().getFile().getUrl());
-				//
-				// 	// 이미지 파일 이름 생성
-				// 	String[] split = uriComponentsBuilder.build().getPath().split("/");
-				// 	String fileName = page.convertTitle() + "_" + i + "_" + split[3];
-				//
-				// 	// 이후 카테고리 하위 image 디렉토리에 이미지파일 생성한다고 가정하고 경로 설정
-				// 	String path = page.getTilImagePath();
-				// 	markDown
-				// 		.append("![" + caption + "](" + path + "image/" + fileName + ")")
-				// 		.append("\n");
+					case "numbered_list_item":
+						markDown
+							.append("1. ")
+							.append(
+								NotionRichTextContent.mergePlainText(block.getNumbered_list_item().getRich_text(), true)
+							)
+							.append("\n");
+						break;
 
-				// todo: 이미지 byte 로 받아와야함
+					case "code":
+						markDown
+							.append("```")
+							.append(block.getCode().getLanguage())
+							.append("\n")
+							.append(NotionRichTextContent.mergePlainText(block.getCode().getRich_text(), true))
+							.append("\n")
+							.append("```\n");
+						break;
 
-				// 	image.add(
-				// 		ImageOfNotionBlockDto
-				// 			.builder()
-				// 			.fileName(fileName)
-				// 			.uriBuilder(uriComponentsBuilder)
-				// 			.build()
-				// 	);
-				// 	break;
+					case "divider":
+						markDown
+							.append("---")
+							.append("\n");
+						break;
 
-				case "divider":
-					markDown
-						.append("---")
-						.append("\n");
-					break;
+					case "to_do":
+						String checkBox = block.getTo_do().isChecked() ? "- [x]" : "- [ ]";
+						markDown
+							.append(checkBox)
+							.append(" ")
+							.append(NotionRichTextContent.mergePlainText(block.getTo_do().getRich_text(), true))
+							.append("   \n");
+						break;
 
-				case "to_do":
-					String checkBox = blocks.get(i).getTo_do().isChecked() ? "- [x]" : "- [ ]";
-					markDown
-						.append(checkBox + " ")
-						.append(blocks.get(i).getTo_do().getRich_text().get(0).getPlain_text())
-						.append("   " + "\n");
-					break;
+					case "image":
+						// 이미지 요청
+						URI imageUri = block.getImage().createURI();
+						String imageEnc64 = this.getImageOfBlock(imageUri);
 
-				default:
-					markDown.append("\n");
+						// 이미지명 추출
+						String fileName = block.getImage().parseFileName(imageUri);
+
+						// 이미지 경로 생성
+						String imagePath =
+							block.getImage().createMarkdownPath(page.getProperties().getCategory(), fileName);
+
+						// 캡션 생성
+						String caption = block.getImage().createCaption();
+
+						markDown
+							.append("![")
+							.append(caption)
+							.append("](")
+							.append(imagePath)
+							.append(")")
+							.append("\n");
+
+						images.add(new NotionStartTILResult.ImageOfNotionBlock(imageEnc64, fileName, imagePath));
+
+						break;
+
+					default:
+						markDown.append("\n");
+				}
+			} catch (Exception error) {
+				log.error("Notion Block Convert To Markdown Error : {}", error.getMessage());
+				return new NotionBlockConversionInfo(markDown.toString(), images, false);
 			}
 		}
 
-		System.out.println("============== Markdown ============== \n" + markDown);
-		return
-			new NotionBlockConversionInfo(Base64.getEncoder().encodeToString(markDown.toString().getBytes()), images);
+		return new NotionBlockConversionInfo(markDown.toString(), images, true);
+	}
+
+	private String getImageOfBlock(URI uri) {
+		byte[] imageByte = notionClient.getBlockImage(uri);
+		return Base64.getEncoder().encodeToString(imageByte);
 	}
 
 }

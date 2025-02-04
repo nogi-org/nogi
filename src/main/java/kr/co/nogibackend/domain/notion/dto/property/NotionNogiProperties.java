@@ -18,4 +18,8 @@ public class NotionNogiProperties {
 	private NotionNogiStatusProperty nogiStatus;
 	private NotionNogiTitleProperty nogiTitle;
 
+	public String getCategory() {
+		return nogiCategory.getSelect().getName();
+	}
+
 }
