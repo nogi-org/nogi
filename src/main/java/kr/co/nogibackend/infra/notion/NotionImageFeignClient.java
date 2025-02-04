@@ -14,9 +14,6 @@ URI baseUrl 에서 동적으로 base url 을 가져와서 처리함.
 public interface NotionImageFeignClient {
 
 	@GetMapping(path = "")
-	byte[] getBlockImage(
-		URI baseUrl
-		// , @PathVariable("path") String path
-	);
+	byte[] getBlockImage(URI baseUrl);
 
 }

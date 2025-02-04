@@ -2,8 +2,6 @@ package kr.co.nogibackend.domain.notion.dto.result;
 
 import java.util.List;
 
-import org.springframework.web.util.UriComponentsBuilder;
-
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 
@@ -39,9 +37,9 @@ public record NotionStartTILResult(
 	}
 
 	public record ImageOfNotionBlock(
-		byte[] data,// 이미지 파일
-		String fileName,// 이미지 파일명 or 고유 ID
-		UriComponentsBuilder uriBuilder// 이미지 URL ( /category/image/fileName )
+		String fileEnc64,// 이미지 파일
+		String fileName,// 이미지 파일명
+		String filePath// 이미지 파일 경로
 	) {
 	}
 }
