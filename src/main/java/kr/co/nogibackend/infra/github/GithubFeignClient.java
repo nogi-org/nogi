@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import kr.co.nogibackend.domain.github.dto.info.GithubCommitDetailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubFileCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubFileDeleteInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubFileShaInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
 import kr.co.nogibackend.infra.github.dto.GithubBlobRequest;
 import kr.co.nogibackend.infra.github.dto.GithubBlobResponse;
 import kr.co.nogibackend.infra.github.dto.GithubBranchInfo;
@@ -33,7 +35,7 @@ import kr.co.nogibackend.infra.github.dto.GithubUpdateReferenceRequest;
 public interface GithubFeignClient {
 
 	/*
-	커밋 정보를 조회하는 메서드
+	 * 커밋 정보를 조회하는 메서드
 	 */
 	@GetMapping("/repos/{owner}/{repo}/commits")
 	List<GithubCommitInfo> getCommits(
@@ -45,8 +47,29 @@ public interface GithubFeignClient {
 	);
 
 	/*
-	파일정보를 조회하는 메서드(SHA 값 포함)
-	https://docs.github.com/ko/rest/repos/contents?apiVersion=2022-11-28#get-repository-content
+	 * 특정 커밋 정보 가져오기
+	 */
+	@GetMapping("/repos/{owner}/{repo}/git/commits/{commitSha}")
+	GithubCommitDetailInfo getCommit(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@PathVariable("commitSha") String commitSha,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+	 * 특정 Tree 정보 가져오기
+	 */
+	@GetMapping("/repos/{owner}/{repo}/git/trees/{treeSha}")
+	GithubTreeInfo getTree(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@PathVariable("treeSha") String treeSha,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+	 * 파일정보를 조회하는 메서드(SHA 값 포함)
 	 */
 	@GetMapping("/repos/{owner}/{repo}/contents/{path}")
 	GithubFileShaInfo getFileInfo(
@@ -57,8 +80,7 @@ public interface GithubFeignClient {
 	);
 
 	/*
-	파일을 생성하거나 업데이트
-	https://docs.github.com/ko/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
+	 * 파일을 생성하거나 업데이트
 	 */
 	@PutMapping("/repos/{owner}/{repo}/contents/{path}")
 	GithubFileCommitInfo createOrUpdateFile(
@@ -70,8 +92,7 @@ public interface GithubFeignClient {
 	);
 
 	/*
-	파일을 삭제하는 메서드
-	https://docs.github.com/ko/rest/repos/contents?apiVersion=2022-11-28#delete-a-file
+	 * 파일을 삭제하는 메서드
 	 */
 	@DeleteMapping("/repos/{owner}/{repo}/contents/{path}")
 	GithubFileDeleteInfo deleteFile(
@@ -83,8 +104,7 @@ public interface GithubFeignClient {
 	);
 
 	/*
-	repository 를 생성하는 메서드
-	https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-for-the-authenticated-user
+	 * repository 를 생성하는 메서드
 	 */
 	@PostMapping("/user/repos")
 	GithubRepoInfo createUserRepository(
@@ -93,8 +113,7 @@ public interface GithubFeignClient {
 	);
 
 	/*
-	repository 를 삭제하는 메서드
-	https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#delete-a-repository
+	 * repository 를 삭제하는 메서드
 	 */
 	@DeleteMapping("/repos/{owner}/{repo}")
 	void deleteRepository(
@@ -140,6 +159,9 @@ public interface GithubFeignClient {
 		@RequestHeader("Authorization") String token
 	);
 
+	/*
+	 * 브랜치 정보 가져오기
+	 */
 	@GetMapping("/repos/{owner}/{repo}/branches/{branch}")
 	GithubBranchInfo getBranch(
 		@PathVariable("owner") String owner,

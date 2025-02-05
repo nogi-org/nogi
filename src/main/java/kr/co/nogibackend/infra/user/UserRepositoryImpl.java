@@ -1,10 +1,11 @@
 package kr.co.nogibackend.infra.user;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
 import kr.co.nogibackend.domain.user.NogiHistory;
+import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +16,12 @@ public class UserRepositoryImpl implements UserRepository {
 	private final UserQueryRepository userQueryRepository;
 
 	@Override
-	public Optional<NogiHistory> findByUserIdAndNotionPageId(Long userId, String notionPageId) {
-		return userQueryRepository.findByUserIdAndNotionPageId(userId, notionPageId);
+	public List<User> findAllUserByIds(List<Long> userIds) {
+		return userQueryRepository.findAllUserByIds(userIds);
+	}
+
+	@Override
+	public List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageIds) {
+		return userQueryRepository.findAllNogiHistoryByNotionPageIds(notionPageIds);
 	}
 }

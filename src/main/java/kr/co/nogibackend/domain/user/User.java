@@ -31,6 +31,7 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String name;// github owner
 	private String notionAuthToken;
 	private String notionDatabaseId;
 	private String githubAuthToken;

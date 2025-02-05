@@ -1,13 +1,17 @@
 package kr.co.nogibackend.domain.user;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -24,33 +28,79 @@ public class UserService {
 	 */
 	public void checkTIL(List<UserCheckTILCommand> commands) {
 
+		List<Long> userIds = commands.stream().map(UserCheckTILCommand::userId).toList();
+		List<String> notionPageIds = commands.stream().map(UserCheckTILCommand::notionPageId).toList();
+
+		Map<Long, User> userMap = userRepository.findAllUserByIds(userIds)
+			.stream()
+			.collect(Collectors.toMap(User::getId, v -> v));
+		Map<String, NogiHistory> nogiHistoryMap = userRepository.findAllNogiHistoryByNotionPageIds(notionPageIds)
+			.stream()
+			.collect(Collectors.toMap(NogiHistory::getNotionPageId, v -> v));
+
 	}
 
-	public UserCheckTILResult checkTIL(UserCheckTILCommand command) {
-		return userRepository.findByUserIdAndNotionPageId(command.userId(), command.notionPageId())
-			.map(nogiHistory -> {
-				NogiHistoryType historyType =
-					nogiHistory.getCategory().equals(command.category()) &&
-						nogiHistory.getTitle().equals(command.title())
-						? NogiHistoryType.UPDATE_CONTENT
-						: NogiHistoryType.UPDATE_TITLE_OR_CATEGORY;
+	private UserCheckTILResult checkTIL(
+		UserCheckTILCommand command,
+		Map<Long, User> userMap,
+		Map<String, NogiHistory> nogiHistoryMap
+	) {
+		// ✅ 유저 존재 여부 체크
+		if (!userMap.containsKey(command.userId())) {
+			log.error("User not found. userId: {}", command.userId());
+			return UserCheckTILResult.of(command.userId(), false);
+		}
 
-				return UserCheckTILResult.of(
-					command.userId(),
-					command.notionPageId(),
-					historyType,
-					command.category(),
-					command.title()
-				);
-			})
-			.orElseGet(() -> UserCheckTILResult.of(
-					command.userId(),
-					command.notionPageId(),
-					NogiHistoryType.CREATE,
-					command.category(),
-					command.title()
-				)
+		// ✅ 유저 GithubAuthToken 존재 여부 체크
+		User user = userMap.get(command.userId());
+		if (user.getGithubAuthToken() == null) {
+			log.error("User's GithubAuthToken not found. userId: {}", command.userId());
+			return UserCheckTILResult.of(command.userId(), false);
+		}
+
+		// ✅ 이전 기록 조회 (notionPageId 기반)
+		NogiHistory nogiHistory = nogiHistoryMap.get(command.notionPageId());
+
+		return this.checkTIL(command, user, nogiHistory);
+	}
+
+	// Webhook 으로 단건 처리할 때를 위해 public 사용
+	public UserCheckTILResult checkTIL(
+		UserCheckTILCommand command,
+		User user,
+		NogiHistory nogiHistory
+	) {
+		if (nogiHistory == null) {
+			// 이전 기록이 없으면 새로운 생성 (CREATE)
+			return UserCheckTILResult.of(
+				command.userId(),
+				user.getName(),
+				command.notionPageId(),
+				NogiHistoryType.CREATE,
+				command.category(),
+				command.title(),
+				user.getGithubAuthToken(),
+				true
 			);
+		}
 
+		// ✅ 기존 기록이 있다면 비교하여 수정 타입 결정
+		NogiHistoryType historyType = nogiHistory.getCategory().equals(command.category()) &&
+			nogiHistory.getTitle().equals(command.title())
+			? NogiHistoryType.UPDATE_CONTENT
+			: NogiHistoryType.UPDATE_TITLE_OR_CATEGORY;
+
+		return UserCheckTILResult.of(
+			command.userId(),
+			user.getName(),
+			command.notionPageId(),
+			historyType,
+			command.category(),
+			command.title(),
+			nogiHistory.getCategory(),
+			nogiHistory.getTitle(),
+			user.getGithubAuthToken(),
+			true
+		);
 	}
 }
