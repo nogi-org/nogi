@@ -1,5 +1,7 @@
 package kr.co.nogibackend.infra.github;
 
+import static org.assertj.core.api.Assertions.*;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
@@ -45,7 +47,7 @@ class GithubFeignClientIntegrationTest {
 	@Value("${github.token}")
 	private String token;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo4";
+	private final String repo = "nogi-test-repo7";
 	private String barerToken;// beforeEach 에서 초기화
 	private static Dotenv dotenv;// .env 파일 로드
 
@@ -84,35 +86,40 @@ class GithubFeignClientIntegrationTest {
 			"Java 제목", "Java",
 			"Java 제목", "image");
 
-		githubService.commitToGithub(command);
+		boolean isSuccess = githubService.commitToGithub(command);
+		assertThat(isSuccess).isEqualTo(true);
 	}
 
 	@Test
 	@DisplayName("새롭게 TIL을 작성하고나서 제목을 수정했을 경우 이전 MD 파일은 삭제되고 새로운 MD 파일이 생성된다.")
 	void testUpdateTitleCommitToGithub() throws IOException {
 
-		githubService.commitToGithub(
+		boolean result1 = githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
 				"image")
 		);
+		assertThat(result1).isEqualTo(true);
 
-		githubService.commitToGithub(
+		boolean result2 = githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.UPDATE_TITLE, "Java", "New Java 제목", "Java", "Java 제목", "image")
 		);
+		assertThat(result2).isEqualTo(true);
 	}
 
 	@Test
 	@DisplayName("새롭게 TIL을 작성하고나서 카테고리를 수정했을 경우 이전 카테고리 하위의 모든 파일은 삭제되고, 새로운 카테고리 하위에 파일이 생성된다.")
 	void testUpdateCategoryCommitToGithub() throws IOException {
-		githubService.commitToGithub(
+		boolean result1 = githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
 				"image")
 		);
+		assertThat(result1).isEqualTo(true);
 
-		githubService.commitToGithub(
+		boolean result2 = githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.UPDATE_CATEGORY, "New_Java", "New Java 제목 Title", "Java", "Java 제목",
 				"image")
 		);
+		assertThat(result2).isEqualTo(true);
 	}
 
 	private GithubCommitCommand getGithubCommitCommand(NogiHistoryType type, String newCategory, String newTitle,
