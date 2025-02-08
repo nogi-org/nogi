@@ -19,14 +19,12 @@ public class UserService {
 	private final UserRepository userRepository;
 
 	/*
-	Notion 에서 가져온 페이지 정보가 아래 3가지 중 어떤 케이스인지 체크
-	1. 생성 : nogiHistory 에 notionPageId 가 없는 경우
-	2. 파일내용 : nogiHsitory 에 notionPageId 가 있으나 category 와 title 은 그대로인 경우
-	3. 파일제목 또는 카테고리 수정 : nogiHistory 에 notionPageId 가 있으나 category 또는 title 이 변경된 경우
-
-	notionPageId 가 고유한 값이라고 가정하고 작업함
+	➡️ Notion 에서 가져온 페이지 정보가 아래 3가지 중 어떤 케이스인지 체크
+	1. 생성 또는 파일내용 : nogiHistory 에 notionPageId 가 없는 경우 or 있으나 category 와 title 은 그대로인 경우
+	2. 파일제목 수정 : nogiHsitory 에 notionPageId 가 있고 category 는 그대로이면서 title이 변경된 경우
+	3. 카테고리 수정 : nogiHistory 에 notionPageId 가 있고 category 가 변경된 경우
 	 */
-	public void checkTIL(List<UserCheckTILCommand> commands) {
+	public List<UserCheckTILResult> checkTIL(List<UserCheckTILCommand> commands) {
 
 		List<Long> userIds = commands.stream().map(UserCheckTILCommand::userId).toList();
 		List<String> notionPageIds = commands.stream().map(UserCheckTILCommand::notionPageId).toList();
@@ -38,6 +36,7 @@ public class UserService {
 			.stream()
 			.collect(Collectors.toMap(NogiHistory::getNotionPageId, v -> v));
 
+		return commands.stream().map(v -> this.checkTIL(v, userMap, nogiHistoryMap)).toList();
 	}
 
 	private UserCheckTILResult checkTIL(
@@ -45,20 +44,18 @@ public class UserService {
 		Map<Long, User> userMap,
 		Map<String, NogiHistory> nogiHistoryMap
 	) {
-		// ✅ 유저 존재 여부 체크
+		// 유저 존재 여부 체크
 		if (!userMap.containsKey(command.userId())) {
-			log.error("User not found. userId: {}", command.userId());
 			return UserCheckTILResult.of(command.userId(), false);
 		}
 
-		// ✅ 유저 GithubAuthToken 존재 여부 체크
+		// 유저 GithubAuthToken 존재 여부 체크
 		User user = userMap.get(command.userId());
 		if (user.getGithubAuthToken() == null) {
-			log.error("User's GithubAuthToken not found. userId: {}", command.userId());
 			return UserCheckTILResult.of(command.userId(), false);
 		}
 
-		// ✅ 이전 기록 조회 (notionPageId 기반)
+		// 이전 기록 조회 (notionPageId 기반)
 		NogiHistory nogiHistory = nogiHistoryMap.get(command.notionPageId());
 
 		return this.checkTIL(command, user, nogiHistory);
@@ -71,7 +68,7 @@ public class UserService {
 		NogiHistory nogiHistory
 	) {
 		if (nogiHistory == null) {
-			// 이전 기록이 없으면 새로운 생성 (CREATE)
+			// 이전 기록이 없으면 새로운 생성 (CREATE_OR_UPDATE_CONTENT)
 			return UserCheckTILResult.of(
 				command.userId(),
 				user.getGithubOwner(),
@@ -87,11 +84,12 @@ public class UserService {
 			);
 		}
 
-		// ✅ 기존 기록이 있다면 비교하여 수정 타입 결정
-		NogiHistoryType historyType = nogiHistory.getCategory().equals(command.category()) &&
-			nogiHistory.getTitle().equals(command.title())
-			? NogiHistoryType.UPDATE_TITLE
-			: NogiHistoryType.UPDATE_CATEGORY;
+		NogiHistoryType historyType = null;
+		if (!nogiHistory.getCategory().equals(command.category())) {
+			historyType = NogiHistoryType.UPDATE_CATEGORY;
+		} else if (!nogiHistory.getTitle().equals(command.title())) {
+			historyType = NogiHistoryType.UPDATE_TITLE;
+		}
 
 		return UserCheckTILResult.of(
 			command.userId(),

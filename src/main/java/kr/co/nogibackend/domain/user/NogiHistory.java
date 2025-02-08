@@ -36,8 +36,6 @@ public class NogiHistory {
 
 	private String notionPageId;
 
-	// private String githubShaKey;
-
 	private String category;
 
 	private String title;
