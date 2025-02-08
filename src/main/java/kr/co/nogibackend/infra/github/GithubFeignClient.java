@@ -1,110 +1,38 @@
 package kr.co.nogibackend.infra.github;
 
-import java.util.List;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import kr.co.nogibackend.domain.github.dto.info.GithubCommitDetailInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubCommitInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubFileCommitInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubFileDeleteInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubFileShaInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
-import kr.co.nogibackend.infra.github.dto.GithubBlobRequest;
-import kr.co.nogibackend.infra.github.dto.GithubBlobResponse;
-import kr.co.nogibackend.infra.github.dto.GithubBranchInfo;
-import kr.co.nogibackend.infra.github.dto.GithubCommitRequest;
-import kr.co.nogibackend.infra.github.dto.GithubCommitResponse;
-import kr.co.nogibackend.infra.github.dto.GithubFileDeleteRequest;
-import kr.co.nogibackend.infra.github.dto.GithubFileRequest;
-import kr.co.nogibackend.infra.github.dto.GithubRepoRequest;
-import kr.co.nogibackend.infra.github.dto.GithubTreeRequest;
-import kr.co.nogibackend.infra.github.dto.GithubTreeResponse;
-import kr.co.nogibackend.infra.github.dto.GithubUpdateReferenceRequest;
+import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 
+/*
+  Package Name : kr.co.nogibackend.infra.github
+  File Name    : GithubFeignClient
+  Author       : won taek oh
+  Created Date : 25. 2. 9.
+  Description  : GIT API를 호출하기 위한 Feign Client
+ */
 @FeignClient(name = "GithubClient", url = "https://api.github.com")
 public interface GithubFeignClient {
 
 	/*
-	 * 커밋 정보를 조회하는 메서드
-	 */
-	@GetMapping("/repos/{owner}/{repo}/commits")
-	List<GithubCommitInfo> getCommits(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@RequestParam(value = "per_page", defaultValue = "10") int perPage,
-		@RequestParam(value = "page", defaultValue = "1") int page,
-		@RequestHeader("Authorization") String token
-	);
-
-	/*
-	 * 특정 커밋 정보 가져오기
-	 */
-	@GetMapping("/repos/{owner}/{repo}/git/commits/{commitSha}")
-	GithubCommitDetailInfo getCommit(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@PathVariable("commitSha") String commitSha,
-		@RequestHeader("Authorization") String token
-	);
-
-	/*
-	 * 특정 Tree 정보 가져오기
-	 */
-	@GetMapping("/repos/{owner}/{repo}/git/trees/{treeSha}")
-	GithubTreeInfo getTree(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@PathVariable("treeSha") String treeSha,
-		@RequestHeader("Authorization") String token
-	);
-
-	/*
-	 * 파일정보를 조회하는 메서드(SHA 값 포함)
-	 */
-	@GetMapping("/repos/{owner}/{repo}/contents/{path}")
-	GithubFileShaInfo getFileInfo(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@PathVariable("path") String path,
-		@RequestHeader("Authorization") String token
-	);
-
-	/*
-	 * 파일을 생성하거나 업데이트
-	 */
-	@PutMapping("/repos/{owner}/{repo}/contents/{path}")
-	GithubFileCommitInfo createOrUpdateFile(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@PathVariable("path") String path,
-		@RequestBody GithubFileRequest request,
-		@RequestHeader("Authorization") String token
-	);
-
-	/*
-	 * 파일을 삭제하는 메서드
-	 */
-	@DeleteMapping("/repos/{owner}/{repo}/contents/{path}")
-	GithubFileDeleteInfo deleteFile(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@PathVariable("path") String path,
-		@RequestBody GithubFileDeleteRequest request,
-		@RequestHeader("Authorization") String token
-	);
-
-	/*
-	 * repository 를 생성하는 메서드
+	➡️ repository 생성
+	doc: https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-for-the-authenticated-user
 	 */
 	@PostMapping("/user/repos")
 	GithubRepoInfo createUserRepository(
@@ -113,7 +41,8 @@ public interface GithubFeignClient {
 	);
 
 	/*
-	 * repository 를 삭제하는 메서드
+	➡️ repository 삭제
+	doc: https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#delete-a-repository
 	 */
 	@DeleteMapping("/repos/{owner}/{repo}")
 	void deleteRepository(
@@ -122,45 +51,9 @@ public interface GithubFeignClient {
 		@RequestHeader("Authorization") String token
 	);
 
-	// 1️⃣ 파일을 Blob으로 업로드 (Create a Blob)
-	@PostMapping("/repos/{owner}/{repo}/git/blobs")
-	GithubBlobResponse createBlob(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@RequestBody GithubBlobRequest request,
-		@RequestHeader("Authorization") String token
-	);
-
-	// 2️⃣ 여러 개의 Blob을 묶어 Git Tree 생성 (Create a Tree)
-	@PostMapping("/repos/{owner}/{repo}/git/trees")
-	GithubTreeResponse createTree(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@RequestBody GithubTreeRequest request,
-		@RequestHeader("Authorization") String token
-	);
-
-	// 3️⃣ 새로운 Tree로 커밋 생성 (Create a Commit)
-	@PostMapping("/repos/{owner}/{repo}/git/commits")
-	GithubCommitResponse createCommit(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@RequestBody GithubCommitRequest request,
-		@RequestHeader("Authorization") String token
-	);
-
-	// 4️⃣ 브랜치 업데이트 (HEAD 이동) (Update a Reference)
-	@PostMapping("/repos/{owner}/{repo}/git/refs/heads/{branch}")
-	void updateBranch(
-		@PathVariable("owner") String owner,
-		@PathVariable("repo") String repo,
-		@PathVariable("branch") String branch,
-		@RequestBody GithubUpdateReferenceRequest request,
-		@RequestHeader("Authorization") String token
-	);
-
 	/*
-	 * 브랜치 정보 가져오기
+	➡️ 최신 브랜치의 Tree SHA 가져오기
+	docs: https://docs.github.com/ko/rest/branches/branches?apiVersion=2022-11-28#get-a-branch
 	 */
 	@GetMapping("/repos/{owner}/{repo}/branches/{branch}")
 	GithubBranchInfo getBranch(
@@ -169,4 +62,55 @@ public interface GithubFeignClient {
 		@PathVariable("branch") String branch,
 		@RequestHeader("Authorization") String token
 	);
+
+	/*
+	➡️ 새로운 파일을 Blob으로 변환하여 업로드
+	docs: https://docs.github.com/ko/rest/git/blobs?apiVersion=2022-11-28#create-a-blob
+	 */
+	@PostMapping("/repos/{owner}/{repo}/git/blobs")
+	GithubBlobInfo createBlob(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@RequestBody GithubCreateBlobRequest request,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+	➡️ 새로운 Git Tree 생성
+	docs: https://docs.github.com/ko/rest/git/trees?apiVersion=2022-11-28#create-a-tree
+	stackoverflow: https://stackoverflow.com/questions/23637961/how-do-i-mark-a-file-as-deleted-in-a-tree-using-the-github-api
+	 */
+	@PostMapping("/repos/{owner}/{repo}/git/trees")
+	GithubCreateTreeInfo createTree(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@RequestBody GithubCreateTreeRequest request,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+	➡️ 새로운 커밋 생성
+	docs: https://docs.github.com/ko/rest/git/commits?apiVersion=2022-11-28#create-a-commit
+	 */
+	@PostMapping("/repos/{owner}/{repo}/git/commits")
+	GithubCreateCommitInfo createCommit(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@RequestBody GithubCreateCommitRequest request,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+	➡️ 브랜치 업데이트 (HEAD 이동)
+	docs: https://docs.github.com/ko/rest/git/refs?apiVersion=2022-11-28#update-a-reference
+	 */
+	@PostMapping("/repos/{owner}/{repo}/git/refs/heads/{branch}")
+	GithubUpdateReferenceInfo updateBranch(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@PathVariable("branch") String branch,
+		@RequestBody GithubUpdateReferenceRequest request,
+		@RequestHeader("Authorization") String token
+	);
+
 }

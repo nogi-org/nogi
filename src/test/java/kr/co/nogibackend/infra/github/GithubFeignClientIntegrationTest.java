@@ -2,16 +2,14 @@ package kr.co.nogibackend.infra.github;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +21,17 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import kr.co.nogibackend.domain.github.GithubService;
-import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
-import kr.co.nogibackend.infra.github.dto.GithubRepoRequest;
+import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
+import kr.co.nogibackend.domain.user.NogiHistoryType;
 
+/*
+  Package Name : kr.co.nogibackend.infra.github
+  File Name    : GithubFeignClientIntegrationTest
+  Author       : won taek oh
+  Created Date : 25. 2. 9.
+  Description  : GithubFeignClient 통합 테스트
+ */
 @SpringBootTest
 @ActiveProfiles("test-github")
 class GithubFeignClientIntegrationTest {
@@ -39,7 +45,7 @@ class GithubFeignClientIntegrationTest {
 	@Value("${github.token}")
 	private String token;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo3";
+	private final String repo = "nogi-test-repo4";
 	private String barerToken;// beforeEach 에서 초기화
 	private static Dotenv dotenv;// .env 파일 로드
 
@@ -55,77 +61,105 @@ class GithubFeignClientIntegrationTest {
 
 	@BeforeEach
 	public void setUp() {
-		// Bearer Token
 		barerToken = "Bearer " + token;
-
-		// // Github 저장소 생성
-		// GithubRepoInfo response = githubFeignClient.createUserRepository(
-		// 	new GithubRepoRequest(repo, true), barerToken
-		// );
-		// System.out.println("Github 저장소 생성 완료: " + response);
-		//
-		// // 저장소 소유자 정보
-		// owner = response.owner().login();
 		owner = "5wontaek";
-	}
-
-	@AfterEach
-	public void tearDown() {
-		// 저장소 삭제
-		//githubFeignClient.deleteRepository("5wontaek", "nogi-test-repo", barerToken);
+		try {
+			// 저장소 삭제
+			githubFeignClient.deleteRepository(owner, repo, barerToken);
+		} catch (Exception ignored) {
+			// 저장소가 없을 경우 무시
+		} finally {
+			// 저장소 생성
+			githubFeignClient.createUserRepository(
+				new GithubRepoRequest(repo, true), barerToken
+			);
+		}
 	}
 
 	@Test
-	void createRepo() {
-		// Github 저장소 생성
-		GithubRepoInfo response = githubFeignClient.createUserRepository(
-			new GithubRepoRequest(repo, true), barerToken
+	@DisplayName("새롭게 TIL을 작성했을 경우 MD 파일과 이미지가 생성된다.")
+	void testCommitToGithub() throws IOException {
+
+		GithubCommitCommand command = getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java",
+			"Java 제목", "Java",
+			"Java 제목", "image");
+
+		githubService.commitToGithub(command);
+	}
+
+	@Test
+	@DisplayName("새롭게 TIL을 작성하고나서 제목을 수정했을 경우 이전 MD 파일은 삭제되고 새로운 MD 파일이 생성된다.")
+	void testUpdateTitleCommitToGithub() throws IOException {
+
+		githubService.commitToGithub(
+			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
+				"image")
 		);
-		System.out.println("Github 저장소 생성 완료: " + response);
 
-		// 저장소 소유자 정보
-		owner = response.owner().login();
+		githubService.commitToGithub(
+			getGithubCommitCommand(NogiHistoryType.UPDATE_TITLE, "Java", "New Java 제목", "Java", "Java 제목", "image")
+		);
 	}
 
 	@Test
-	void deleteRepo() {
-		// 저장소 삭제
-		githubFeignClient.deleteRepository(owner, repo, barerToken);
+	@DisplayName("새롭게 TIL을 작성하고나서 카테고리를 수정했을 경우 이전 카테고리 하위의 모든 파일은 삭제되고, 새로운 카테고리 하위에 파일이 생성된다.")
+	void testUpdateCategoryCommitToGithub() throws IOException {
+		githubService.commitToGithub(
+			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
+				"image")
+		);
+
+		githubService.commitToGithub(
+			getGithubCommitCommand(NogiHistoryType.UPDATE_CATEGORY, "New_Java", "New Java 제목 Title", "Java", "Java 제목",
+				"image")
+		);
 	}
 
-	@Test
-	void testUploadMultipleFiles() throws IOException {
+	private GithubCommitCommand getGithubCommitCommand(NogiHistoryType type, String newCategory, String newTitle,
+		String prevCategory, String prevTitle, String imageFilePath) throws IOException {
 		// ✅ 공통 경로 설정 (GitHub 내 이미지 URL)
-		String imagePath = "https://raw.githubusercontent.com/5wontaek/nogi-test-repo/main/Java/image";
+		String rootImgPath =
+			"https://raw.githubusercontent.com/5wontaek/nogi-test-repo/main/" + "newCategory/" + imageFilePath;
 
 		// 📝 Markdown 파일 (이미지 포함)
 		String mdContent = String.format("""
 			# Hello GitHub
-			This is a test markdown file with an image.
+			This is a test markdown file with an image.4
 
 			![Red Image](%s/이미지1.jpeg)
 			![Blue Image](%s/이미지2.jpeg)
-			""", imagePath, imagePath);
+			""", rootImgPath, rootImgPath);
 
-		// 🔹 resources/image 폴더에서 이미지 읽기 & Base64 변환
-		String redImageBase64 = encodeImageToBase64("image/이미지1.jpeg");
-		String blueImageBase64 = encodeImageToBase64("image/이미지2.jpg");
+		// ✅ 이미지 정보 리스트 생성
+		List<GithubCommitCommand.ImageOfGithub> images = List.of(
+			new GithubCommitCommand.ImageOfGithub(encodeImageToBase64("image/이미지1.jpeg"), "이미지1.jpeg", imageFilePath),
+			new GithubCommitCommand.ImageOfGithub(encodeImageToBase64("image/이미지2.jpg"), "이미지2.jpg", imageFilePath)
+		);
 
-		// ✅ 업로드할 파일 목록 생성
-		Map<String, String> files = new HashMap<>();
-		files.put("Java/노기이름1.md", mdContent); // 마크다운 파일 (평문)
-		files.put("Java/image/이미지1.jpeg", redImageBase64); // 이미지 파일 (Base64)
-		files.put("Java/image/이미지2.jpeg", blueImageBase64); // 이미지 파일 (Base64)
-
-		// ✅ When: GitHub API를 사용하여 파일 업로드
-		githubService.uploadMultipleFiles(
+		// ✅ GithubCommitCommand 객체 생성 (테스트용)
+		return new GithubCommitCommand(
+			1001L,
 			owner,
 			repo,
 			"main",
+			"onetaekoh@gmail.com",
+			"notion-page-1234",
+			type,
+			newCategory,
+			newTitle,
+			prevCategory,
+			prevTitle,
+			getNowDate(),
+			mdContent,
 			barerToken,
-			files,
-			"2025-01-31T16:13:30+12:00"
+			true,
+			images
 		);
+	}
+
+	private static String getNowDate() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+		return OffsetDateTime.now().format(formatter);
 	}
 
 	/**
@@ -135,43 +169,5 @@ class GithubFeignClientIntegrationTest {
 		ClassPathResource resource = new ClassPathResource(imagePath);
 		byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
 		return Base64.getEncoder().encodeToString(imageBytes);
-	}
-
-	@Test
-	void testUploadMarkdownFilesWithDateRange() {
-		// ✅ 시작 날짜 설정 (2024-01-01 ~ 2024-06-30)
-		LocalDate startDate = LocalDate.of(2024, 12, 31);
-		LocalDate endDate = LocalDate.of(2025, 2, 1);
-
-		// ✅ 날짜를 하루씩 증가시키면서 반복
-		for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
-			// 📌 날짜를 12:00 PM (정오)로 설정
-			String commitDate = date.atTime(12, 0).atOffset(ZoneOffset.of("+09:00"))
-				.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
-			// 📝 Markdown 파일 (이미지 없이)
-			String mdContent = String.format("""
-				# Hello GitHub
-				This is a test markdown file for date %s.
-
-				This commit was created at exactly 12:00 PM on %s.
-				""", date, date);
-
-			// ✅ 업로드할 파일 목록 생성 (이미지 제외)
-			Map<String, String> files = new HashMap<>();
-			files.put("Java/daily_commit_" + date + ".md", mdContent);
-
-			// ✅ GitHub API를 사용하여 파일 업로드
-			githubService.uploadMultipleFiles(
-				owner,
-				repo,
-				"main",
-				barerToken,
-				files,
-				commitDate // 날짜별 커밋 적용
-			);
-
-			System.out.println("✅ 커밋 완료: " + date + " 12:00 PM");
-		}
 	}
 }

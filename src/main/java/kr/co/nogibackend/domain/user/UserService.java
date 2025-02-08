@@ -74,9 +74,12 @@ public class UserService {
 			// 이전 기록이 없으면 새로운 생성 (CREATE)
 			return UserCheckTILResult.of(
 				command.userId(),
-				user.getName(),
+				user.getGithubOwner(),
+				user.getGithubRepository(),
+				user.getGithubDefaultBranch(),
+				user.getGithubEmail(),
 				command.notionPageId(),
-				NogiHistoryType.CREATE,
+				NogiHistoryType.CREATE_OR_UPDATE_CONTENT,
 				command.category(),
 				command.title(),
 				user.getGithubAuthToken(),
@@ -87,12 +90,15 @@ public class UserService {
 		// ✅ 기존 기록이 있다면 비교하여 수정 타입 결정
 		NogiHistoryType historyType = nogiHistory.getCategory().equals(command.category()) &&
 			nogiHistory.getTitle().equals(command.title())
-			? NogiHistoryType.UPDATE_CONTENT
-			: NogiHistoryType.UPDATE_TITLE_OR_CATEGORY;
+			? NogiHistoryType.UPDATE_TITLE
+			: NogiHistoryType.UPDATE_CATEGORY;
 
 		return UserCheckTILResult.of(
 			command.userId(),
-			user.getName(),
+			user.getGithubOwner(),
+			user.getGithubRepository(),
+			user.getGithubDefaultBranch(),
+			user.getGithubEmail(),
 			command.notionPageId(),
 			historyType,
 			command.category(),

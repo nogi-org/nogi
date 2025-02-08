@@ -5,6 +5,9 @@ import kr.co.nogibackend.domain.user.NogiHistoryType;
 public record UserCheckTILResult(
 	Long userId,// 유저 ID
 	String userName,// 유저 이름 (github owner)
+	String repository,// 깃허브 레포지토리
+	String branch, // 브랜치 이름
+	String githubEmail,// 깃허브 이메일
 	String notionPageId,// 노션 페이지 ID
 	NogiHistoryType type,// 히스토리 타입
 	String newCategory,// 디렉터리 하위 구조
@@ -28,6 +31,9 @@ public record UserCheckTILResult(
 			null,
 			null,
 			null,
+			null,
+			null,
+			null,
 			isSuccess
 		);
 	}
@@ -35,6 +41,9 @@ public record UserCheckTILResult(
 	public static UserCheckTILResult of(
 		Long userId,
 		String userName,
+		String repository,
+		String branch,
+		String githubEmail,
 		String notionPageId,
 		NogiHistoryType type,
 		String newCategory,
@@ -45,6 +54,9 @@ public record UserCheckTILResult(
 		return new UserCheckTILResult(
 			userId,
 			userName,
+			repository,
+			branch,
+			githubEmail,
 			notionPageId,
 			type,
 			newCategory,
@@ -59,6 +71,9 @@ public record UserCheckTILResult(
 	public static UserCheckTILResult of(
 		Long userId,
 		String userName,
+		String repository,
+		String branch,
+		String githubEmail,
 		String notionPageId,
 		NogiHistoryType type,
 		String newCategory,
@@ -71,6 +86,9 @@ public record UserCheckTILResult(
 		return new UserCheckTILResult(
 			userId,
 			userName,
+			repository,
+			branch,
+			githubEmail,
 			notionPageId,
 			type,
 			newCategory,
