@@ -18,6 +18,7 @@ import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class NotionService {
 	}
 
 	public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
-		// todo: command validation check 추가 (실패 시 무시 및 로그)
+		// todo: command validation check 추가 (실패 시 무시 및 로그) 고민해보자. null 값이면 어떻게 처리해줄지.
 
 		// 대기 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages =
@@ -58,8 +59,7 @@ public class NotionService {
 			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults());
 
 			// result 로 빌드
-			NotionStartTILResult result = NotionStartTILResult.of(command.getUserId(), page, encodingOfBlock);
-			results.add(result);
+			results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
 		}
 		return results;
 	}
@@ -67,20 +67,36 @@ public class NotionService {
 	/*
 	Github 에 commit 된 TIL 을 Notion 에 완료, 실패 여부 반영
 	 */
-	public void endTIL(List<NotionEndTILCommand> commands) {
-		// return
-		// 	commands
-		// 		.stream()
-		// 		.map(this::endTIL)
-		// 		.flatMap(List::stream)
-		// 		.toList();
+	public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
+		return
+			commands
+				.stream()
+				.map(this::endTIL)
+				.toList();
 	}
 
-	// todo: 에러 핸들링, result 반환하기, isSuccess 를 객체로 만들어서 reason 필드가 필요할듯.
-	public String endTIL(NotionEndTILCommand command) {
-		Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(command.isSuccess());
-		notionClient.updatePageStatus(command.getNotionAuthToken(), command.getNotionPageId(), request);
-		return null;
+	public NotionEndTILResult endTIL(NotionEndTILCommand command) {
+		boolean isUpdateResult =
+			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
+		return
+			new NotionEndTILResult(
+				command.userId()
+				, command.notionAuthToken()
+				, command.notionPageId()
+				, command.category()
+				, command.title()
+				, isUpdateResult
+			);
+	}
+
+	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
+		try {
+			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
+			notionClient.updatePageStatus(authToken, pageId, request);
+			return true;
+		} catch (Exception error) {
+			return false;
+		}
 	}
 
 	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
@@ -226,11 +242,13 @@ public class NotionService {
 				}
 			} catch (Exception error) {
 				log.error("Notion Block Convert To Markdown Error : {}", error.getMessage());
-				return new NotionBlockConversionInfo(markDown.toString(), images, false);
+				return
+					new NotionBlockConversionInfo(markDown.toString(), images, false, "Block 변환 오류");
 			}
 		}
 
-		return new NotionBlockConversionInfo(markDown.toString(), images, true);
+		return
+			new NotionBlockConversionInfo(markDown.toString(), images, true);
 	}
 
 	private String getImageOfBlock(URI uri) {
