@@ -11,13 +11,14 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.co.nogibackend.domain.notion.dto.command.NotionEndTilCommand;
-import kr.co.nogibackend.domain.notion.dto.command.NotionStartTilCommand;
+import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
+import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class NotionService {
 	/*
 	Notion 에 대기 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
 	 */
-	public List<NotionStartTILResult> startTIL(List<NotionStartTilCommand> commands) {
+	public List<NotionStartTILResult> startTIL(List<NotionStartTILCommand> commands) {
 		return
 			commands
 				.stream()
@@ -42,12 +43,12 @@ public class NotionService {
 				.toList();
 	}
 
-	public List<NotionStartTILResult> startTIL(NotionStartTilCommand command) {
-		// todo: command validation check 추가 (실패 시 무시 및 로그)
+	public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
+		// todo: command validation check 추가 (실패 시 무시 및 로그) 고민해보자. null 값이면 어떻게 처리해줄지.
 
 		// 대기 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages =
-			this.getPendingPages(command.getNotionAuthToken(), command.getNotionDatabaseId());
+			this.getCompletedPages(command.getNotionAuthToken(), command.getNotionDatabaseId());
 
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
@@ -58,8 +59,7 @@ public class NotionService {
 			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults());
 
 			// result 로 빌드
-			NotionStartTILResult result = NotionStartTILResult.of(command.getUserId(), page, encodingOfBlock);
-			results.add(result);
+			results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
 		}
 		return results;
 	}
@@ -67,10 +67,36 @@ public class NotionService {
 	/*
 	Github 에 commit 된 TIL 을 Notion 에 완료, 실패 여부 반영
 	 */
-	public void endTIL(List<NotionEndTilCommand> users) {
+	public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
+		return
+			commands
+				.stream()
+				.map(this::endTIL)
+				.toList();
 	}
 
-	public void endTIL(NotionEndTilCommand user) {
+	public NotionEndTILResult endTIL(NotionEndTILCommand command) {
+		boolean isUpdateResult =
+			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
+		return
+			new NotionEndTILResult(
+				command.userId()
+				, command.notionAuthToken()
+				, command.notionPageId()
+				, command.category()
+				, command.title()
+				, isUpdateResult
+			);
+	}
+
+	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
+		try {
+			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
+			notionClient.updatePageStatus(authToken, pageId, request);
+			return true;
+		} catch (Exception error) {
+			return false;
+		}
 	}
 
 	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
@@ -94,9 +120,9 @@ public class NotionService {
 		return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
 	}
 
-	private List<NotionPageInfo> getPendingPages(String authToken, String databaseId) {
+	private List<NotionPageInfo> getCompletedPages(String authToken, String databaseId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
-		Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_PENDING);
+		Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
 		return
 			notionClient
 				.getPagesFromDatabase(authToken, databaseId, filter)
@@ -216,11 +242,13 @@ public class NotionService {
 				}
 			} catch (Exception error) {
 				log.error("Notion Block Convert To Markdown Error : {}", error.getMessage());
-				return new NotionBlockConversionInfo(markDown.toString(), images, false);
+				return
+					new NotionBlockConversionInfo(markDown.toString(), images, false, "Block 변환 오류");
 			}
 		}
 
-		return new NotionBlockConversionInfo(markDown.toString(), images, true);
+		return
+			new NotionBlockConversionInfo(markDown.toString(), images, true);
 	}
 
 	private String getImageOfBlock(URI uri) {

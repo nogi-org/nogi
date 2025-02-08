@@ -15,4 +15,7 @@ public interface NotionClient {
 
 	byte[] getBlockImage(URI baseUri);
 
+	NotionPageInfo updatePageStatus
+		(String authToken, String pageId, Map<String, Object> request);
+
 }
