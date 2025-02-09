@@ -24,6 +24,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import io.github.cdimascio.dotenv.Dotenv;
 import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 
@@ -46,8 +48,11 @@ class GithubFeignClientIntegrationTest {
 
 	@Value("${github.token}")
 	private String token;// 환경변수로 주입
+
+	@Value("${github.nogi-bot-token}")
+	private String nogiBotToken;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo7";
+	private final String repo = "nogi-test-repo5";
 	private String barerToken;// beforeEach 에서 초기화
 	private static Dotenv dotenv;// .env 파일 로드
 
@@ -59,6 +64,7 @@ class GithubFeignClientIntegrationTest {
 	@DynamicPropertySource
 	static void setProperties(DynamicPropertyRegistry registry) {
 		registry.add("github.token", () -> dotenv.get("TEST_GITHUB_TOKEN"));
+		registry.add("github.nogi-bot-token", () -> dotenv.get("NOGI_BOT_GITHUB_TOKEN"));
 	}
 
 	@BeforeEach
@@ -176,5 +182,27 @@ class GithubFeignClientIntegrationTest {
 		ClassPathResource resource = new ClassPathResource(imagePath);
 		byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
 		return Base64.getEncoder().encodeToString(imageBytes);
+	}
+
+	@Test
+	@DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
+	void testCreateIssue() {
+		githubFeignClient.addCollaborator(
+			owner,
+			repo,
+			"nogi-bot",
+			new GithubAddCollaboratorRequest(null),
+			barerToken
+		);
+
+		githubFeignClient.createIssue(
+			owner,
+			repo,
+			new GithubCreateIssueRequest(
+				"Test Issue",
+				"Test Issue Body @" + owner,
+				List.of(owner)
+			),
+			"Bearer " + nogiBotToken);
 	}
 }

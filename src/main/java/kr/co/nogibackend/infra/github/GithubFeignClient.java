@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -12,10 +13,13 @@ import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
+import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
@@ -110,6 +114,31 @@ public interface GithubFeignClient {
 		@PathVariable("repo") String repo,
 		@PathVariable("branch") String branch,
 		@RequestBody GithubUpdateReferenceRequest request,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+     ➡️ 이슈 생성 (멘션 포함)
+     docs: https://docs.github.com/ko/rest/issues/issues?apiVersion=2022-11-28#create-an-issue
+     */
+	@PostMapping("/repos/{owner}/{repo}/issues")
+	GithubIssueInfo createIssue(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@RequestBody GithubCreateIssueRequest request,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
+	➡️ 협력자 추가
+	docs: https://docs.github.com/ko/rest/repos/collaborators?apiVersion=2022-11-28#add-a-repository-collaborator
+	 */
+	@PutMapping("/repos/{owner}/{repo}/collaborators/{username}")
+	void addCollaborator(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repo,
+		@PathVariable("username") String username,
+		@RequestBody GithubAddCollaboratorRequest request,
 		@RequestHeader("Authorization") String token
 	);
 
