@@ -1,16 +1,21 @@
 package kr.co.nogibackend.infra.notion;
 
+import static kr.co.nogibackend.response.code.NotionResponseCode.*;
+
 import java.net.URI;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotionClientImpl implements NotionClient {
@@ -30,8 +35,8 @@ public class NotionClientImpl implements NotionClient {
 					.getPagesFromDatabase(authToken, databaseId, request)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
-			System.out.println(error.getMessage());
+			// todo: 후속 처리 정책 고민해보기
+			log.info("[NotionClientImpl] getPagesFromDatabase - Message : {} ", error.getMessage());
 			return NotionInfo.empty();
 		}
 	}
@@ -48,16 +53,40 @@ public class NotionClientImpl implements NotionClient {
 					.getBlocksFromPage(authToken, pageId, startCursor)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
-			System.out.println(error.getMessage());
+			// todo: 후속 처리 정책 고민해보기
+			log.info("[NotionClientImpl] getBlocksFromPage - Message: {} ", error.getMessage());
 			return NotionInfo.empty();
 		}
 	}
 
 	@Override
 	public byte[] getBlockImage(URI baseUri) {
-		// todo: 익셉션 떨궈서 사용하는 쪽에서 처리하게 하기
-		return notionImageFeignClient.getBlockImage(baseUri);
+		try {
+			return notionImageFeignClient.getBlockImage(baseUri);
+		} catch (Exception error) {
+			// todo: 후속 처리 정책 고민해보기
+			log.info("[NotionClientImpl] getBlockImage");
+			throw new GlobalException(F_GET_BLOCK_IMAGE);
+		}
+	}
+
+	@Override
+	public NotionPageInfo updatePageStatus(
+		String authToken
+		, String pageId
+		, Map<String, Object> request
+	) {
+		try {
+			return
+				notionFeignClient
+					.updatePageStatus(authToken, pageId, request)
+					.getBody();
+		} catch (Exception error) {
+			// todo: 후속 처리 정책 고민해보기
+			log.info("[NotionClientImpl] updatePageStatus - ");
+			throw new GlobalException(F_UPDATE_TIL_STATUS);
+		}
+
 	}
 
 }
