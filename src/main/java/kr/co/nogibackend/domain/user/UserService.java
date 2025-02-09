@@ -2,10 +2,12 @@ package kr.co.nogibackend.domain.user;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateNogiHistoryCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
@@ -37,29 +39,34 @@ public class UserService {
 			.stream()
 			.collect(Collectors.toMap(NogiHistory::getNotionPageId, v -> v));
 
-		return commands.stream().map(v -> this.checkTIL(v, userMap, nogiHistoryMap)).toList();
+		return commands.stream()
+			.map(command -> checkTIL(command, userMap, nogiHistoryMap))
+			.flatMap(Optional::stream)
+			.collect(Collectors.toList());
 	}
 
-	private UserCheckTILResult checkTIL(
+	private Optional<UserCheckTILResult> checkTIL(
 		UserCheckTILCommand command,
 		Map<Long, User> userMap,
 		Map<String, NogiHistory> nogiHistoryMap
 	) {
 		// 유저 존재 여부 체크
 		if (!userMap.containsKey(command.userId())) {
-			return UserCheckTILResult.of(command.userId(), false);
+			ExecutionResultContext.addErrorResult("User not found", command.notionPageId());
+			return Optional.empty();
 		}
 
 		// 유저 GithubAuthToken 존재 여부 체크
 		User user = userMap.get(command.userId());
 		if (user.getGithubAuthToken() == null) {
-			return UserCheckTILResult.of(command.userId(), false);
+			ExecutionResultContext.addErrorResult("User not found", command.notionPageId());
+			return Optional.empty();
 		}
 
 		// 이전 기록 조회 (notionPageId 기반)
 		NogiHistory nogiHistory = nogiHistoryMap.get(command.notionPageId());
 
-		return this.checkTIL(command, user, nogiHistory);
+		return Optional.ofNullable(this.checkTIL(command, user, nogiHistory));
 	}
 
 	// Webhook 으로 단건 처리할 때를 위해 public 사용
