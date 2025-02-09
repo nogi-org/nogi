@@ -41,12 +41,16 @@ public class NotionDemoController {
 		@RequestParam("pageId") String pageId
 	) {
 		return Response.success(
-			notionService.endTIL(NotionEndTILCommand
-				.builder()
-				.notionAuthToken(authToken)
-				.notionPageId(pageId)
-				.isSuccess(true)
-				.build())
+			notionService.endTIL(
+				new NotionEndTILCommand(
+					1L,
+					authToken,
+					pageId,
+					"category",
+					"title",
+					true
+				)
+			)
 		);
 	}
 

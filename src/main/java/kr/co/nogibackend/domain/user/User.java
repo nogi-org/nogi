@@ -33,6 +33,9 @@ public class User {
 	private Long id;
 	private String notionAuthToken;
 	private String notionDatabaseId;
-	private String githubAutoToken;
+	private String githubAuthToken;
 	private String githubRepository;
+	private String githubDefaultBranch;
+	private String githubEmail;
+	private String githubOwner;
 }

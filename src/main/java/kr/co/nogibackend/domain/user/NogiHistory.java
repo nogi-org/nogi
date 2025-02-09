@@ -36,10 +36,12 @@ public class NogiHistory {
 
 	private String notionPageId;
 
-	private String githubShaKey;
-
 	private String category;
 
 	private String title;
 
+	public void updateMarkdownInfo(String category, String title) {
+		this.category = category;
+		this.title = title;
+	}
 }
