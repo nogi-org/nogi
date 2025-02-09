@@ -40,4 +40,8 @@ public class NogiHistory {
 
 	private String title;
 
+	public void updateMarkdownInfo(String category, String title) {
+		this.category = category;
+		this.title = title;
+	}
 }

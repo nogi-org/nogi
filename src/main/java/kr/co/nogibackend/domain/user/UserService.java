@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
+import kr.co.nogibackend.domain.user.dto.command.UserUpdateNogiHistoryCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -105,6 +106,32 @@ public class UserService {
 			nogiHistory.getTitle(),
 			user.getGithubAuthToken(),
 			true
+		);
+	}
+
+	public void updateNogiHistory(List<UserUpdateNogiHistoryCommand> commands) {
+		List<NogiHistory> NogiHistory = userRepository.findAllNogiHistoryByNotionPageIds(
+			commands.stream().map(UserUpdateNogiHistoryCommand::notionPageId).toList()
+		);
+
+		Map<String, UserUpdateNogiHistoryCommand> commandMap = commands.stream().collect(Collectors.toMap(
+				UserUpdateNogiHistoryCommand::notionPageId,
+				v -> v
+			)
+		);
+
+		NogiHistory.forEach(v -> {
+			UserUpdateNogiHistoryCommand command = commandMap.get(v.getNotionPageId());
+			if (command != null) {
+				this.updateNogiHistory(v, command);
+			}
+		});
+	}
+
+	public void updateNogiHistory(NogiHistory nogiHistory, UserUpdateNogiHistoryCommand command) {
+		nogiHistory.updateMarkdownInfo(
+			command.category(),
+			command.title()
 		);
 	}
 }
