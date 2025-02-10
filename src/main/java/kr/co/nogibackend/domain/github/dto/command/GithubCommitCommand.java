@@ -25,7 +25,6 @@ public record GithubCommitCommand(
 	String commitDate,          // 커밋 일자
 	String content,             // markdown 파일 내용
 	String githubToken,         // 깃허브 토큰
-	boolean isSuccess,          // 성공 여부
 	List<ImageOfGithub> images // 이미지 정보
 ) {
 	public record ImageOfGithub(
@@ -117,7 +116,6 @@ public record GithubCommitCommand(
 					notion.commitDate(),
 					notion.content(),
 					userCheckTILResult.githubToken(),
-					userCheckTILResult.isSuccess() && notion.statusDetail().isSuccess(),
 					notion.images().stream()
 						.map(image -> new ImageOfGithub(image.fileEnc64(), image.fileName(), image.filePath()))
 						.collect(Collectors.toList())

@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.nogibackend.domain.notion.NotionService;
-import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.response.service.Response;
@@ -41,16 +40,7 @@ public class NotionDemoController {
 		@RequestParam("pageId") String pageId
 	) {
 		return Response.success(
-			notionService.endTIL(
-				new NotionEndTILCommand(
-					1L,
-					authToken,
-					pageId,
-					"category",
-					"title",
-					true
-				)
-			)
+			null
 		);
 	}
 

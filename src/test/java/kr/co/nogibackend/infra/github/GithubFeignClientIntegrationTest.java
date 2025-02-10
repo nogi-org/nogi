@@ -52,7 +52,7 @@ class GithubFeignClientIntegrationTest {
 	@Value("${github.nogi-bot-token}")
 	private String nogiBotToken;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo5";
+	private final String repo = "nogi-test-repo10";
 	private String barerToken;// beforeEach 에서 초기화
 	private static Dotenv dotenv;// .env 파일 로드
 
@@ -170,14 +170,11 @@ class GithubFeignClientIntegrationTest {
 		);
 	}
 
-<<<<<<< HEAD
-=======
 	private static String getNowDate() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 		return OffsetDateTime.now().format(formatter);
 	}
 
->>>>>>> c565041da4c792c44deb39c4fed2fb4f0312cf1e
 	/**
 	 * 📌 `resources/image` 폴더의 이미지를 읽고 Base64로 변환하는 유틸 메서드
 	 */
@@ -186,9 +183,6 @@ class GithubFeignClientIntegrationTest {
 		byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
 		return Base64.getEncoder().encodeToString(imageBytes);
 	}
-<<<<<<< HEAD
-}
-=======
 
 	@Test
 	@DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
@@ -212,4 +206,3 @@ class GithubFeignClientIntegrationTest {
 			"Bearer " + nogiBotToken);
 	}
 }
->>>>>>> c565041da4c792c44deb39c4fed2fb4f0312cf1e
