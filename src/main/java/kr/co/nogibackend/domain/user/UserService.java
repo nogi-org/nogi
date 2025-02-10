@@ -52,14 +52,14 @@ public class UserService {
 	) {
 		// 유저 존재 여부 체크
 		if (!userMap.containsKey(command.userId())) {
-			ExecutionResultContext.addErrorResult("User not found", command.notionPageId());
+			ExecutionResultContext.addNotionPageErrorResult("User not found", command.notionPageId());
 			return Optional.empty();
 		}
 
 		// 유저 GithubAuthToken 존재 여부 체크
 		User user = userMap.get(command.userId());
 		if (user.getGithubAuthToken() == null) {
-			ExecutionResultContext.addErrorResult("User not found", command.notionPageId());
+			ExecutionResultContext.addNotionPageErrorResult("User not found", command.notionPageId());
 			return Optional.empty();
 		}
 
