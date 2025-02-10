@@ -1,7 +1,5 @@
 package kr.co.nogibackend.infra.github;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
@@ -92,40 +90,35 @@ class GithubFeignClientIntegrationTest {
 			"Java 제목", "Java",
 			"Java 제목", "image");
 
-		boolean isSuccess = githubService.commitToGithub(command);
-		assertThat(isSuccess).isEqualTo(true);
+		githubService.commitToGithub(command);
 	}
 
 	@Test
 	@DisplayName("새롭게 TIL을 작성하고나서 제목을 수정했을 경우 이전 MD 파일은 삭제되고 새로운 MD 파일이 생성된다.")
 	void testUpdateTitleCommitToGithub() throws IOException {
 
-		boolean result1 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
 				"image")
 		);
-		assertThat(result1).isEqualTo(true);
 
-		boolean result2 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.UPDATE_TITLE, "Java", "New Java 제목", "Java", "Java 제목", "image")
 		);
-		assertThat(result2).isEqualTo(true);
 	}
 
 	@Test
 	@DisplayName("새롭게 TIL을 작성하고나서 카테고리를 수정했을 경우 이전 카테고리 하위의 모든 파일은 삭제되고, 새로운 카테고리 하위에 파일이 생성된다.")
 	void testUpdateCategoryCommitToGithub() throws IOException {
-		boolean result1 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
 				"image")
 		);
-		assertThat(result1).isEqualTo(true);
 
-		boolean result2 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.UPDATE_CATEGORY, "New_Java", "New Java 제목 Title", "Java", "Java 제목",
 				"image")
 		);
-		assertThat(result2).isEqualTo(true);
 	}
 
 	private GithubCommitCommand getGithubCommitCommand(NogiHistoryType type, String newCategory, String newTitle,
@@ -157,6 +150,7 @@ class GithubFeignClientIntegrationTest {
 			"main",
 			"onetaekoh@gmail.com",
 			"notion-page-1234",
+			"notion-auth-token",
 			type,
 			newCategory,
 			newTitle,
@@ -165,7 +159,6 @@ class GithubFeignClientIntegrationTest {
 			getNowDate(),
 			mdContent,
 			barerToken,
-			true,
 			images
 		);
 	}

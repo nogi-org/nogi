@@ -27,7 +27,7 @@ public class UserQueryRepository {
 			.fetch();
 	}
 
-	public List<User> findAllUserByIds(List<Long> userIds) {
+	public List<User> findAllUserByIds(Long... userIds) {
 
 		QUser qUser = QUser.user;
 

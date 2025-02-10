@@ -7,9 +7,11 @@ import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import lombok.RequiredArgsConstructor;
@@ -53,5 +55,10 @@ public class GithubClientImpl implements GithubClient {
 	public GithubUpdateReferenceInfo updateBranch(String owner, String repo, String branch,
 		GithubUpdateReferenceRequest request, String token) {
 		return githubFeignClient.updateBranch(owner, repo, branch, request, token);
+	}
+
+	@Override
+	public GithubIssueInfo createIssue(String owner, String repo, GithubCreateIssueRequest request, String token) {
+		return githubFeignClient.createIssue(owner, repo, request, token);
 	}
 }

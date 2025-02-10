@@ -14,14 +14,20 @@ import lombok.RequiredArgsConstructor;
 public class UserRepositoryImpl implements UserRepository {
 
 	private final UserQueryRepository userQueryRepository;
+	private final NogiHistoryJpaRepository nogiHistoryJpaRepository;
 
 	@Override
-	public List<User> findAllUserByIds(List<Long> userIds) {
+	public List<User> findAllUserByIds(Long... userIds) {
 		return userQueryRepository.findAllUserByIds(userIds);
 	}
 
 	@Override
 	public List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageIds) {
 		return userQueryRepository.findAllNogiHistoryByNotionPageIds(notionPageIds);
+	}
+
+	@Override
+	public NogiHistory saveNogiHistory(NogiHistory nogiHistory) {
+		return nogiHistoryJpaRepository.save(nogiHistory);
 	}
 }

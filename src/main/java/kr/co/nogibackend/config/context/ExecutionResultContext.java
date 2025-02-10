@@ -17,22 +17,22 @@ public class ExecutionResultContext {
 	private static final ThreadLocal<List<ProcessingResult>> threadLocal = ThreadLocal.withInitial(ArrayList::new);
 
 	public static void addUserErrorResult(String message, Long userId) {
-		addResult(false, message, String.valueOf(userId), ProcessingResult.ResultType.USER);
+		addResult(false, message, userId);
 	}
 
-	public static void addNotionPageErrorResult(String message, String notionPageId) {
-		addResult(false, message, notionPageId, ProcessingResult.ResultType.NOTION_PAGE);
+	public static void addNotionPageErrorResult(String message, Long userId) {
+		addResult(false, message, userId);
 	}
 
-	public static void addNotionPageSuccessResult(String message, String notionPageId) {
-		addResult(true, message, notionPageId, ProcessingResult.ResultType.NOTION_PAGE);
+	public static void addSuccessResult(String message, Long userId) {
+		addResult(true, message, userId);
 	}
 
-	private static void addResult(boolean success, String message, String key, ProcessingResult.ResultType type) {
-		threadLocal.get().add(new ProcessingResult(success, message, key, type));
+	private static void addResult(boolean success, String message, Long userId) {
+		threadLocal.get().add(new ProcessingResult(success, message, userId));
 	}
 
-	public static List<ProcessingResult> getAllResults() {
+	public static List<ProcessingResult> getResults() {
 		return threadLocal.get();
 	}
 
@@ -43,22 +43,7 @@ public class ExecutionResultContext {
 	public record ProcessingResult(
 		boolean success,
 		String message,
-		String key,
-		ResultType type
+		Long userId
 	) {
-		public enum ResultType {
-			USER(Long.class),
-			NOTION_PAGE(String.class);
-
-			private final Class<?> keyType;
-
-			ResultType(Class<?> keyType) {
-				this.keyType = keyType;
-			}
-
-			public Class<?> getKeyType() {
-				return keyType;
-			}
-		}
 	}
 }

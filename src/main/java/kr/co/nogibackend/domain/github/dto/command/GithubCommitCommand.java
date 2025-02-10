@@ -17,6 +17,7 @@ public record GithubCommitCommand(
 	String githubBranch,       // 깃허브 브랜치
 	String githubEmail,       // 깃허브 이메일
 	String notionPageId,        // 노션 페이지 ID
+	String notionAuthToken,     // 노션 인증 토큰
 	NogiHistoryType type,       // 히스토리 타입 (생성, 수정 등)
 	String newCategory,         // 새로운 카테고리 (디렉토리 하위 구조)
 	String newTitle,            // 새로운 제목 (파일명)
@@ -108,6 +109,7 @@ public record GithubCommitCommand(
 					userCheckTILResult.branch(),
 					userCheckTILResult.githubEmail(),
 					notion.notionPageId(),
+					userCheckTILResult.notionAuthToken(),
 					userCheckTILResult.type(),
 					notion.category(),
 					notion.title(),

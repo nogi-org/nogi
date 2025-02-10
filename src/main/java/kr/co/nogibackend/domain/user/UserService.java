@@ -6,11 +6,14 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
-import kr.co.nogibackend.domain.user.dto.command.UserUpdateNogiHistoryCommand;
+import kr.co.nogibackend.domain.user.dto.command.UserStoreNogiHistoryCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
+import kr.co.nogibackend.domain.user.dto.result.UserResult;
+import kr.co.nogibackend.domain.user.dto.result.UserStoreNogiHistoryResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +32,7 @@ public class UserService {
 	 */
 	public List<UserCheckTILResult> checkTIL(List<UserCheckTILCommand> commands) {
 
-		List<Long> userIds = commands.stream().map(UserCheckTILCommand::userId).toList();
+		Long[] userIds = commands.stream().map(UserCheckTILCommand::userId).toArray(Long[]::new);
 		List<String> notionPageIds = commands.stream().map(UserCheckTILCommand::notionPageId).toList();
 
 		Map<Long, User> userMap = userRepository.findAllUserByIds(userIds)
@@ -42,7 +45,7 @@ public class UserService {
 		return commands.stream()
 			.map(command -> checkTIL(command, userMap, nogiHistoryMap))
 			.flatMap(Optional::stream)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	private Optional<UserCheckTILResult> checkTIL(
@@ -52,14 +55,14 @@ public class UserService {
 	) {
 		// 유저 존재 여부 체크
 		if (!userMap.containsKey(command.userId())) {
-			ExecutionResultContext.addNotionPageErrorResult("User not found", command.notionPageId());
+			ExecutionResultContext.addNotionPageErrorResult("User not found", command.userId());
 			return Optional.empty();
 		}
 
 		// 유저 GithubAuthToken 존재 여부 체크
 		User user = userMap.get(command.userId());
 		if (user.getGithubAuthToken() == null) {
-			ExecutionResultContext.addNotionPageErrorResult("User not found", command.notionPageId());
+			ExecutionResultContext.addNotionPageErrorResult("User not found", command.userId());
 			return Optional.empty();
 		}
 
@@ -84,6 +87,7 @@ public class UserService {
 				user.getGithubDefaultBranch(),
 				user.getGithubEmail(),
 				command.notionPageId(),
+				user.getNotionAuthToken(),
 				NogiHistoryType.CREATE_OR_UPDATE_CONTENT,
 				command.category(),
 				command.title(),
@@ -106,6 +110,7 @@ public class UserService {
 			user.getGithubDefaultBranch(),
 			user.getGithubEmail(),
 			command.notionPageId(),
+			user.getNotionAuthToken(),
 			historyType,
 			command.category(),
 			command.title(),
@@ -116,29 +121,75 @@ public class UserService {
 		);
 	}
 
-	public void updateNogiHistory(List<UserUpdateNogiHistoryCommand> commands) {
-		List<NogiHistory> NogiHistory = userRepository.findAllNogiHistoryByNotionPageIds(
-			commands.stream().map(UserUpdateNogiHistoryCommand::notionPageId).toList()
-		);
-
-		Map<String, UserUpdateNogiHistoryCommand> commandMap = commands.stream().collect(Collectors.toMap(
-				UserUpdateNogiHistoryCommand::notionPageId,
+	public List<UserStoreNogiHistoryResult> storeNogiHistory(List<UserStoreNogiHistoryCommand> commands) {
+		// key : notionPageId, value : NogiHistory
+		Map<String, NogiHistory> nogiHistoryMap = userRepository.findAllNogiHistoryByNotionPageIds(
+			commands.stream().map(UserStoreNogiHistoryCommand::notionPageId).toList()
+		).stream().collect(Collectors.toMap(
+				NogiHistory::getNotionPageId,
 				v -> v
 			)
 		);
 
-		NogiHistory.forEach(v -> {
-			UserUpdateNogiHistoryCommand command = commandMap.get(v.getNotionPageId());
-			if (command != null) {
-				this.updateNogiHistory(v, command);
-			}
-		});
+		return commands.stream()
+			.filter(command -> storeNogiHistory(command, nogiHistoryMap)) // 성공한 경우만 필터링
+			.map(command -> {
+					// 성공한 경우 알림을 취해 결과를 추가
+					ExecutionResultContext.addSuccessResult(
+						"%s/%s.md를 성공적으로 커밋했어요!".formatted(command.category(), command.title()),
+						command.userId()
+					);
+					return new UserStoreNogiHistoryResult(command.notionPageId());
+				}
+			).toList();
 	}
 
-	public void updateNogiHistory(NogiHistory nogiHistory, UserUpdateNogiHistoryCommand command) {
+	public boolean storeNogiHistory(UserStoreNogiHistoryCommand command, Map<String, NogiHistory> nogiHistoryMap) {
+		try {
+			if (nogiHistoryMap.containsKey(command.notionPageId())) {
+				updateNogiHistory(nogiHistoryMap.get(command.notionPageId()), command);
+				return true;
+			} else {
+				userRepository.saveNogiHistory(
+					NogiHistory.builder()
+						.user(User.builder().id(command.userId()).build())
+						.notionPageId(command.notionPageId())
+						.category(command.category())
+						.title(command.title())
+						.build()
+				);
+				return true;
+			}
+		} catch (Exception e) {
+			ExecutionResultContext.addNotionPageErrorResult(
+				"DB에 이력을 저장중 문제가 발생했어요",
+				command.userId()
+			);
+			return false;
+		}
+	}
+
+	@Transactional
+	public void updateNogiHistory(NogiHistory nogiHistory, UserStoreNogiHistoryCommand command) {
 		nogiHistory.updateMarkdownInfo(
 			command.category(),
 			command.title()
 		);
+	}
+
+	public List<UserResult> getUsersByIds(Long... userIds) {
+		return userRepository.findAllUserByIds(userIds)
+			.stream()
+			.map(v -> new UserResult(
+					v.getId(),
+					v.getNotionAuthToken(),
+					v.getNotionDatabaseId(),
+					v.getGithubAuthToken(),
+					v.getGithubRepository(),
+					v.getGithubDefaultBranch(),
+					v.getGithubEmail(),
+					v.getGithubOwner()
+				)
+			).toList();
 	}
 }

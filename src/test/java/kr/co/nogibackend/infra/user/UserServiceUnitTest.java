@@ -50,7 +50,7 @@ public class UserServiceUnitTest {
 			.githubEmail("owner1@example.com")
 			.build();
 
-		when(userRepository.findAllUserByIds(anyList()))
+		when(userRepository.findAllUserByIds(any(Long[].class)))
 			.thenReturn(Collections.singletonList(user));
 		when(userRepository.findAllNogiHistoryByNotionPageIds(anyList()))
 			.thenReturn(Collections.emptyList());
@@ -111,7 +111,7 @@ public class UserServiceUnitTest {
 			.title(title)
 			.build();
 
-		when(userRepository.findAllUserByIds(anyList()))
+		when(userRepository.findAllUserByIds(any(Long[].class)))
 			.thenReturn(Collections.singletonList(user));
 		when(userRepository.findAllNogiHistoryByNotionPageIds(anyList()))
 			.thenReturn(Collections.singletonList(history));
@@ -173,7 +173,7 @@ public class UserServiceUnitTest {
 			.title(oldTitle)
 			.build();
 
-		when(userRepository.findAllUserByIds(anyList()))
+		when(userRepository.findAllUserByIds(any(Long[].class)))
 			.thenReturn(Collections.singletonList(user));
 		when(userRepository.findAllNogiHistoryByNotionPageIds(anyList()))
 			.thenReturn(Collections.singletonList(history));
@@ -235,7 +235,7 @@ public class UserServiceUnitTest {
 			.title(title)
 			.build();
 
-		when(userRepository.findAllUserByIds(anyList()))
+		when(userRepository.findAllUserByIds(any(Long[].class)))
 			.thenReturn(Collections.singletonList(user));
 		when(userRepository.findAllNogiHistoryByNotionPageIds(anyList()))
 			.thenReturn(Collections.singletonList(history));

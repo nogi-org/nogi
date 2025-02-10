@@ -59,10 +59,12 @@ public class NotionService {
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
 			// 블럭 조회
-			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPage(command.getNotionAuthToken(), page);
+			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPage(command.getNotionAuthToken(), page,
+				command.getUserId());
 
 			// 블럭 markdown 으로 변환
-			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults());
+			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults(),
+				command.getUserId());
 
 			// result 로 빌드
 			results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
@@ -85,35 +87,42 @@ public class NotionService {
 
 	public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
 		boolean isUpdateResult =
-			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
-		
+			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId(),
+				command.userId());
+
 		return
-			isUpdateResult
-				? Optional.of(new NotionEndTILResult(command.notionPageId()))
-				: Optional.empty();
+			isUpdateResult ?
+				Optional.of(
+					new NotionEndTILResult(
+						command.userId(),
+						command.notionPageId(),
+						command.category(),
+						command.title()
+					)
+				) : Optional.empty();
 	}
 
-	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
+	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId, Long userId) {
 		try {
 			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
 			notionClient.updatePageStatus(authToken, pageId, request);
 			return true;
 		} catch (Exception error) {
-			ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 Notion에 반영 중 문제가 발생했어요.", pageId);
+			ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 Notion에 반영 중 문제가 발생했어요.", userId);
 			return false;
 		}
 	}
 
 	// 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
-	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
-		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null);
+	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page, Long userId) {
+		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null, userId);
 
 		// hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
 		boolean hasMore = blocks.isHas_more();
 		String nextCursor = blocks.getNext_cursor();
 
 		while (hasMore) {
-			NotionInfo<NotionBlockInfo> nextBlocks = this.getBlocks(notionAuthToken, page.getId(), nextCursor);
+			NotionInfo<NotionBlockInfo> nextBlocks = this.getBlocks(notionAuthToken, page.getId(), nextCursor, userId);
 			blocks.getResults().addAll(nextBlocks.getResults());
 			hasMore = nextBlocks.isHas_more();
 			nextCursor = nextBlocks.getNext_cursor();
@@ -123,11 +132,11 @@ public class NotionService {
 	}
 
 	// 노션 페이지의 블럭 요청
-	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId, String startCursor) {
+	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId, String startCursor, Long userId) {
 		try {
 			return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
 		} catch (Exception error) {
-			ExecutionResultContext.addNotionPageErrorResult("Notion Block을 불러오는 중 문제가 발생했어요.", pageId);
+			ExecutionResultContext.addNotionPageErrorResult("Notion Block을 불러오는 중 문제가 발생했어요.", userId);
 			return NotionInfo.empty();
 		}
 	}
@@ -147,7 +156,7 @@ public class NotionService {
 	}
 
 	// 블럭 조회 후 각각의 블럭을 markdown 으로 변환
-	private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page, List<NotionBlockInfo> blocks) {
+	private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page, List<NotionBlockInfo> blocks, Long userId) {
 		StringBuilder markDown = new StringBuilder();
 		List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
 
@@ -259,7 +268,7 @@ public class NotionService {
 						markDown.append("\n");
 				}
 			} catch (Exception error) {
-				ExecutionResultContext.addNotionPageErrorResult("Markdown 변환 중 문제가 발생했어요.", page.getId());
+				ExecutionResultContext.addNotionPageErrorResult("Markdown 변환 중 문제가 발생했어요.", userId);
 				return new NotionBlockConversionInfo(markDown.toString(), images);
 			}
 		}
