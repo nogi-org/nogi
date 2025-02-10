@@ -11,6 +11,7 @@ import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
@@ -18,11 +19,16 @@ import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
-import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/*
+노션 용어정리
+1. 데이터베이스: TIL 페이지를 담고있는 데이터베이스, 속성도 포함
+2. 페이지: 데이터베이스가 담고 있는 여러개의 페이지, 페이지는 각각 TIL 로 구분됨
+3. 블럭: 페이지에 작성된 내용, 한줄이 블럭 한개
+ */
 @Slf4j
 @Service
 @Transactional
@@ -32,7 +38,7 @@ public class NotionService {
 	private final NotionClient notionClient;
 
 	/*
-	Notion 에 대기 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
+	Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
 	 */
 	public List<NotionStartTILResult> startTIL(List<NotionStartTILCommand> commands) {
 		return
@@ -44,18 +50,16 @@ public class NotionService {
 	}
 
 	public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
-		// todo: command validation check 추가 (실패 시 무시 및 로그) 고민해보자. null 값이면 어떻게 처리해줄지.
-
-		// 대기 상태 TIL 페이지 조회
+		// 작성완료 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages =
-			this.getCompletedPages(command.getNotionAuthToken(), command.getNotionDatabaseId());
+			this.getCompletedPages(command.getNotionAuthToken(), command.getNotionDatabaseId(), command.getUserId());
 
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
 			// 블럭 조회
 			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPage(command.getNotionAuthToken(), page);
 
-			// 블럭 인코딩
+			// 블럭 markdown 으로 변환
 			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults());
 
 			// result 로 빌드
@@ -65,40 +69,45 @@ public class NotionService {
 	}
 
 	/*
-	Github 에 commit 된 TIL 을 Notion 에 완료, 실패 여부 반영
+	Github 에 commit 된 결과를 notion 상태값 변경
 	 */
-	public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
-		return
-			commands
-				.stream()
-				.map(this::endTIL)
-				.toList();
+	public void endTIL(List<NotionEndTILCommand> commands) {
+		commands.forEach(this::endTIL);
 	}
 
-	public NotionEndTILResult endTIL(NotionEndTILCommand command) {
-		boolean isUpdateResult =
-			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
-		return
-			new NotionEndTILResult(
-				command.userId()
-				, command.notionAuthToken()
-				, command.notionPageId()
-				, command.category()
-				, command.title()
-				, isUpdateResult
-			);
-	}
-
-	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
+	public void endTIL(NotionEndTILCommand command) {
 		try {
-			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
-			notionClient.updatePageStatus(authToken, pageId, request);
-			return true;
+			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(command.isSuccess());
+			notionClient.updatePageStatus(command.notionAuthToken(), command.notionPageId(), request);
 		} catch (Exception error) {
-			return false;
+			ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 Notion 에 반영 중 문제가 발생했어요.", command.notionPageId());
 		}
+
+		// boolean isUpdateResult =
+		// 	this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
+		// return
+		// 	isUpdateResult ?
+		// 	new NotionEndTILResult(
+		// 		command.userId()
+		// 		, command.notionAuthToken()
+		// 		, command.notionPageId()
+		// 		, command.category()
+		// 		, command.title()
+		// 	)
 	}
 
+	// private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
+	// 	try {
+	// 		Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
+	// 		notionClient.updatePageStatus(authToken, pageId, request);
+	// 		return true;
+	// 	} catch (Exception error) {
+	// 		ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 노션에 반영 중 문제가 발생했어요.", pageId);
+	// 		return false;
+	// 	}
+	// }
+
+	// 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
 	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
 		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null);
 
@@ -116,19 +125,31 @@ public class NotionService {
 		return blocks;
 	}
 
+	// 노션 페이지의 블럭 요청
 	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId, String startCursor) {
-		return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
+		try {
+			return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
+		} catch (Exception error) {
+			ExecutionResultContext.addNotionPageErrorResult("Notion Block을 불러오는 중 문제가 발생했어요.", pageId);
+			return NotionInfo.empty();
+		}
 	}
 
-	private List<NotionPageInfo> getCompletedPages(String authToken, String databaseId) {
+	private List<NotionPageInfo> getCompletedPages(String authToken, String databaseId, Long userId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
-		Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
-		return
-			notionClient
-				.getPagesFromDatabase(authToken, databaseId, filter)
-				.getResults();
+		try {
+			Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
+			return
+				notionClient
+					.getPagesFromDatabase(authToken, databaseId, filter)
+					.getResults();
+		} catch (Exception error) {
+			ExecutionResultContext.addUserErrorResult("Notion Page를 불러오는 중 문제가 발생했어요.", userId);
+			return List.of();
+		}
 	}
 
+	// 블럭 조회 후 각각의 블럭을 markdown 으로 변환
 	private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page, List<NotionBlockInfo> blocks) {
 		StringBuilder markDown = new StringBuilder();
 		List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
@@ -241,14 +262,11 @@ public class NotionService {
 						markDown.append("\n");
 				}
 			} catch (Exception error) {
-				log.error("Notion Block Convert To Markdown Error : {}", error.getMessage());
-				return
-					new NotionBlockConversionInfo(markDown.toString(), images, false, "Block 변환 오류");
+				ExecutionResultContext.addNotionPageErrorResult("Markdown 변환 중 문제가 발생했어요.", page.getId());
+				return new NotionBlockConversionInfo(markDown.toString(), images);
 			}
 		}
-
-		return
-			new NotionBlockConversionInfo(markDown.toString(), images, true);
+		return new NotionBlockConversionInfo(markDown.toString(), images);
 	}
 
 	private String getImageOfBlock(URI uri) {

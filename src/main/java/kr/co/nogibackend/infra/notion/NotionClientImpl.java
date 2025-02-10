@@ -35,9 +35,7 @@ public class NotionClientImpl implements NotionClient {
 					.getPagesFromDatabase(authToken, databaseId, request)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 후속 처리 정책 고민해보기
-			log.info("[NotionClientImpl] getPagesFromDatabase - Message : {} ", error.getMessage());
-			return NotionInfo.empty();
+			throw new GlobalException(F_GET_NOTION_PAGE);
 		}
 	}
 
@@ -53,9 +51,7 @@ public class NotionClientImpl implements NotionClient {
 					.getBlocksFromPage(authToken, pageId, startCursor)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 후속 처리 정책 고민해보기
-			log.info("[NotionClientImpl] getBlocksFromPage - Message: {} ", error.getMessage());
-			return NotionInfo.empty();
+			throw new GlobalException(F_GET_NOTION_BLOCK);
 		}
 	}
 
@@ -64,8 +60,6 @@ public class NotionClientImpl implements NotionClient {
 		try {
 			return notionImageFeignClient.getBlockImage(baseUri);
 		} catch (Exception error) {
-			// todo: 후속 처리 정책 고민해보기
-			log.info("[NotionClientImpl] getBlockImage");
 			throw new GlobalException(F_GET_BLOCK_IMAGE);
 		}
 	}
@@ -82,8 +76,6 @@ public class NotionClientImpl implements NotionClient {
 					.updatePageStatus(authToken, pageId, request)
 					.getBody();
 		} catch (Exception error) {
-			// todo: 후속 처리 정책 고민해보기
-			log.info("[NotionClientImpl] updatePageStatus - ");
 			throw new GlobalException(F_UPDATE_TIL_STATUS);
 		}
 
