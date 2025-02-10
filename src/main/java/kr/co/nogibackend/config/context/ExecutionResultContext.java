@@ -32,7 +32,7 @@ public class ExecutionResultContext {
 		threadLocal.get().add(new ProcessingResult(success, message, key, type));
 	}
 
-	public List<ProcessingResult> getAllResults() {
+	public static List<ProcessingResult> getAllResults() {
 		return threadLocal.get();
 	}
 

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,47 +67,42 @@ public class NotionService {
 			// result 로 빌드
 			results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
 		}
+
 		return results;
 	}
 
 	/*
 	Github 에 commit 된 결과를 notion 상태값 변경
 	 */
-	public void endTIL(List<NotionEndTILCommand> commands) {
-		commands.forEach(this::endTIL);
+	public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
+		return
+			commands
+				.stream()
+				.map(this::endTIL)
+				.flatMap(Optional::stream)
+				.toList();
 	}
 
-	public void endTIL(NotionEndTILCommand command) {
+	public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
+		boolean isUpdateResult =
+			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
+		
+		return
+			isUpdateResult
+				? Optional.of(new NotionEndTILResult(command.notionPageId()))
+				: Optional.empty();
+	}
+
+	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
 		try {
-			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(command.isSuccess());
-			notionClient.updatePageStatus(command.notionAuthToken(), command.notionPageId(), request);
+			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
+			notionClient.updatePageStatus(authToken, pageId, request);
+			return true;
 		} catch (Exception error) {
-			ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 Notion 에 반영 중 문제가 발생했어요.", command.notionPageId());
+			ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 Notion에 반영 중 문제가 발생했어요.", pageId);
+			return false;
 		}
-
-		// boolean isUpdateResult =
-		// 	this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId());
-		// return
-		// 	isUpdateResult ?
-		// 	new NotionEndTILResult(
-		// 		command.userId()
-		// 		, command.notionAuthToken()
-		// 		, command.notionPageId()
-		// 		, command.category()
-		// 		, command.title()
-		// 	)
 	}
-
-	// private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId) {
-	// 	try {
-	// 		Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
-	// 		notionClient.updatePageStatus(authToken, pageId, request);
-	// 		return true;
-	// 	} catch (Exception error) {
-	// 		ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 노션에 반영 중 문제가 발생했어요.", pageId);
-	// 		return false;
-	// 	}
-	// }
 
 	// 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
 	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page) {
