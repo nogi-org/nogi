@@ -1,5 +1,7 @@
 package kr.co.nogibackend.infra.guide;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import kr.co.nogibackend.domain.guide.Guide;
@@ -16,6 +18,11 @@ public class GuideRepositoryImpl implements GuideRepository {
 	@Override
 	public Guide registerGuide(GuideRegisterCommand command) {
 		return guideJpaRepository.save(command.toGuideEntity());
+	}
+
+	@Override
+	public Optional<Guide> findByStep(int step) {
+		return guideJpaRepository.findByStep(step);
 	}
 
 }
