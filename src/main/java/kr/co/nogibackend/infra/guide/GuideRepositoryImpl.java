@@ -1,5 +1,6 @@
 package kr.co.nogibackend.infra.guide;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -23,6 +24,21 @@ public class GuideRepositoryImpl implements GuideRepository {
 	@Override
 	public Optional<Guide> findByStep(int step) {
 		return guideJpaRepository.findByStep(step);
+	}
+
+	@Override
+	public List<Guide> findGuides() {
+		return guideJpaRepository.findAllByOrderByStepAsc();
+	}
+
+	@Override
+	public Optional<Guide> findById(Long guideId) {
+		return guideJpaRepository.findById(guideId);
+	}
+
+	@Override
+	public void deleteById(Long guideId) {
+		guideJpaRepository.deleteById(guideId);
 	}
 
 }

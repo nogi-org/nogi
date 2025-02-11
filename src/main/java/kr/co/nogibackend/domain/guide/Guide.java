@@ -49,4 +49,11 @@ public class Guide {
 	@JoinColumn(name = "USER_ID", foreignKey = @ForeignKey(name = "FK_TB_GUIDE__USER_ID"))
 	private User user;
 
+	// 모든 필드 수정
+	public void updateAll(String image, String content, Integer step) {
+		this.image = image;
+		this.content = content;
+		this.step = step;
+	}
+
 }
