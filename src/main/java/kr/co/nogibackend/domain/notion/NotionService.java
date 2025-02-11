@@ -59,12 +59,12 @@ public class NotionService {
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
 			// 블럭 조회
-			NotionInfo<NotionBlockInfo> blocks = this.getBlocksOfPage(command.getNotionAuthToken(), page,
-				command.getUserId());
+			NotionInfo<NotionBlockInfo> blocks =
+				this.getBlocksOfPage(command.getNotionAuthToken(), page, command.getUserId());
 
 			// 블럭 markdown 으로 변환
-			NotionBlockConversionInfo encodingOfBlock = this.convertMarkdown(page, blocks.getResults(),
-				command.getUserId());
+			NotionBlockConversionInfo encodingOfBlock =
+				this.convertMarkdown(page, blocks.getResults(), command.getUserId());
 
 			// result 로 빌드
 			results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
@@ -91,15 +91,15 @@ public class NotionService {
 				command.userId());
 
 		return
-			isUpdateResult ?
-				Optional.of(
-					new NotionEndTILResult(
-						command.userId(),
-						command.notionPageId(),
-						command.category(),
-						command.title()
-					)
-				) : Optional.empty();
+			isUpdateResult
+				? Optional.of(
+				new NotionEndTILResult(
+					command.userId(),
+					command.notionPageId(),
+					command.category(),
+					command.title()
+				))
+				: Optional.empty();
 	}
 
 	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId, Long userId) {
