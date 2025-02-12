@@ -1,6 +1,7 @@
 package kr.co.nogibackend.infra.user;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -30,4 +31,15 @@ public class UserRepositoryImpl implements UserRepository {
 	public NogiHistory saveNogiHistory(NogiHistory nogiHistory) {
 		return nogiHistoryJpaRepository.save(nogiHistory);
 	}
+
+	@Override
+	public List<User> findAllUser() {
+		return userQueryRepository.findAllUser();
+	}
+
+	@Override
+	public Optional<User> findNogiBot() {
+		return userQueryRepository.findNogiBot();
+	}
+
 }

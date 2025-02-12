@@ -180,16 +180,18 @@ public class UserService {
 	public List<UserResult> getUsersByIds(Long... userIds) {
 		return userRepository.findAllUserByIds(userIds)
 			.stream()
-			.map(v -> new UserResult(
-					v.getId(),
-					v.getNotionAuthToken(),
-					v.getNotionDatabaseId(),
-					v.getGithubAuthToken(),
-					v.getGithubRepository(),
-					v.getGithubDefaultBranch(),
-					v.getGithubEmail(),
-					v.getGithubOwner()
-				)
-			).toList();
+			.map(UserResult::from)
+			.toList();
+	}
+
+	public List<UserResult> findUser() {
+		return userRepository.findAllUser().stream()
+			.map(UserResult::from)
+			.toList();
+	}
+
+	public Optional<UserResult> findNogiBot() {
+		Optional<User> masterUser = userRepository.findNogiBot();
+		return masterUser.map(UserResult::from);
 	}
 }

@@ -1,6 +1,8 @@
 package kr.co.nogibackend.domain.user;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -31,6 +33,8 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@Enumerated(EnumType.STRING)
+	private Role role;
 	private String notionAuthToken;
 	private String notionDatabaseId;
 	private String githubAuthToken;
@@ -38,4 +42,8 @@ public class User {
 	private String githubDefaultBranch;
 	private String githubEmail;
 	private String githubOwner;
+
+	public enum Role {
+		NOGI_BOT, ADMIN, USER
+	}
 }

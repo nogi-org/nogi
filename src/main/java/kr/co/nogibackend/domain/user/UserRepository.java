@@ -1,6 +1,7 @@
 package kr.co.nogibackend.domain.user;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository {
 
@@ -9,4 +10,8 @@ public interface UserRepository {
 	List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageIds);
 
 	NogiHistory saveNogiHistory(NogiHistory build);
+
+	List<User> findAllUser();
+
+	Optional<User> findNogiBot();
 }

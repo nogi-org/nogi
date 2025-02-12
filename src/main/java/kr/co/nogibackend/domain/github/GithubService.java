@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
@@ -39,9 +38,6 @@ public class GithubService {
 
 	private final GithubClient githubClient;
 	private static final Set<String> BINARY_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".gif");
-
-	@Value("${nogi.bot-github-token}")
-	private String nogiBotToken;
 
 	public List<GithubCommitResult> commitToGithub(List<GithubCommitCommand> commands) {
 		return commands.stream()
@@ -202,7 +198,7 @@ public class GithubService {
 					markdownMessage,
 					List.of(githubUser.owner())
 				),
-				nogiBotToken
+				command.masterUser().authToken()
 			);
 		});
 	}

@@ -1,6 +1,7 @@
 package kr.co.nogibackend.infra.user;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -19,7 +20,6 @@ public class UserQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
 	public List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageId) {
-
 		var qNogiHistory = QNogiHistory.nogiHistory;
 
 		return queryFactory.selectFrom(qNogiHistory)
@@ -28,11 +28,28 @@ public class UserQueryRepository {
 	}
 
 	public List<User> findAllUserByIds(Long... userIds) {
-
 		QUser qUser = QUser.user;
 
 		return queryFactory.selectFrom(qUser)
 			.where(qUser.id.in(userIds))
 			.fetch();
+	}
+
+	public List<User> findAllUser() {
+		QUser qUser = QUser.user;
+
+		return queryFactory.selectFrom(qUser)
+			.where(qUser.role.eq(User.Role.USER))
+			.fetch();
+	}
+
+	public Optional<User> findNogiBot() {
+		QUser qUser = QUser.user;
+
+		return Optional.ofNullable(
+			queryFactory.selectFrom(qUser)
+				.where(qUser.role.eq(User.Role.NOGI_BOT))
+				.fetchOne()
+		);
 	}
 }
