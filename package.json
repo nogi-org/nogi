@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "aws-amplify": "^6.6.6",
+    "axios": "^1.7.9",
     "vue": "^3.4.21"
   },
   "devDependencies": {
