@@ -9,8 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.domain.user.User.Role;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.command.UserStoreNogiHistoryCommand;
+import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
 import kr.co.nogibackend.domain.user.dto.result.UserStoreNogiHistoryResult;
@@ -193,5 +195,25 @@ public class UserService {
 	public Optional<UserResult> findNogiBot() {
 		Optional<User> masterUser = userRepository.findNogiBot();
 		return masterUser.map(UserResult::from);
+	}
+
+	public void storeUserGithubInfo(UserUpdateCommand command) {
+		userRepository.findByGithubAccessToken(command.getGithubAuthToken())
+			.ifPresentOrElse(
+				user -> user.update(command),
+				() -> {
+					User newUser = User.builder()
+						.role(Role.USER) // 기본 역할 설정 (필요 시 변경)
+						.notionAuthToken(command.getNotionAuthToken())
+						.notionDatabaseId(command.getNotionDatabaseId())
+						.githubAuthToken(command.getGithubAuthToken())
+						.githubRepository(command.getGithubRepository())
+						.githubDefaultBranch(command.getGithubDefaultBranch())
+						.githubEmail(command.getGithubEmail())
+						.githubOwner(command.getGithubOwner())
+						.build();
+					userRepository.saveUser(newUser);
+				}
+			);
 	}
 }

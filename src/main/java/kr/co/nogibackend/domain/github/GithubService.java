@@ -15,10 +15,13 @@ import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import lombok.RequiredArgsConstructor;
@@ -36,8 +39,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class GithubService {
 
-	private final GithubClient githubClient;
 	private static final Set<String> BINARY_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".gif");
+	private final GithubClient githubClient;
 
 	public List<GithubCommitResult> commitToGithub(List<GithubCommitCommand> commands) {
 		return commands.stream()
@@ -235,4 +238,11 @@ public class GithubService {
 		return sb.toString();
 	}
 
+	public GithubOauthAccessTokenInfo getAccessToken(GithubOAuthAccessTokenRequest publicRepo) {
+		return githubClient.getAccessToken(publicRepo);
+	}
+
+	public GithubUserInfo getUserInfo(String code) {
+		return githubClient.getUserInfo(code);
+	}
 }

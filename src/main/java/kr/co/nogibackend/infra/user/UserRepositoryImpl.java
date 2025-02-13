@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class UserRepositoryImpl implements UserRepository {
 
 	private final UserQueryRepository userQueryRepository;
+	private final UserJpaRepository userJpaRepository;
 	private final NogiHistoryJpaRepository nogiHistoryJpaRepository;
 
 	@Override
@@ -40,6 +41,16 @@ public class UserRepositoryImpl implements UserRepository {
 	@Override
 	public Optional<User> findNogiBot() {
 		return userQueryRepository.findNogiBot();
+	}
+
+	@Override
+	public Optional<User> findByGithubAccessToken(String accessToken) {
+		return userQueryRepository.findByGithubAccessToken(accessToken);
+	}
+
+	@Override
+	public User saveUser(User user) {
+		return userJpaRepository.save(user);
 	}
 
 }

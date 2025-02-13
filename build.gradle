@@ -51,6 +51,21 @@ dependencies {
     // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+//    // security
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+//
+//    // 기본 Security 및 OAuth2 로그인
+//    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+//
+//    // JSON 처리 라이브러리 (OAuth2SuccessHandler에서 ObjectMapper 사용)
+//    implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+    // JWT 라이브러리 (JJWT)
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'  // API 의존성
+    implementation 'io.jsonwebtoken:jjwt-impl:0.12.3' // 구현체
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3' // JSON 처리용 Jackson 의존성
+
 }
 
 tasks.named('test') {

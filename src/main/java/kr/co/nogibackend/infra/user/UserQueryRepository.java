@@ -52,4 +52,16 @@ public class UserQueryRepository {
 				.fetchOne()
 		);
 	}
+
+	public Optional<User> findByGithubAccessToken(String accessToken) {
+		QUser qUser = QUser.user;
+
+		return Optional.ofNullable(
+			queryFactory.selectFrom(qUser)
+				.where(
+					qUser.githubAuthToken.eq(accessToken)
+				)
+				.fetchOne()
+		);
+	}
 }

@@ -14,13 +14,16 @@ import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 
@@ -33,6 +36,22 @@ import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
  */
 @FeignClient(name = "GithubClient", url = "https://api.github.com")
 public interface GithubFeignClient {
+
+	/*
+	➡️ 사용자 정보 가져오기
+	doc: https://docs.github.com/ko/rest/users?apiVersion=2022-11-28#get-the-authenticated-user
+	 */
+	@GetMapping("/user")
+	GithubUserInfo getUserInfo(@RequestHeader("Authorization") String token);
+
+	/*
+	➡️ Access Token 가져오기
+	doc: https://docs.github.com/ko/developers/apps/authorizing-oauth-apps#web-application-flow
+	 */
+	@PostMapping("/login/oauth/access_token")
+	GithubOauthAccessTokenInfo getAccessToken(
+		@RequestBody GithubOAuthAccessTokenRequest request
+	);
 
 	/*
 	➡️ repository 생성
