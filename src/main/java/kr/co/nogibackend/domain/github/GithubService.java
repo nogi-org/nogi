@@ -3,19 +3,32 @@ package kr.co.nogibackend.domain.github;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
+import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
+import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /*
   Package Name : kr.co.nogibackend.domain.github
@@ -24,19 +37,23 @@ import lombok.RequiredArgsConstructor;
   Created Date : 25. 2. 9.
   Description  : GitHub API를 호출하는 서비스
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GithubService {
 
-	private final GithubClient githubClient;
 	private static final Set<String> BINARY_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".gif");
+	private final GithubClient githubClient;
 
-	public List<Boolean> commitToGithub(List<GithubCommitCommand> commands) {
-		return commands.stream().map(this::commitToGithub).toList();
+	public List<GithubCommitResult> commitToGithub(List<GithubCommitCommand> commands) {
+		return commands.stream()
+			.map(this::commitToGithub)
+			.flatMap(Optional::stream)
+			.toList();
 	}
 
 	// TODO 성공 실패여부 객체를 리턴하도록 수정
-	public boolean commitToGithub(GithubCommitCommand command) {
+	public Optional<GithubCommitResult> commitToGithub(GithubCommitCommand command) {
 		try {
 			String owner = command.githubOwner();
 			String repo = command.githubRepository();
@@ -62,10 +79,23 @@ public class GithubService {
 			// 5️⃣ 브랜치 업데이트 (HEAD 이동)
 			updateBranch(owner, repo, branch, newCommitSha, token);
 
-			return true;
+			return Optional.of(
+				new GithubCommitResult(
+					command.userId(),
+					command.notionPageId(),
+					command.notionAuthToken(),
+					command.newCategory(),
+					command.newTitle()
+				)
+			);
 		} catch (Exception e) {
-			return false;
+			log.error("Github commit error", e);
+			ExecutionResultContext.addNotionPageErrorResult(
+				"Github에 Commit 중 문제가 발생했어요",
+				command.userId()
+			);
 		}
+		return Optional.empty();
 	}
 
 	private List<GithubCreateTreeRequest.TreeEntry> createTreeEntries(
@@ -150,5 +180,87 @@ public class GithubService {
 	// 현재 브랜치의 최신 SHA 가져오기
 	private String getLatestCommitSha(String owner, String repo, String branch, String token) {
 		return githubClient.getBranch(owner, repo, branch, token).commit().sha();
+	}
+
+	public void notify(GithubNotifyCommand command) {
+		Map<Long, GithubNotifyCommand.GithubUser> userMap = command.userMap();
+
+		Map<Long, List<ExecutionResultContext.ProcessingResult>> executionResultMap =
+			ExecutionResultContext.getResults().stream()
+				.collect(Collectors.groupingBy(ExecutionResultContext.ProcessingResult::userId));
+
+		executionResultMap.forEach((userId, results) -> {
+			GithubNotifyCommand.GithubUser githubUser = userMap.get(userId);
+
+			String title = this.generateTitle(results); // 제목 동적 생성
+			String markdownMessage = this.createMarkdownMessage(results, githubUser.owner(), title);
+
+			// GitHub Issue 생성
+			githubClient.createIssue(
+				githubUser.owner(),
+				githubUser.Repo(),
+				new GithubCreateIssueRequest(
+					title,
+					markdownMessage,
+					List.of(githubUser.owner())
+				),
+				command.masterUser().authToken()
+			);
+		});
+	}
+
+	private String generateTitle(List<ExecutionResultContext.ProcessingResult> results) {
+		if (results.size() == 1) {
+			ExecutionResultContext.ProcessingResult result = results.get(0);
+			return (result.success() ? "✅ " : "❌ ") + result.message(); // 단건일 때 메시지를 제목으로
+		}
+
+		long successCount = results.stream().filter(ExecutionResultContext.ProcessingResult::success).count();
+		long failureCount = results.size() - successCount;
+
+		return successCount + "건 성공, " + failureCount + "건 실패"; // 여러 건일 때 개수 표시
+	}
+
+	private String createMarkdownMessage(List<ExecutionResultContext.ProcessingResult> results, String owner,
+		String title) {
+		StringBuilder sb = new StringBuilder();
+
+		sb.append("### ").append(title).append("\n\n"); // 🔹 동적으로 제목 삽입
+
+		if (results.size() > 1) { // 여러 건이면 상세 메시지 출력
+			results.forEach(result -> {
+				if (result.success()) {
+					sb.append("✅ ").append(result.message()).append("\n");
+				} else {
+					sb.append("❌ ").append(result.message()).append("\n");
+				}
+			});
+		}
+
+		sb.append("\n@").append(owner);
+		return sb.toString();
+	}
+
+	public GithubOauthAccessTokenInfo getAccessToken(GithubOAuthAccessTokenRequest publicRepo) {
+		return githubClient.getAccessToken(publicRepo);
+	}
+
+	public GithubUserResult getUserInfo(String accessToken) {
+		String token = "Bearer " + accessToken;
+
+		GithubUserInfo userInfo = githubClient.getUserInfo(token);
+		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
+
+		return GithubUserResult.from(
+			userInfo,
+			userEmails.get(0) // 첫 번째 이메일 사용
+		);
+	}
+
+	public void createRepository(String repositoryName, String accessToken) {
+		githubClient.createUserRepository(
+			new GithubRepoRequest(repositoryName, true),
+			accessToken
+		);
 	}
 }

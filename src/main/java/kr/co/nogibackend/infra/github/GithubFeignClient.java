@@ -1,5 +1,7 @@
 package kr.co.nogibackend.infra.github;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,8 @@ import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
@@ -33,6 +37,20 @@ import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
  */
 @FeignClient(name = "GithubClient", url = "https://api.github.com")
 public interface GithubFeignClient {
+
+	/*
+	➡️ 사용자 정보 가져오기
+	doc: https://docs.github.com/ko/rest/users?apiVersion=2022-11-28#get-the-authenticated-user
+	 */
+	@GetMapping("/user")
+	GithubUserInfo getUserInfo(@RequestHeader("Authorization") String token);
+
+	/*
+	➡️ 사용자 이메일 정보 가져오기
+	doc: https://docs.github.com/ko/rest/users?apiVersion=2022-11-28#get-the-authenticated-user
+	 */
+	@GetMapping("/user/emails")
+	List<GithubUserEmailInfo> getUserEmailInfo(@RequestHeader("Authorization") String token);
 
 	/*
 	➡️ repository 생성

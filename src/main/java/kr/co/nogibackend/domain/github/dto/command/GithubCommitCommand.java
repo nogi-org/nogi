@@ -17,6 +17,7 @@ public record GithubCommitCommand(
 	String githubBranch,       // 깃허브 브랜치
 	String githubEmail,       // 깃허브 이메일
 	String notionPageId,        // 노션 페이지 ID
+	String notionAuthToken,     // 노션 인증 토큰
 	NogiHistoryType type,       // 히스토리 타입 (생성, 수정 등)
 	String newCategory,         // 새로운 카테고리 (디렉토리 하위 구조)
 	String newTitle,            // 새로운 제목 (파일명)
@@ -25,7 +26,6 @@ public record GithubCommitCommand(
 	String commitDate,          // 커밋 일자
 	String content,             // markdown 파일 내용
 	String githubToken,         // 깃허브 토큰
-	boolean isSuccess,          // 성공 여부
 	List<ImageOfGithub> images // 이미지 정보
 ) {
 	public record ImageOfGithub(
@@ -109,6 +109,7 @@ public record GithubCommitCommand(
 					userCheckTILResult.branch(),
 					userCheckTILResult.githubEmail(),
 					notion.notionPageId(),
+					userCheckTILResult.notionAuthToken(),
 					userCheckTILResult.type(),
 					notion.category(),
 					notion.title(),
@@ -117,7 +118,6 @@ public record GithubCommitCommand(
 					notion.commitDate(),
 					notion.content(),
 					userCheckTILResult.githubToken(),
-					userCheckTILResult.isSuccess() && notion.statusDetail().isSuccess(),
 					notion.images().stream()
 						.map(image -> new ImageOfGithub(image.fileEnc64(), image.fileName(), image.filePath()))
 						.collect(Collectors.toList())

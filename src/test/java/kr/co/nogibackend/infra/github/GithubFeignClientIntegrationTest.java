@@ -1,7 +1,5 @@
 package kr.co.nogibackend.infra.github;
 
-import static org.assertj.core.api.Assertions.*;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.OffsetDateTime;
@@ -24,6 +22,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import io.github.cdimascio.dotenv.Dotenv;
 import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
@@ -52,7 +52,7 @@ class GithubFeignClientIntegrationTest {
 	@Value("${github.nogi-bot-token}")
 	private String nogiBotToken;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo5";
+	private final String repo = "nogi-test-repo10";
 	private String barerToken;// beforeEach 에서 초기화
 	private static Dotenv dotenv;// .env 파일 로드
 
@@ -92,40 +92,35 @@ class GithubFeignClientIntegrationTest {
 			"Java 제목", "Java",
 			"Java 제목", "image");
 
-		boolean isSuccess = githubService.commitToGithub(command);
-		assertThat(isSuccess).isEqualTo(true);
+		githubService.commitToGithub(command);
 	}
 
 	@Test
 	@DisplayName("새롭게 TIL을 작성하고나서 제목을 수정했을 경우 이전 MD 파일은 삭제되고 새로운 MD 파일이 생성된다.")
 	void testUpdateTitleCommitToGithub() throws IOException {
 
-		boolean result1 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
 				"image")
 		);
-		assertThat(result1).isEqualTo(true);
 
-		boolean result2 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.UPDATE_TITLE, "Java", "New Java 제목", "Java", "Java 제목", "image")
 		);
-		assertThat(result2).isEqualTo(true);
 	}
 
 	@Test
 	@DisplayName("새롭게 TIL을 작성하고나서 카테고리를 수정했을 경우 이전 카테고리 하위의 모든 파일은 삭제되고, 새로운 카테고리 하위에 파일이 생성된다.")
 	void testUpdateCategoryCommitToGithub() throws IOException {
-		boolean result1 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.CREATE_OR_UPDATE_CONTENT, "Java", "Java 제목", "Java", "Java 제목",
 				"image")
 		);
-		assertThat(result1).isEqualTo(true);
 
-		boolean result2 = githubService.commitToGithub(
+		githubService.commitToGithub(
 			getGithubCommitCommand(NogiHistoryType.UPDATE_CATEGORY, "New_Java", "New Java 제목 Title", "Java", "Java 제목",
 				"image")
 		);
-		assertThat(result2).isEqualTo(true);
 	}
 
 	private GithubCommitCommand getGithubCommitCommand(NogiHistoryType type, String newCategory, String newTitle,
@@ -157,6 +152,7 @@ class GithubFeignClientIntegrationTest {
 			"main",
 			"onetaekoh@gmail.com",
 			"notion-page-1234",
+			"notion-auth-token",
 			type,
 			newCategory,
 			newTitle,
@@ -165,19 +161,15 @@ class GithubFeignClientIntegrationTest {
 			getNowDate(),
 			mdContent,
 			barerToken,
-			true,
 			images
 		);
 	}
 
-<<<<<<< HEAD
-=======
 	private static String getNowDate() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
 		return OffsetDateTime.now().format(formatter);
 	}
 
->>>>>>> c565041da4c792c44deb39c4fed2fb4f0312cf1e
 	/**
 	 * 📌 `resources/image` 폴더의 이미지를 읽고 Base64로 변환하는 유틸 메서드
 	 */
@@ -186,9 +178,6 @@ class GithubFeignClientIntegrationTest {
 		byte[] imageBytes = Files.readAllBytes(resource.getFile().toPath());
 		return Base64.getEncoder().encodeToString(imageBytes);
 	}
-<<<<<<< HEAD
-}
-=======
 
 	@Test
 	@DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
@@ -211,5 +200,16 @@ class GithubFeignClientIntegrationTest {
 			),
 			"Bearer " + nogiBotToken);
 	}
+
+	@Test
+	public void getUserInfo() {
+		GithubUserInfo userInfo = githubFeignClient.getUserInfo(barerToken);
+		System.out.println("userInfo = " + userInfo);
+	}
+
+	@Test
+	public void getUserEmailInfo() {
+		List<GithubUserEmailInfo> userEmailInfo = githubFeignClient.getUserEmailInfo(barerToken);
+		System.out.println("userEmailInfo = " + userEmailInfo);
+	}
 }
->>>>>>> c565041da4c792c44deb39c4fed2fb4f0312cf1e

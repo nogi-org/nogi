@@ -1,10 +1,23 @@
 package kr.co.nogibackend.domain.user;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository {
 
-	List<User> findAllUserByIds(List<Long> userIds);
+	List<User> findAllUserByIds(Long... userIds);
 
 	List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageIds);
+
+	NogiHistory saveNogiHistory(NogiHistory build);
+
+	List<User> findAllUser();
+
+	Optional<User> findNogiBot();
+
+	Optional<User> findByGithubOwner(String githubOwner);
+
+	User saveUser(User user);
+
+	Optional<User> findById(Long id);
 }
