@@ -8,6 +8,9 @@ frontend:
       commands:
         - VITE_API_BASE_URL=${VITE_API_BASE_URL}
         - VITE_CLIENT_BASE_URL=${VITE_CLIENT_BASE_URL}
+        - echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" >> .env
+        - echo "VITE_CLIENT_BASE_URL=${VITE_CLIENT_BASE_URL}" >> .env
+        - cat .env
         - npm run build:prod
   artifacts:
     baseDirectory: dist
