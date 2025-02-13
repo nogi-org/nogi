@@ -21,4 +21,4 @@ app.component('font-awesome-icon', FontAwesomeIcon).mount('#app');
 app.component('VueDatePicker', VueDatePicker);
 library.add(fas, far);
 
-window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);
+// window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);

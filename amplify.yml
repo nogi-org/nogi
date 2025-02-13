@@ -6,12 +6,8 @@ frontend:
         - npm ci --prefer-offline
     build:
       commands:
-        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
-        - VITE_CLIENT_BASE_URL=${VITE_CLIENT_BASE_URL}
-        - echo "VITE_API_BASE_URL=${VITE_API_BASE_URL}" >> .env
-        - echo "VITE_CLIENT_BASE_URL=${VITE_CLIENT_BASE_URL}" >> .env
         - cat .env
-        - npm run build:prod
+        - npm run build:prod # prod 환경으로 빌드(.env.prod 파일 읽음)
   artifacts:
     baseDirectory: dist
     files:
