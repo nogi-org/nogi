@@ -6,7 +6,7 @@ frontend:
         - npm ci --prefer-offline
     build:
       commands:
-        - npm run build
+        - npm run prod
   artifacts:
     baseDirectory: dist
     files:
