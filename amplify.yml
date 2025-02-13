@@ -11,6 +11,9 @@ backend:
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
 frontend:
   phases:
+    preBuild:
+      commands:
+        - npm install
     build:
       commands:
         - echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" >> .env # 환경 변수를 .env 파일에 추가
