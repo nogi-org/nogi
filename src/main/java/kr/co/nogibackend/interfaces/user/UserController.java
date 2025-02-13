@@ -15,6 +15,13 @@ import kr.co.nogibackend.interfaces.user.dto.UserUpdateRequest;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 
+/*
+  Package Name : kr.co.nogibackend.interfaces.user
+  File Name    : UserController
+  Author       : won taek oh
+  Created Date : 25. 2. 14.
+  Description  :
+ */
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor

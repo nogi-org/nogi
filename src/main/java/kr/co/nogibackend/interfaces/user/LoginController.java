@@ -14,6 +14,13 @@ import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 
+/*
+  Package Name : kr.co.nogibackend.interfaces.user
+  File Name    : LoginController
+  Author       : won taek oh
+  Created Date : 25. 2. 14.
+  Description  :
+ */
 @RestController
 @RequiredArgsConstructor
 public class LoginController {
