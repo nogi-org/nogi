@@ -32,6 +32,7 @@
     "@tiptap/starter-kit": "^2.1.16",
     "@tiptap/vue-3": "^2.1.16",
     "@vuepic/vue-datepicker": "^8.4.0",
+    "ampx": "^0.2.2",
     "autoprefixer": "^10.4.18",
     "axios": "^1.6.7",
     "dayjs": "^1.11.10",
