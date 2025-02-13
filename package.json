@@ -6,7 +6,7 @@
   "scripts": {
     "local": "vite",
     "prod": "vite --mode prod",
-    "build": "vite build",
+    "build:prod": "vite build --mode prod",
     "preview": "vite preview",
     "test:unit": "vitest",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
