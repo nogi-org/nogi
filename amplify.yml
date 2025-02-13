@@ -6,7 +6,8 @@ frontend:
         - npm ci --prefer-offline
     build:
       commands:
-        - echo "VITE_API_BASE_URL=$VITE_API_BASE_URL" >> .env
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+        - VITE_CLIENT_BASE_URL=${VITE_CLIENT_BASE_URL}
         - npm run build:prod
   artifacts:
     baseDirectory: dist
