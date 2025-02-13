@@ -3,7 +3,7 @@ frontend:
   phases:
     preBuild:
       commands:
-        - npm install
+        - npm ci --prefer-offline
     build:
       commands:
         - npm run build
