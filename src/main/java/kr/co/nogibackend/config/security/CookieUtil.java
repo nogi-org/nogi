@@ -9,6 +9,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+// access token 을 쿠키에 저장할 경우 사용
 @Component
 public class CookieUtil {
 

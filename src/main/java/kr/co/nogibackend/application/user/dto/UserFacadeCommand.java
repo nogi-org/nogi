@@ -1,4 +1,4 @@
-package kr.co.nogibackend.application.notion;
+package kr.co.nogibackend.application.user.dto;
 
 public class UserFacadeCommand {
 

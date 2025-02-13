@@ -53,13 +53,13 @@ public class UserQueryRepository {
 		);
 	}
 
-	public Optional<User> findByGithubAccessToken(String accessToken) {
+	public Optional<User> findByGithubOwner(String owner) {
 		QUser qUser = QUser.user;
 
 		return Optional.ofNullable(
 			queryFactory.selectFrom(qUser)
 				.where(
-					qUser.githubAuthToken.eq(accessToken)
+					qUser.githubOwner.eq(owner)
 				)
 				.fetchOne()
 		);

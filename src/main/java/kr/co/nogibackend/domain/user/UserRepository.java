@@ -15,7 +15,9 @@ public interface UserRepository {
 
 	Optional<User> findNogiBot();
 
-	Optional<User> findByGithubAccessToken(String accessToken);
+	Optional<User> findByGithubOwner(String githubOwner);
 
 	User saveUser(User user);
+
+	Optional<User> findById(Long id);
 }

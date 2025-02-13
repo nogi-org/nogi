@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.user.dto.command;
 
+import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserUpdateCommand {
 
-	private String id;
+	private Long id;
 	private String notionAuthToken;
 	private String notionDatabaseId;
 	private String githubAuthToken;
@@ -21,4 +22,12 @@ public class UserUpdateCommand {
 	private String githubDefaultBranch;
 	private String githubEmail;
 	private String githubOwner;
+
+	public static UserUpdateCommand from(GithubUserResult githubUserResult, String accessToken) {
+		return UserUpdateCommand.builder()
+			.githubAuthToken(accessToken)
+			.githubEmail(githubUserResult.email())
+			.githubOwner(githubUserResult.owner())
+			.build();
+	}
 }

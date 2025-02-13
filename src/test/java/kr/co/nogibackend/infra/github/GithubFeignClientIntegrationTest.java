@@ -22,6 +22,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import io.github.cdimascio.dotenv.Dotenv;
 import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
@@ -197,5 +199,17 @@ class GithubFeignClientIntegrationTest {
 				List.of(owner)
 			),
 			"Bearer " + nogiBotToken);
+	}
+
+	@Test
+	public void getUserInfo() {
+		GithubUserInfo userInfo = githubFeignClient.getUserInfo(barerToken);
+		System.out.println("userInfo = " + userInfo);
+	}
+
+	@Test
+	public void getUserEmailInfo() {
+		List<GithubUserEmailInfo> userEmailInfo = githubFeignClient.getUserEmailInfo(barerToken);
+		System.out.println("userEmailInfo = " + userEmailInfo);
 	}
 }

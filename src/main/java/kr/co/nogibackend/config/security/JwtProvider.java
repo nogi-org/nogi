@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtProvider {
 
-	private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 30;  // 30분
+	private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;  // 24시간
 	private static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일
 	private final SecretKey secretKey;
 	private final JwtParser jwtParser;
@@ -88,15 +88,5 @@ public class JwtProvider {
 		}
 		return null;
 	}
-
-	/**
-	 * JWT에서 Authentication 객체 생성
-	 */
-	//  public Authentication getAuthentication(String token) {
-	//    Long userId = getUserIdFromToken(token); // JWT에서 사용자 ID 추출
-	//    List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")); // 기본 ROLE
-	//    User user = new User(String.valueOf(userId), "", authorities);
-	//    return new UsernamePasswordAuthenticationToken(user, token, authorities);
-	//  }
 }
 

@@ -1,5 +1,7 @@
 package kr.co.nogibackend.domain.user;
 
+import static kr.co.nogibackend.response.code.UserResponseCode.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,10 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.user.User.Role;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.command.UserStoreNogiHistoryCommand;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
+import kr.co.nogibackend.domain.user.dto.info.UserInfo;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
 import kr.co.nogibackend.domain.user.dto.result.UserStoreNogiHistoryResult;
@@ -197,23 +201,41 @@ public class UserService {
 		return masterUser.map(UserResult::from);
 	}
 
-	public void storeUserGithubInfo(UserUpdateCommand command) {
-		userRepository.findByGithubAccessToken(command.getGithubAuthToken())
-			.ifPresentOrElse(
-				user -> user.update(command),
-				() -> {
-					User newUser = User.builder()
-						.role(Role.USER) // 기본 역할 설정 (필요 시 변경)
-						.notionAuthToken(command.getNotionAuthToken())
-						.notionDatabaseId(command.getNotionDatabaseId())
-						.githubAuthToken(command.getGithubAuthToken())
-						.githubRepository(command.getGithubRepository())
-						.githubDefaultBranch(command.getGithubDefaultBranch())
-						.githubEmail(command.getGithubEmail())
-						.githubOwner(command.getGithubOwner())
-						.build();
-					userRepository.saveUser(newUser);
-				}
-			);
+	@Transactional
+	public UserResult createOrUpdateUser(UserUpdateCommand command) {
+		User user = userRepository.findByGithubOwner(command.getGithubOwner())
+			.map(existingUser -> {
+				existingUser.update(command);
+				return existingUser;
+			})
+			.orElseGet(() -> {
+				User newUser = User.builder()
+					.role(Role.USER) // 기본 역할 설정 (필요 시 변경)
+					.notionAuthToken(command.getNotionAuthToken())
+					.notionDatabaseId(command.getNotionDatabaseId())
+					.githubAuthToken(command.getGithubAuthToken())
+					.githubRepository(command.getGithubRepository())
+					.githubDefaultBranch(command.getGithubDefaultBranch())
+					.githubEmail(command.getGithubEmail())
+					.githubOwner(command.getGithubOwner())
+					.build();
+				return userRepository.saveUser(newUser);
+			});
+
+		return UserResult.from(user);
+	}
+
+	@Transactional
+	public UserInfo updateUser(UserUpdateCommand command) {
+		User updateTarget = userRepository.findById(command.getId())
+			.orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+
+		return UserInfo.from(updateTarget.update(command));
+	}
+
+	public UserInfo findUserById(Long id) {
+		User user = userRepository.findById(id)
+			.orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+		return UserInfo.from(user);
 	}
 }

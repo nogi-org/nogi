@@ -9,6 +9,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
@@ -16,6 +17,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import lombok.RequiredArgsConstructor;
 
@@ -31,10 +33,16 @@ import lombok.RequiredArgsConstructor;
 public class GithubClientImpl implements GithubClient {
 
 	private final GithubFeignClient githubFeignClient;
+	private final GithubLoginFeignClient githubLoginFeignClient;
 
 	@Override
 	public GithubOauthAccessTokenInfo getAccessToken(GithubOAuthAccessTokenRequest request) {
-		return githubFeignClient.getAccessToken(request);
+		return githubLoginFeignClient.getAccessToken(request);
+	}
+
+	@Override
+	public GithubRepoInfo createUserRepository(GithubRepoRequest request, String token) {
+		return githubFeignClient.createUserRepository(request, token);
 	}
 
 	@Override

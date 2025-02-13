@@ -16,14 +16,17 @@ import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
+import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -242,7 +245,22 @@ public class GithubService {
 		return githubClient.getAccessToken(publicRepo);
 	}
 
-	public GithubUserInfo getUserInfo(String code) {
-		return githubClient.getUserInfo(code);
+	public GithubUserResult getUserInfo(String accessToken) {
+		String token = "Bearer " + accessToken;
+
+		GithubUserInfo userInfo = githubClient.getUserInfo(token);
+		GithubUserEmailInfo userEmails = githubClient.getUserEmails(token);
+
+		return GithubUserResult.from(
+			userInfo,
+			userEmails
+		);
+	}
+
+	public void createRepository(String repositoryName, String accessToken) {
+		githubClient.createUserRepository(
+			new GithubRepoRequest(repositoryName, true),
+			accessToken
+		);
 	}
 }

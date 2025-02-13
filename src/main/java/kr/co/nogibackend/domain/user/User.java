@@ -1,6 +1,6 @@
 package kr.co.nogibackend.domain.user;
 
-import java.util.Optional;
+import org.springframework.util.StringUtils;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,14 +46,22 @@ public class User {
 	private String githubEmail;
 	private String githubOwner;
 
-	public void update(UserUpdateCommand command) {
-		Optional.ofNullable(command.getNotionAuthToken()).ifPresent(value -> this.notionAuthToken = value);
-		Optional.ofNullable(command.getNotionDatabaseId()).ifPresent(value -> this.notionDatabaseId = value);
-		Optional.ofNullable(command.getGithubAuthToken()).ifPresent(value -> this.githubAuthToken = value);
-		Optional.ofNullable(command.getGithubRepository()).ifPresent(value -> this.githubRepository = value);
-		Optional.ofNullable(command.getGithubDefaultBranch()).ifPresent(value -> this.githubDefaultBranch = value);
-		Optional.ofNullable(command.getGithubEmail()).ifPresent(value -> this.githubEmail = value);
-		Optional.ofNullable(command.getGithubOwner()).ifPresent(value -> this.githubOwner = value);
+	public User update(UserUpdateCommand command) {
+		if (StringUtils.hasText(command.getNotionAuthToken()))
+			this.notionAuthToken = command.getNotionAuthToken();
+		if (StringUtils.hasText(command.getNotionDatabaseId()))
+			this.notionDatabaseId = command.getNotionDatabaseId();
+		if (StringUtils.hasText(command.getGithubAuthToken()))
+			this.githubAuthToken = command.getGithubAuthToken();
+		if (StringUtils.hasText(command.getGithubRepository()))
+			this.githubRepository = command.getGithubRepository();
+		if (StringUtils.hasText(command.getGithubDefaultBranch()))
+			this.githubDefaultBranch = command.getGithubDefaultBranch();
+		if (StringUtils.hasText(command.getGithubEmail()))
+			this.githubEmail = command.getGithubEmail();
+		if (StringUtils.hasText(command.getGithubOwner()))
+			this.githubOwner = command.getGithubOwner();
+		return this;
 	}
 
 	public enum Role {

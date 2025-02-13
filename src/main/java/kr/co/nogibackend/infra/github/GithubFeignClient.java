@@ -1,5 +1,7 @@
 package kr.co.nogibackend.infra.github;
 
+import java.util.List;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,16 +16,15 @@ import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
-import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 
@@ -45,13 +46,11 @@ public interface GithubFeignClient {
 	GithubUserInfo getUserInfo(@RequestHeader("Authorization") String token);
 
 	/*
-	➡️ Access Token 가져오기
-	doc: https://docs.github.com/ko/developers/apps/authorizing-oauth-apps#web-application-flow
+	➡️ 사용자 이메일 정보 가져오기
+	doc: https://docs.github.com/ko/rest/users?apiVersion=2022-11-28#get-the-authenticated-user
 	 */
-	@PostMapping("/login/oauth/access_token")
-	GithubOauthAccessTokenInfo getAccessToken(
-		@RequestBody GithubOAuthAccessTokenRequest request
-	);
+	@GetMapping("/user/emails")
+	List<GithubUserEmailInfo> getUserEmailInfo(@RequestHeader("Authorization") String token);
 
 	/*
 	➡️ repository 생성
