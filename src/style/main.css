@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'NotoSansKR-Regular';
+  src: url('/assets/fonts/NotoSansKR-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NotoSansKR-Bold';
+  src: url('/assets/fonts/NotoSansKR-Bold.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NotoSansKR-Light';
+  src: url('/assets/fonts/NotoSansKR-Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'NotoSansKR-Medium';
+  src: url('/assets/fonts/NotoSansKR-Medium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: NotoSansKR-Light, NotoSansKR-Regular, NotoSansKR-Bold, NotoSansKR-Medium;
+  background-color: #0d1118;
+  color: #ffffff;
+}
+
+button,
+a {
+  cursor: pointer;
+}
+
+input{
+  outline: none;
+  background-color: transparent;
+}

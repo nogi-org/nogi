@@ -1,10 +1,10 @@
-<script setup lang="ts">
-import Todos from './components/Todos.vue'
+<script setup>
+import { RouterView } from 'vue-router';
+import SystemChecking from '@/components/common/SystemChecking.vue';
+const SYSTEM_CHECKING = false;
 </script>
 
 <template>
-  <main>
-    <Todos />
-  </main>
+  <SystemChecking v-if="SYSTEM_CHECKING" />
+  <RouterView v-else />
 </template>
-
