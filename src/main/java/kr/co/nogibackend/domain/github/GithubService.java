@@ -249,11 +249,11 @@ public class GithubService {
 		String token = "Bearer " + accessToken;
 
 		GithubUserInfo userInfo = githubClient.getUserInfo(token);
-		GithubUserEmailInfo userEmails = githubClient.getUserEmails(token);
+		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
 
 		return GithubUserResult.from(
 			userInfo,
-			userEmails
+			userEmails.get(0) // 첫 번째 이메일 사용
 		);
 	}
 

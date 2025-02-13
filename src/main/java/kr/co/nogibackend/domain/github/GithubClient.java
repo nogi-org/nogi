@@ -1,5 +1,7 @@
 package kr.co.nogibackend.domain.github;
 
+import java.util.List;
+
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
@@ -74,5 +76,5 @@ public interface GithubClient {
 		String token
 	);
 
-	GithubUserEmailInfo getUserEmails(String token);
+	List<GithubUserEmailInfo> getUserEmails(String token);
 }

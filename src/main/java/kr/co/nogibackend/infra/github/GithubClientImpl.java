@@ -1,5 +1,7 @@
 package kr.co.nogibackend.infra.github;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import kr.co.nogibackend.domain.github.GithubClient;
@@ -11,6 +13,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
@@ -81,5 +84,10 @@ public class GithubClientImpl implements GithubClient {
 	@Override
 	public GithubIssueInfo createIssue(String owner, String repo, GithubCreateIssueRequest request, String token) {
 		return githubFeignClient.createIssue(owner, repo, request, token);
+	}
+
+	@Override
+	public List<GithubUserEmailInfo> getUserEmails(String token) {
+		return githubFeignClient.getUserEmailInfo(token);
 	}
 }
