@@ -1,8 +1,9 @@
 package kr.co.nogibackend.config.security;
 
+import static kr.co.nogibackend.util.CookieUtil.*;
+
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,8 +14,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.nogibackend.util.CookieUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityTokenFilter extends OncePerRequestFilter {
 
 	private final JwtProvider jwtProvider;
+	private final CookieUtil cookieUtil;
 
 	// spring security 필터
 	@Override
@@ -40,14 +44,13 @@ public class SecurityTokenFilter extends OncePerRequestFilter {
 		, FilterChain chain
 	) throws ServletException, IOException {
 
-		Optional<String> token = jwtProvider.resolveToken(request);
-		boolean hasValidToken = jwtProvider.validateToken(token);
-
-		if (hasValidToken) {
-			Auth userInfo = jwtProvider.getUserInfoFromToken(token.get());
-			this.authenticateUser(userInfo);
-		}
-
+		cookieUtil
+			.getCookie(request, ACCESS_COOKIE_NAME)
+			.map(Cookie::getValue)
+			.filter(jwtProvider::validateToken)
+			.map(jwtProvider::getUserInfoFromToken)
+			.ifPresent(this::authenticateUser);
+		
 		chain.doFilter(request, response);
 	}
 

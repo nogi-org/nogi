@@ -1,12 +1,10 @@
 package kr.co.nogibackend.config.security;
 
 import java.util.Date;
-import java.util.Optional;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -16,7 +14,6 @@ import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
 import kr.co.nogibackend.domain.user.User;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,8 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtProvider {
 
-	private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;  // 24시간
-	private static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일
+	public static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;  // 24시간
+	public static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일
 	private final SecretKey secretKey;
 	private final JwtParser jwtParser;
 
@@ -60,13 +57,9 @@ public class JwtProvider {
 	}
 
 	// JWT 검증
-	public boolean validateToken(Optional<String> token) {
-		if (token.isEmpty()) {
-			return false;
-		}
-
+	public boolean validateToken(String token) {
 		try {
-			jwtParser.parseSignedClaims(token.get());
+			jwtParser.parseSignedClaims(token);
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.error("JWT Token 만료");
@@ -76,7 +69,7 @@ public class JwtProvider {
 		return false;
 	}
 
-	// JWT에서 유저 정보 가져오기
+	// JWT 에서 유저 정보 가져오기
 	public Auth getUserInfoFromToken(String token) {
 		Claims claims = jwtParser.parseSignedClaims(token).getPayload();
 		Long userId = Long.valueOf(claims.getSubject());
@@ -92,14 +85,15 @@ public class JwtProvider {
 				.build();
 	}
 
+	// todo: 쿠키 방식이면 메소드 사용 안함
 	// 요청 헤더에서 JWT 토큰 추출
-	public Optional<String> resolveToken(HttpServletRequest request) {
-		return
-			Optional
-				.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
-				.filter(token -> token.length() >= 7 && token.substring(0, 7).equalsIgnoreCase("Bearer "))
-				.map(token -> token.substring(7));
-	}
+	// public Optional<String> resolveToken(HttpServletRequest request) {
+	// 	return
+	// 		Optional
+	// 			.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+	// 			.filter(token -> token.length() >= 7 && token.substring(0, 7).equalsIgnoreCase("Bearer "))
+	// 			.map(token -> token.substring(7));
+	// }
 
 }
 

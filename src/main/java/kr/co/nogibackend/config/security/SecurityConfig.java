@@ -52,7 +52,9 @@ public class SecurityConfig {
 
 		// USER 권한 설정
 		Map<HttpMethod, String> USER_URL =
-			Map.of();
+			Map.of(
+				HttpMethod.GET, "/guide/list"
+			);
 
 		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);
 		ROLE_PERMISSIONS.put(User.Role.USER.name(), USER_URL);
@@ -108,6 +110,7 @@ public class SecurityConfig {
 		List<String> origins = List.of(this.allowedOrigin);
 		configuration.addAllowedHeader("*");
 		configuration.setAllowedOrigins(origins);
+		configuration.setAllowCredentials(true);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
 
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

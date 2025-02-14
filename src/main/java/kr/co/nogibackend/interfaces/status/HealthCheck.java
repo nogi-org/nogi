@@ -1,4 +1,4 @@
-package kr.co.nogibackend.interfaces;
+package kr.co.nogibackend.interfaces.status;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
