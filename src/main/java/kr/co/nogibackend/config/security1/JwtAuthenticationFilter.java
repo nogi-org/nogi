@@ -1,4 +1,4 @@
-package kr.co.nogibackend.config.security;
+package kr.co.nogibackend.config.security1;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,13 +10,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kr.co.nogibackend.config.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-	private final JwtProvider jwtProvider;
 
 	// 인증 필터를 적용하지 않을 URL 목록
 	private static final List<String> EXCLUDED_URLS = List.of(
@@ -24,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		"/github/auth-url",
 		"/login/code/github"
 	);
+	private final JwtProvider jwtProvider;
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {

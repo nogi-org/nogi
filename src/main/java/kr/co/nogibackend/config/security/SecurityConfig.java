@@ -1,0 +1,114 @@
+package kr.co.nogibackend.config.security;
+
+import java.util.Arrays;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import kr.co.nogibackend.domain.user.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+	private final SecurityTokenFilter securityTokenFilter;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	private final String[] ADMIN_URL = {};
+	private final String[] USER_URL = {
+		// 댓글
+		"/v1/post/comment",
+		"/v1/comment",
+		"/v1/comment/status",
+		// 파일
+		"/v1/file/upload",
+		// 좋아요
+		"/v1/post/{postId}/heart",
+		// 게시글
+		"/v1/post/create",
+		"/v1/post/{postId}/delete",
+		// 태그
+		"/v1/tags/create",
+		// 유저
+		"/v1/user",
+		"/v1/user/profile",
+	};
+	@Value("${cors-config.allowed-origin}")
+	private String allowedOrigin;
+
+	@Bean
+	protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+		http
+			.csrf(AbstractHttpConfigurer::disable)
+			.cors((cors) -> cors.configurationSource(apiConfigurationSource()))
+			.sessionManagement((sessionManagement) ->
+				sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			)
+			.formLogin(AbstractHttpConfigurer::disable)
+			.httpBasic(AbstractHttpConfigurer::disable)
+			.exceptionHandling((exceptionHandling) ->
+				exceptionHandling
+					.authenticationEntryPoint(customAuthenticationEntryPoint)
+					.accessDeniedHandler(customAccessDeniedHandler)
+			)
+			.authorizeHttpRequests((authorizeRequests) ->
+				authorizeRequests
+					// 어드민만 접근가능
+					.requestMatchers(ADMIN_URL).hasAuthority(User.Role.ADMIN.name())
+					// 어드민, 유저 접근가능
+					.requestMatchers(USER_URL).hasAuthority(User.Role.USER.name())
+					// 그외 모두 접근가능
+					.anyRequest().permitAll()
+			)
+			.addFilterBefore(securityTokenFilter, UsernamePasswordAuthenticationFilter.class);
+		return http.build();
+	}
+
+	// 비밀번호 인코딩
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	// role 상속 레벨 정의
+	@Bean
+	public RoleHierarchy roleHierarchy() {
+		RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+		// ADMIN > USER 계층 설정
+		roleHierarchy.setHierarchy(User.Role.ADMIN.name() + " > " + User.Role.USER.name());
+		return roleHierarchy;
+	}
+
+	// CORS 설정
+	private CorsConfigurationSource apiConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+
+		List<String> origins = List.of(this.allowedOrigin);
+		configuration.addAllowedHeader("*");
+		configuration.setAllowedOrigins(origins);
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS"));
+
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
+
+}

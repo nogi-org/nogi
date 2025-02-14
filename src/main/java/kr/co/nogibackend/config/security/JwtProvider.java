@@ -1,10 +1,12 @@
 package kr.co.nogibackend.config.security;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -26,32 +28,38 @@ public class JwtProvider {
 	private final JwtParser jwtParser;
 
 	public JwtProvider(@Value("${jwt.secret}") String secret) {
-		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));  // 🔥 Secret Key 변경
-		this.jwtParser = Jwts.parser().verifyWith(secretKey).build();  // 🔥 JwtParser 생성
+		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+		this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
 	}
 
 	/**
 	 * JWT 액세스 토큰 생성
 	 */
 	public String generateToken(Long userId) {
-		return Jwts.builder()
-			.subject(String.valueOf(userId))
-			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
-			.signWith(secretKey)
-			.compact();
+		return
+			Jwts
+				.builder()
+				.subject(String.valueOf(userId))
+				// todo: user role 필요
+				.claim("role", "USER")
+				.issuedAt(new Date())
+				.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
+				.signWith(secretKey)
+				.compact();
 	}
 
 	/**
 	 * JWT 리프레시 토큰 생성
 	 */
 	public String generateRefreshToken(Long userId) {
-		return Jwts.builder()
-			.subject(String.valueOf(userId))
-			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
-			.signWith(secretKey)
-			.compact();
+		return
+			Jwts
+				.builder()
+				.subject(String.valueOf(userId))
+				.issuedAt(new Date())
+				.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
+				.signWith(secretKey)
+				.compact();
 	}
 
 	/**
@@ -59,7 +67,7 @@ public class JwtProvider {
 	 */
 	public boolean validateToken(String token) {
 		try {
-			jwtParser.parseSignedClaims(token);  // 🔥 새 방식 적용
+			jwtParser.parseSignedClaims(token);
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.error("JWT Token 만료");
@@ -73,6 +81,7 @@ public class JwtProvider {
 	 * JWT에서 사용자 ID 추출
 	 */
 	public Long getUserIdFromToken(String token) {
+		// todo: role 필요
 		return Long.valueOf(jwtParser.parseSignedClaims(token)
 			.getPayload()
 			.getSubject());
@@ -82,11 +91,13 @@ public class JwtProvider {
 	 * 요청 헤더에서 JWT 토큰 추출
 	 */
 	public String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
-		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-			return bearerToken.substring(7);
-		}
-		return null;
+		return
+			Optional
+				.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+				.filter(token -> token.length() >= 7 && token.substring(0, 7).equalsIgnoreCase("Bearer "))
+				.map(token -> token.substring(7))
+				.orElse(null);
 	}
+
 }
 

@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: dev
 
 # Security 도입 후 제거
 cors:

@@ -48,7 +48,7 @@ public class UserFacade {
 			UserUpdateCommand.from(githubUserResult, githubAccessToken)
 		);
 
-		// 4. access toekn 발급하기(nogi token)
+		// 4. access toekn 발급하기(nogi token) todo: userId, role 필요
 		String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id());
 
 		return UserLoginByGithubInfo.from(savedUserResult, nogiAccessToken);

@@ -1,4 +1,4 @@
-package kr.co.nogibackend.config.security;
+package kr.co.nogibackend.util;
 
 import java.util.Arrays;
 import java.util.Optional;

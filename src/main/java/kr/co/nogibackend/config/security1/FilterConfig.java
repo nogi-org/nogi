@@ -1,4 +1,4 @@
-package kr.co.nogibackend.config.security;
+package kr.co.nogibackend.config.security1;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
