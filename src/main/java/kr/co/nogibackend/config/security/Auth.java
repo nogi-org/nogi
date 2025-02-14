@@ -10,11 +10,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import kr.co.nogibackend.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 @Builder
-@ToString
 public class Auth implements UserDetails {
 
 	private Long userId;

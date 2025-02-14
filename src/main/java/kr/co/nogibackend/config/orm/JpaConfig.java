@@ -1,4 +1,4 @@
-package kr.co.nogibackend.config;
+package kr.co.nogibackend.config.orm;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

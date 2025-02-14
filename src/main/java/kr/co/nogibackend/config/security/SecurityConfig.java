@@ -1,11 +1,14 @@
 package kr.co.nogibackend.config.security;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,27 +35,28 @@ public class SecurityConfig {
 	private final SecurityTokenFilter securityTokenFilter;
 	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 	private final CustomAccessDeniedHandler customAccessDeniedHandler;
-	private final String[] ADMIN_URL = {};
-	private final String[] USER_URL = {
-		// 댓글
-		"/v1/post/comment",
-		"/v1/comment",
-		"/v1/comment/status",
-		// 파일
-		"/v1/file/upload",
-		// 좋아요
-		"/v1/post/{postId}/heart",
-		// 게시글
-		"/v1/post/create",
-		"/v1/post/{postId}/delete",
-		// 태그
-		"/v1/tags/create",
-		// 유저
-		"/v1/user",
-		"/v1/user/profile",
-	};
 	@Value("${cors-config.allowed-origin}")
 	private String allowedOrigin;
+
+	// 권한(Role)별 URL 매핑
+	private static final Map<String, Map<HttpMethod, String>> ROLE_PERMISSIONS = new HashMap<>();
+
+	static {
+		// ADMIN 권한 설정
+		Map<HttpMethod, String> ADMIN_URL =
+			Map.of(
+				HttpMethod.POST, "/guide",
+				HttpMethod.PUT, "/guide",
+				HttpMethod.DELETE, "/guide"
+			);
+
+		// USER 권한 설정
+		Map<HttpMethod, String> USER_URL =
+			Map.of();
+
+		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);
+		ROLE_PERMISSIONS.put(User.Role.USER.name(), USER_URL);
+	}
 
 	@Bean
 	protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -69,15 +73,15 @@ public class SecurityConfig {
 					.authenticationEntryPoint(customAuthenticationEntryPoint)
 					.accessDeniedHandler(customAccessDeniedHandler)
 			)
-			.authorizeHttpRequests((authorizeRequests) ->
-				authorizeRequests
-					// 어드민만 접근가능
-					.requestMatchers(ADMIN_URL).hasAuthority(User.Role.ADMIN.name())
-					// 어드민, 유저 접근가능
-					.requestMatchers(USER_URL).hasAuthority(User.Role.USER.name())
-					// 그외 모두 접근가능
-					.anyRequest().permitAll()
-			)
+			.authorizeHttpRequests(authorizeRequests -> {
+				ROLE_PERMISSIONS.forEach((role, methodUrls) ->
+					methodUrls.forEach((method, url) ->
+						authorizeRequests.requestMatchers(method, url).hasAuthority(role)
+					)
+				);
+				// 그 외 모든 요청은 허용
+				authorizeRequests.anyRequest().permitAll();
+			})
 			.addFilterBefore(securityTokenFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}

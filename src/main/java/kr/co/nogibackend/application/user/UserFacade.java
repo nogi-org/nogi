@@ -44,12 +44,11 @@ public class UserFacade {
 		GithubUserResult githubUserResult = githubService.getUserInfo(githubAccessToken);
 
 		// 3. user 정보 저장하기
-		UserResult savedUserResult = userService.createOrUpdateUser(
-			UserUpdateCommand.from(githubUserResult, githubAccessToken)
-		);
+		UserResult savedUserResult =
+			userService.createOrUpdateUser(UserUpdateCommand.from(githubUserResult, githubAccessToken));
 
-		// 4. access toekn 발급하기(nogi token) todo: userId, role 필요
-		String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id());
+		// 4. access toekn 발급하기(nogi token)
+		String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id(), savedUserResult.role());
 
 		return UserLoginByGithubInfo.from(savedUserResult, nogiAccessToken);
 	}

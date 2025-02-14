@@ -2,7 +2,7 @@ package kr.co.nogibackend.config.security;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,7 +15,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kr.co.nogibackend.config.security1.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SecurityTokenFilter extends OncePerRequestFilter {
 
-	private final JwtTokenProvider jwtTokenProvider;
+	private final JwtProvider jwtProvider;
 
 	// spring security 필터
 	@Override
@@ -41,14 +40,12 @@ public class SecurityTokenFilter extends OncePerRequestFilter {
 		, FilterChain chain
 	) throws ServletException, IOException {
 
-		String token = jwtTokenProvider.resolveToken(request);
-		boolean hasValidToken = jwtTokenProvider.validateToken(token);
+		Optional<String> token = jwtProvider.resolveToken(request);
+		boolean hasValidToken = jwtProvider.validateToken(token);
 
 		if (hasValidToken) {
-			UUID externalId = jwtTokenProvider.parserUserExternalId(token);
-			// todo: userId, role 를 담아서 아래 메소드에 넘기기
-			Auth auth = this.findTokenUser(externalId, token);
-			this.authenticateUser(auth);
+			Auth userInfo = jwtProvider.getUserInfoFromToken(token.get());
+			this.authenticateUser(userInfo);
 		}
 
 		chain.doFilter(request, response);
