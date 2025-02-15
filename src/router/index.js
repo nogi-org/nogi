@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { AuthManager } from '@/manager/auth/AuthManager.js';
+import { useAuthStore } from '@/stores/authStore.js';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -44,13 +46,16 @@ const router = createRouter({
         {
           path: '/my-page',
           name: 'myPage',
-          meta: { category: 'myPage' },
+          meta: { category: 'myPage', requiresAuth: true },
           component: () => import('@/views/user/MyPage.vue')
         },
         {
           path: '/admin',
           name: 'adminPage',
-          meta: { category: 'admin' },
+          meta: {
+            category: 'admin',
+            requiresRole: AuthManager.ROLE.ADMIN
+          },
           component: () => import('@/views/admin/AdminPage.vue')
         }
       ]
@@ -59,8 +64,18 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  // console.log(`to: ${to}, from: ${from}, next: ${next}`);
-  next();
+  const authStore = useAuthStore();
+  const auth = authStore.getAuth().value;
+  if (to.meta?.requiresAuth && !auth) {
+    // 로그인 필요한 페이지인데 로그인하지 않은 경우
+    next('/');
+  } else if (to.meta?.requiresRole && to.meta?.requiresRole !== auth.role) {
+    // 권한이 부족 경우
+    next('/');
+  } else {
+    // 정상적으로 라우팅 진행
+    next();
+  }
 });
 
 export default router;
