@@ -3,6 +3,7 @@ import { onBeforeMount, ref } from 'vue';
 import { UserManager } from '@/manager/user/UserManager.js';
 import Validation from '@/components/common/Validation.vue';
 import { useRoute } from 'vue-router';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 const user = new UserManager();
 const validation = ref(null);
@@ -12,7 +13,7 @@ onBeforeMount(async () => {
   await loadPosts(currentCategoryId.value);
 });
 
-const loadPosts = async (categoryId) => {};
+const loadPosts = async categoryId => {};
 
 const setInput = (value, target) => {
   switch (target) {

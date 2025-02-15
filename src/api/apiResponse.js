@@ -248,7 +248,7 @@ export const customResponse = (code, message, success) => {
 
 const createCustomResponse = (code, message, success = false) => {
   return {
-    success: success,
+    isStatus: success,
     code: code,
     message: message
   };

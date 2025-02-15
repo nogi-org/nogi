@@ -1,44 +1,31 @@
 import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
+import { AuthManager } from '@/manager/auth/AuthManager.js';
 
-export const useAuthStatusStore = defineStore('useAuthStatusStore', () => {
-  const AUTH_KEY = 'auth';
+export const useAuthStore = defineStore('useAuthStore', () => {
   const auth = ref(
-    localStorage.getItem(AUTH_KEY) ? JSON.parse(localStorage.getItem(AUTH_KEY)) : null
+    localStorage.getItem(AuthManager.AUTH_KEY)
+      ? JSON.parse(localStorage.getItem(AuthManager.AUTH_KEY))
+      : null
   );
 
-  const getAuth = computed(() => auth.value);
-
-  function setAuth(payload) {
-    localStorage.setItem(AUTH_KEY, JSON.stringify(payload));
-    auth.value = payload;
+  function getAuth() {
+    return auth;
   }
 
   function deleteAuth() {
-    localStorage.removeItem('auth');
     auth.value = null;
+    localStorage.removeItem(AuthManager.AUTH_KEY);
   }
 
-  function hasOwner(externalId) {
-    return auth.value?.externalId === externalId;
+  function setAuth(payload) {
+    auth.value = payload;
+    localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(payload));
   }
 
-  function hasAdmin() {
-    return auth.value?.role === 'MASTER' || auth.value?.role === 'MANAGER';
-  }
-
-  function updateAuth(payload) {
-    if (payload.profilePath != null) {
-      auth.value.profileImage = payload.profilePath;
-    } else if (payload.nickname != null) {
-      auth.value.nickname = payload.nickname;
-    }
-    setAuth(auth.value);
-  }
-
-  function hasOnLogin() {
-    return auth.value != null;
-  }
-
-  return { getAuth, setAuth, deleteAuth, hasOwner, hasAdmin, updateAuth, hasOnLogin };
+  return {
+    getAuth,
+    deleteAuth,
+    setAuth
+  };
 });

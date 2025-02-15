@@ -13,7 +13,7 @@ export const apiResponseModalStore = defineStore(
 
     function onActive(payload) {
       contents.value = {
-        hasStatus: payload.success,
+        isStatus: payload.isStatus,
         code: payload.code,
         message: payload.message
       };

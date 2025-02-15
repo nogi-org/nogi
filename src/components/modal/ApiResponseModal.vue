@@ -14,12 +14,12 @@ onMounted(() => {
 
 watch(
   () => alertStore.getActive.hasActive,
-  hasActive => {
+  (hasActive) => {
     if (hasActive) modal.show();
   }
 );
 
-const createModal = modalEl => {
+const createModal = (modalEl) => {
   const options = {
     onHide: () => {
       alertStore.offActive();
@@ -63,25 +63,27 @@ const createModal = modalEl => {
           <div
             class="flex items-center justify-center text-xs py-2 font-noto_sans_m"
             :class="{
-              'text-red-500': !alertStore.getActive.contents.hasStatus,
-              'text-indigo-500': alertStore.getActive.contents.hasStatus
+              'text-danger': !alertStore.getActive.contents.isStatus,
+              'text-action': alertStore.getActive.contents.isStatus
             }"
           >
             <font-awesome-icon
               icon="fa-regular fa-circle-check"
               class="mr-1"
-              v-if="alertStore.getActive.contents.hasStatus"
+              v-if="alertStore.getActive.contents.isStatus"
             />
             <font-awesome-icon
               icon="fa-solid fa-ban"
               class="mr-1"
-              v-if="!alertStore.getActive.contents.hasStatus"
+              v-if="!alertStore.getActive.contents.isStatus"
             />
             <p>
               {{ alertStore.getActive.contents.code }}
             </p>
           </div>
-          <h3 class="mb-5 text-sm text-gray-500 py-2 sm:text-base">
+          <h3
+            class="mb-5 text-sm text-gray-500 py-2 sm:text-base whitespace-pre-line"
+          >
             {{ alertStore.getActive.contents.message }}
           </h3>
           <button

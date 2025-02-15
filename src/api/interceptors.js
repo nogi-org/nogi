@@ -1,15 +1,13 @@
-import { AuthManager } from '@/manager/auth/AuthManager.js';
 import { ApiResponse, handleCommonError } from '@/api/apiResponse.js';
 import router from '@/router/index.js';
 import { apiResponseModalStore } from '@/stores/modalStore.js';
-import { useAuthStatusStore } from '@/stores/authStore.js';
 
 export function setInterceptors(instance) {
-  // const authManager = new AuthManager();
   //요청 인터셉터
   instance.interceptors.request.use(
     config => {
-      config.headers.Authorization = AuthManager.getToken();
+      // todo: 쿠키로 바꾸면 필요없음
+      // config.headers.Authorization = AuthManager.getToken();
       return config;
     },
     error => {
@@ -35,11 +33,12 @@ export function setInterceptors(instance) {
 
 // 공통 에러처리
 function handleInterceptorCommonError(error) {
-  const response = handleCommonError(error.response.data);
+  const response = handleCommonError(error.response);
   if (!response) return;
   if (response.code === ApiResponse.AUTH_2) {
     router.push({ name: 'home' }).then(() => {
-      useAuthStatusStore().deleteAuth();
+      // todo: 작업하기
+      // authStore().deleteAuth();
       apiResponseModalStore().onActive(response);
     });
   } else {

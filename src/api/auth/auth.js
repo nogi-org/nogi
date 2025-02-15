@@ -1,11 +1,11 @@
 import api from '@/api/index.js';
-import { handleJoin } from '@/api/apiResponse.js';
+import { handleJoin, handleUserInfo } from '@/api/apiResponse.js';
 
-export const apiLoginKakao = payload => {
+export const getGithubLoginURL = () => {
   return api
-    .post('v1/auth/join', payload)
-    .then(res => res.data)
-    .catch(error => handleJoin(error.response.data));
+    .get('/github/auth-url')
+    .then(res => res.data.result)
+    .catch(error => handleUserInfo(error.response));
 };
 
 export const apiLogout = () => {

@@ -6,10 +6,12 @@
     class="z-40 left-0 top-0 bottom-0 right-0 fixed bg-white w-screen h-screen"
     style="background-color: rgba(0, 0, 0, 0.37)"
   >
-    <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 absolutez-50">
+    <div
+      class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 absolutez-50"
+    >
       <svg
         aria-hidden="true"
-        class="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-purple-600"
+        class="inline w-10 h-10 text-gray-200 animate-spin fill-action"
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

@@ -1,33 +1,26 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
-import { ref, watch, watchEffect } from 'vue';
-import { useAuthStatusStore } from '@/stores/authStore.js';
+import { onMounted, watchEffect } from 'vue';
 import { useNavigationStore } from '@/stores/navigationStore.js';
 import LoginButton from '@/components/buttons/LoginButton.vue';
 import LogoutButton from '@/components/buttons/LogoutButton.vue';
+import { AuthManager } from '@/manager/auth/AuthManager.js';
 
 const route = useRoute();
 
-const authStatusStore = useAuthStatusStore();
-const hasJoin = ref(authStatusStore.getAuth);
+const auth = new AuthManager();
+const authInfo = auth.getAuthInfo();
 
 const navigationStore = useNavigationStore();
-const navigations = navigationStore.getNavigation();
+const navigations = navigationStore.getNavigations();
 
-watch(
-  () => authStatusStore.getAuth,
-  () => {
-    hasJoin.value = authStatusStore.getAuth;
-  }
-);
-
-watchEffect(() => {
-  navigationStore.setNavigationActiveByRoute(route);
+onMounted(() => {
+  navigationStore.setIsVisibleByAuth();
 });
 
-const onLogin = () => {
-  console.log('로그인!!!!');
-};
+watchEffect(() => {
+  navigationStore.setIsActiveByRoute(route);
+});
 </script>
 
 <template>
@@ -43,8 +36,8 @@ const onLogin = () => {
           />
         </RouterLink>
       </h1>
-      <LoginButton v-if="!hasJoin" @onLogin="onLogin" />
-      <LogoutButton v-if="hasJoin" @onLogout="onLogout" />
+      <LoginButton v-if="!authInfo" @onLogin="auth.toGithubLoginPage()" />
+      <LogoutButton v-if="authInfo" @onLogout="auth.onLogout()" />
     </div>
 
     <!--두번째줄-->
@@ -54,7 +47,7 @@ const onLogin = () => {
           <span
             :class="{
               'font-noto_sans_m relative after:block after:w-full after:h-[0.3px] after:bg-white after:mt-1 after:content-[\'\']':
-                item.hasActive
+                item.isActive
             }"
           >
             {{ item.title }}

@@ -1,4 +1,4 @@
-import { useAuthStatusStore } from '@/stores/authStore.js';
+import { useAuthStore } from '@/stores/authStore.js';
 import { apiResponseModalStore } from '@/stores/modalStore.js';
 import { apiGetUserInfo } from '@/api/user/user.js';
 import { reactive } from 'vue';
@@ -6,7 +6,7 @@ import defaultProfile from '/assets/images/default_profile.png';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 export class UserManager {
-  #authStatusStore = useAuthStatusStore();
+  #authStore = useAuthStore();
   #apiResponseModal = apiResponseModalStore();
   #spinnerStore = useSpinnerStore();
   #profile = reactive({
@@ -35,7 +35,7 @@ export class UserManager {
     let info;
     if (this.#hasOwner(externalId)) {
       // 내정보
-      info = this.#authStatusStore.getAuth;
+      info = this.#authStore.getAuth;
       this.#profile.hasOwner = true;
     } else {
       // TODO: 서버에서 유저정보가져오기
@@ -56,7 +56,7 @@ export class UserManager {
   }
 
   #hasOwner(externalId) {
-    return this.#authStatusStore.hasOwner(externalId);
+    return this.#authStore.hasOwner(externalId);
   }
 
   checkInfoValidation() {
