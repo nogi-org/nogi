@@ -40,6 +40,8 @@ dependencies {
     implementation 'io.github.openfeign:feign-httpclient:11.8'
     // dotenv(todo: 필요여부 따라 삭제하기)
     testImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
+    // H2
+    runtimeOnly 'com.h2database:h2'
     // MySQL
     runtimeOnly 'com.mysql:mysql-connector-j'
     // querydsl
@@ -62,6 +64,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'  // API 의존성
     implementation 'io.jsonwebtoken:jjwt-impl:0.12.3' // 구현체
     implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3' // JSON 처리용 Jackson 의존성
+
+    // springdoc-openapi
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
 }
 
 tasks.named('test') {
