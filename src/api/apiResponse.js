@@ -33,13 +33,10 @@ export const handleLogout = response => {
 export const handleUserInfo = response => {
   switch (response.code) {
     case ApiResponse.S_0:
-      response.message = '변경완료되었습니다.';
+      response.message = '정상적으로 등록완료했어요.';
       break;
     case ApiResponse.AUTH_0:
       response.message = '요청한 유저정보를 찾을 수 없습니다.';
-      break;
-    case ApiResponse.USER_0:
-      response.message = '중복된 닉네임입니다.';
       break;
   }
   return response;

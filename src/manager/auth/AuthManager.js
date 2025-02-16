@@ -25,7 +25,8 @@ export class AuthManager {
   // github 로그인 URL 요청
   async toGithubLoginPage() {
     this.#spinnerStore.on();
-    window.location.href = await getGithubLoginURL();
+    const response = await getGithubLoginURL();
+    window.location.href = response.result;
     this.#spinnerStore.off();
   }
 

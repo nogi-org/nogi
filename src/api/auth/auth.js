@@ -2,7 +2,7 @@ import api from '@/api/index.js';
 import { handleLogout } from '@/api/apiResponse.js';
 
 export const getGithubLoginURL = () => {
-  return api.get('/github/auth-url').then(success => success.result);
+  return api.get('/github/auth-url').then(success => success);
 };
 
 export const apiLogout = () => {
