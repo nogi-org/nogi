@@ -11,6 +11,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/*
+  Package Name : kr.co.nogibackend.util
+  File Name    : CookieUtil
+  Author       : won taek oh
+  Created Date : 25. 2. 13.
+  Description  :
+ */
 @Component
 public class CookieUtil {
 
@@ -49,5 +56,5 @@ public class CookieUtil {
 	public static int createAccessTokenCookieExpTime() {
 		return (int)(ACCESS_TOKEN_VALIDITY / 1000);
 	}
-	
+
 }

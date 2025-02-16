@@ -27,6 +27,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
+import kr.co.nogibackend.util.AuthTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -246,7 +247,7 @@ public class GithubService {
 	}
 
 	public GithubUserResult getUserInfo(String accessToken) {
-		String token = "Bearer " + accessToken;
+		String token = AuthTokenUtil.generateBearerToken(accessToken);
 
 		GithubUserInfo userInfo = githubClient.getUserInfo(token);
 		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
@@ -260,7 +261,7 @@ public class GithubService {
 	public void createRepository(String repositoryName, String accessToken) {
 		githubClient.createUserRepository(
 			new GithubRepoRequest(repositoryName, true),
-			accessToken
+			AuthTokenUtil.generateBearerToken(accessToken)
 		);
 	}
 }
