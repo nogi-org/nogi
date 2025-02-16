@@ -7,6 +7,7 @@ import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class LoginController {
+public class AuthController {
 
 	private final UserFacade userFacade;
 	private final CookieUtil cookieUtil;
@@ -79,6 +80,12 @@ public class LoginController {
 
 		// 프론트엔드 리다이렉트 주소로 이동
 		response.sendRedirect(redirectUrl);
+		return Response.success();
+	}
+
+	@PutMapping("/logout")
+	public ResponseEntity<?> logout(HttpServletResponse response) {
+		cookieUtil.deleteCookie(response, ACCESS_COOKIE_NAME);
 		return Response.success();
 	}
 

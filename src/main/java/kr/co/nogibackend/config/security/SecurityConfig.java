@@ -52,9 +52,7 @@ public class SecurityConfig {
 
 		// USER 권한 설정
 		Map<HttpMethod, String> USER_URL =
-			Map.of(
-				HttpMethod.GET, "/guide/list"
-			);
+			Map.of();
 
 		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);
 		ROLE_PERMISSIONS.put(User.Role.USER.name(), USER_URL);
@@ -84,6 +82,7 @@ public class SecurityConfig {
 				// 그 외 모든 요청은 허용
 				authorizeRequests.anyRequest().permitAll();
 			})
+			.logout(AbstractHttpConfigurer::disable)
 			.addFilterBefore(securityTokenFilter, UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
