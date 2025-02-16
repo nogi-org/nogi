@@ -7,59 +7,59 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
+import kr.co.nogibackend.domain.user.User;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class JwtProvider {
 
-	private static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;  // 24시간
-	private static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일
+	public static final long ACCESS_TOKEN_VALIDITY = 1000L * 60 * 60 * 24;  // 24시간
+	public static final long REFRESH_TOKEN_VALIDITY = 1000L * 60 * 60 * 24 * 7;  // 7일
 	private final SecretKey secretKey;
 	private final JwtParser jwtParser;
 
 	public JwtProvider(@Value("${jwt.secret}") String secret) {
-		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));  // 🔥 Secret Key 변경
-		this.jwtParser = Jwts.parser().verifyWith(secretKey).build();  // 🔥 JwtParser 생성
+		this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+		this.jwtParser = Jwts.parser().verifyWith(secretKey).build();
 	}
 
-	/**
-	 * JWT 액세스 토큰 생성
-	 */
-	public String generateToken(Long userId) {
-		return Jwts.builder()
-			.subject(String.valueOf(userId))
-			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
-			.signWith(secretKey)
-			.compact();
+	// JWT 액세스 토큰 생성
+	public String generateToken(Long userId, User.Role role) {
+		return
+			Jwts
+				.builder()
+				.subject(String.valueOf(userId))
+				.claim("role", role.name())
+				.issuedAt(new Date())
+				.expiration(new Date(System.currentTimeMillis() + ACCESS_TOKEN_VALIDITY))
+				.signWith(secretKey)
+				.compact();
 	}
 
-	/**
-	 * JWT 리프레시 토큰 생성
-	 */
+	// JWT 리프레시 토큰 생성
 	public String generateRefreshToken(Long userId) {
-		return Jwts.builder()
-			.subject(String.valueOf(userId))
-			.issuedAt(new Date())
-			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
-			.signWith(secretKey)
-			.compact();
+		return
+			Jwts
+				.builder()
+				.subject(String.valueOf(userId))
+				.issuedAt(new Date())
+				.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_VALIDITY))
+				.signWith(secretKey)
+				.compact();
 	}
 
-	/**
-	 * JWT 검증
-	 */
+	// JWT 검증
 	public boolean validateToken(String token) {
 		try {
-			jwtParser.parseSignedClaims(token);  // 🔥 새 방식 적용
+			jwtParser.parseSignedClaims(token);
 			return true;
 		} catch (ExpiredJwtException e) {
 			log.error("JWT Token 만료");
@@ -69,24 +69,31 @@ public class JwtProvider {
 		return false;
 	}
 
-	/**
-	 * JWT에서 사용자 ID 추출
-	 */
-	public Long getUserIdFromToken(String token) {
-		return Long.valueOf(jwtParser.parseSignedClaims(token)
-			.getPayload()
-			.getSubject());
+	// JWT 에서 유저 정보 가져오기
+	public Auth getUserInfoFromToken(String token) {
+		Claims claims = jwtParser.parseSignedClaims(token).getPayload();
+		Long userId = Long.valueOf(claims.getSubject());
+
+		String roleString = claims.get("role", String.class);
+		User.Role role = User.Role.valueOf(roleString);
+
+		return
+			Auth
+				.builder()
+				.userId(userId)
+				.role(role)
+				.build();
 	}
 
-	/**
-	 * 요청 헤더에서 JWT 토큰 추출
-	 */
-	public String resolveToken(HttpServletRequest request) {
-		String bearerToken = request.getHeader("Authorization");
-		if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-			return bearerToken.substring(7);
-		}
-		return null;
-	}
+	// todo: 쿠키 방식이면 메소드 사용 안함
+	// 요청 헤더에서 JWT 토큰 추출
+	// public Optional<String> resolveToken(HttpServletRequest request) {
+	// 	return
+	// 		Optional
+	// 			.ofNullable(request.getHeader(HttpHeaders.AUTHORIZATION))
+	// 			.filter(token -> token.length() >= 7 && token.substring(0, 7).equalsIgnoreCase("Bearer "))
+	// 			.map(token -> token.substring(7));
+	// }
+
 }
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.domain.guide.GuideService;
 import kr.co.nogibackend.domain.guide.dto.request.GuideRegisterRequest;
 import kr.co.nogibackend.domain.guide.dto.request.GuideUpdateRequest;
@@ -24,8 +25,9 @@ public class GuideController {
 
 	private final GuideService guideService;
 
+	// todo: userId 등록 필요, 지금 하드코딩 되어잇음
 	@PostMapping
-	public ResponseEntity<?> registerGuide(@Validated @RequestBody GuideRegisterRequest request) {
+	public ResponseEntity<?> registerGuide(@Validated @RequestBody GuideRegisterRequest request, Auth auth) {
 		return Response.success(guideService.registerGuide(request.toCommand()));
 	}
 

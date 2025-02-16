@@ -209,16 +209,17 @@ public class UserService {
 				return existingUser;
 			})
 			.orElseGet(() -> {
-				User newUser = User.builder()
-					.role(Role.USER) // 기본 역할 설정 (필요 시 변경)
-					.notionAuthToken(command.getNotionAuthToken())
-					.notionDatabaseId(command.getNotionDatabaseId())
-					.githubAuthToken(command.getGithubAuthToken())
-					.githubRepository(command.getGithubRepository())
-					.githubDefaultBranch(command.getGithubDefaultBranch())
-					.githubEmail(command.getGithubEmail())
-					.githubOwner(command.getGithubOwner())
-					.build();
+				User newUser =
+					User.builder()
+						.role(Role.USER)
+						.notionAuthToken(command.getNotionAuthToken())
+						.notionDatabaseId(command.getNotionDatabaseId())
+						.githubAuthToken(command.getGithubAuthToken())
+						.githubRepository(command.getGithubRepository())
+						.githubDefaultBranch(command.getGithubDefaultBranch())
+						.githubEmail(command.getGithubEmail())
+						.githubOwner(command.getGithubOwner())
+						.build();
 				return userRepository.saveUser(newUser);
 			});
 

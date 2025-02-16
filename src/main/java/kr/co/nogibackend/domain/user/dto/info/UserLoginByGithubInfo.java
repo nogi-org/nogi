@@ -18,21 +18,24 @@ public class UserLoginByGithubInfo {
 	private String accessToken;
 
 	public static UserLoginByGithubInfo from(UserResult userresult, String accessToken) {
-		return UserLoginByGithubInfo.builder()
-			.userInfo(
-				new UserInfo(
-					userresult.id(),
-					userresult.notionAuthToken(),
-					userresult.notionDatabaseId(),
-					userresult.githubAuthToken(),
-					userresult.githubRepository(),
-					userresult.githubDefaultBranch(),
-					userresult.githubEmail(),
-					userresult.githubOwner()
+		return
+			UserLoginByGithubInfo
+				.builder()
+				.userInfo(
+					new UserInfo(
+						userresult.id(),
+						userresult.role(),
+						userresult.notionAuthToken(),
+						userresult.notionDatabaseId(),
+						userresult.githubAuthToken(),
+						userresult.githubRepository(),
+						userresult.githubDefaultBranch(),
+						userresult.githubEmail(),
+						userresult.githubOwner()
+					)
 				)
-			)
-			.accessToken(accessToken)
-			.build();
+				.accessToken(accessToken)
+				.build();
 	}
 
 	/*

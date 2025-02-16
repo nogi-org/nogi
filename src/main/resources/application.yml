@@ -1,7 +1,3 @@
 spring:
   profiles:
-    active: local
-
-# Security 도입 후 제거
-cors:
-  allowed-origins: "http://localhost:5173"
+    active: dev
