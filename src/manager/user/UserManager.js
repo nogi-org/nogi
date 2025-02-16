@@ -1,13 +1,13 @@
 import { useAuthStore } from '@/stores/authStore.js';
-import { apiResponseModalStore } from '@/stores/modalStore.js';
 import { apiGetUserInfo } from '@/api/user/user.js';
 import { reactive } from 'vue';
 import defaultProfile from '/assets/images/default_profile.png';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
+import { useApiResponseModalStore } from '@/stores/apiResponseModalStore.js';
 
 export class UserManager {
   #authStore = useAuthStore();
-  #apiResponseModal = apiResponseModalStore();
+  #apiResponseModal = useApiResponseModalStore();
   #spinnerStore = useSpinnerStore();
   #profile = reactive({
     externalId: '',

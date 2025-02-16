@@ -1,12 +1,5 @@
 import api from '@/api/index.js';
-import { handleProfileImage, handleUserInfo } from '@/api/apiResponse.js';
-
-export const apiUpdateProfileImage = payload => {
-  return api
-    .put('/v1/user/profile', payload)
-    .then(res => handleProfileImage(res.data))
-    .catch(error => handleProfileImage(error.response.data));
-};
+import { handleUserInfo } from '@/api/apiResponse.js';
 
 export const apiUpdateUserInfo = payload => {
   return api

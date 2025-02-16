@@ -13,6 +13,7 @@ import { far } from '@fortawesome/free-regular-svg-icons';
 // datepicker
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+
 const app = createApp(App);
 
 app.use(createPinia());
@@ -20,5 +21,3 @@ app.use(router);
 app.component('font-awesome-icon', FontAwesomeIcon).mount('#app');
 app.component('VueDatePicker', VueDatePicker);
 library.add(fas, far);
-
-// window.Kakao.init(import.meta.env.VITE_KAKAO_JS_KEY);

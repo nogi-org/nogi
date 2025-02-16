@@ -1,13 +1,15 @@
-import { ApiResponse, handleCommonError } from '@/api/apiResponse.js';
+import {
+  ApiResponse,
+  convertResponseFormat,
+  handleCommonError
+} from '@/api/apiResponse.js';
 import router from '@/router/index.js';
-import { apiResponseModalStore } from '@/stores/modalStore.js';
+import { useAuthStore } from '@/stores/authStore.js';
 
 export function setInterceptors(instance) {
   //요청 인터셉터
   instance.interceptors.request.use(
     config => {
-      // todo: 쿠키로 바꾸면 필요없음
-      // config.headers.Authorization = AuthManager.getToken();
       return config;
     },
     error => {
@@ -20,11 +22,12 @@ export function setInterceptors(instance) {
   instance.interceptors.response.use(
     response => {
       //응답에 대한 로직
-      return response;
+      return convertResponseFormat(response.data);
     },
     error => {
-      handleInterceptorCommonError(error);
-      return Promise.reject(error);
+      const response = convertResponseFormat(error.response.data);
+      handleInterceptorCommonError(response);
+      return Promise.reject(response);
     }
   );
 
@@ -32,16 +35,17 @@ export function setInterceptors(instance) {
 }
 
 // 공통 에러처리
-function handleInterceptorCommonError(error) {
-  const response = handleCommonError(error.response);
-  if (!response) return;
-  if (response.code === ApiResponse.AUTH_2) {
-    router.push({ name: 'home' }).then(() => {
-      // todo: 작업하기
-      // authStore().deleteAuth();
-      apiResponseModalStore().onActive(response);
-    });
-  } else {
-    apiResponseModalStore().onActive(response);
+function handleInterceptorCommonError(response) {
+  const isCommonError = handleCommonError(response);
+  if (!isCommonError) return;
+
+  switch (response.code) {
+    case ApiResponse.USER_2: // 401
+      router.push({ name: 'home' });
+      useAuthStore().deleteAuth();
+      break;
+    case ApiResponse.USER_3: // 403
+      router.push({ name: 'home' });
+      break;
   }
 }

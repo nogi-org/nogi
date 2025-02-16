@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
-import { onMounted, watchEffect } from 'vue';
+import { onMounted, watch, watchEffect } from 'vue';
 import { useNavigationStore } from '@/stores/navigationStore.js';
 import LoginButton from '@/components/buttons/LoginButton.vue';
 import LogoutButton from '@/components/buttons/LogoutButton.vue';
@@ -17,6 +17,14 @@ const navigations = navigationStore.getNavigations();
 onMounted(() => {
   navigationStore.setIsVisibleByAuth();
 });
+
+watch(
+  () => authInfo.value,
+  newValue => {
+    navigationStore.setIsVisibleByAuth();
+  },
+  { deep: true }
+);
 
 watchEffect(() => {
   navigationStore.setIsActiveByRoute(route);

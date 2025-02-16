@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { initFlowbite, Modal } from 'flowbite';
-import { apiResponseModalStore } from '@/stores/modalStore.js';
+import { useApiResponseModalStore } from '@/stores/apiResponseModalStore.js';
 
 let modal;
 const modalEl = ref(null);
-const alertStore = apiResponseModalStore();
+const alertStore = useApiResponseModalStore();
 
 onMounted(() => {
   initFlowbite();
@@ -14,12 +14,12 @@ onMounted(() => {
 
 watch(
   () => alertStore.getActive.hasActive,
-  (hasActive) => {
+  hasActive => {
     if (hasActive) modal.show();
   }
 );
 
-const createModal = (modalEl) => {
+const createModal = modalEl => {
   const options = {
     onHide: () => {
       alertStore.offActive();
@@ -63,19 +63,19 @@ const createModal = (modalEl) => {
           <div
             class="flex items-center justify-center text-xs py-2 font-noto_sans_m"
             :class="{
-              'text-danger': !alertStore.getActive.contents.isStatus,
-              'text-action': alertStore.getActive.contents.isStatus
+              'text-danger': !alertStore.getActive.contents.isSuccess,
+              'text-action': alertStore.getActive.contents.isSuccess
             }"
           >
             <font-awesome-icon
               icon="fa-regular fa-circle-check"
               class="mr-1"
-              v-if="alertStore.getActive.contents.isStatus"
+              v-if="alertStore.getActive.contents.isSuccess"
             />
             <font-awesome-icon
               icon="fa-solid fa-ban"
               class="mr-1"
-              v-if="!alertStore.getActive.contents.isStatus"
+              v-if="!alertStore.getActive.contents.isSuccess"
             />
             <p>
               {{ alertStore.getActive.contents.code }}

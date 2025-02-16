@@ -1,16 +1,13 @@
 import api from '@/api/index.js';
-import { handleJoin, handleUserInfo } from '@/api/apiResponse.js';
+import { handleLogout } from '@/api/apiResponse.js';
 
 export const getGithubLoginURL = () => {
-  return api
-    .get('/github/auth-url')
-    .then(res => res.data.result)
-    .catch(error => handleUserInfo(error.response));
+  return api.get('/github/auth-url').then(success => success.result);
 };
 
 export const apiLogout = () => {
   return api
-    .put('v1/auth/out')
-    .then(res => res.data)
-    .catch(error => handleJoin(error.response.data));
+    .put('/logout')
+    .then(success => handleLogout(success))
+    .catch(error => handleLogout(error));
 };

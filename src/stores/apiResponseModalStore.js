@@ -1,8 +1,8 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
-export const apiResponseModalStore = defineStore(
-  'apiResponseModalStore',
+export const useApiResponseModalStore = defineStore(
+  'useApiResponseModalStore',
   () => {
     const hasActive = ref(false); // 모달 활성화 여부
     const contents = ref({}); // 모달 내용(에러, 성공 모달 구분)
@@ -13,7 +13,7 @@ export const apiResponseModalStore = defineStore(
 
     function onActive(payload) {
       contents.value = {
-        isStatus: payload.isStatus,
+        isSuccess: payload.isSuccess,
         code: payload.code,
         message: payload.message
       };
