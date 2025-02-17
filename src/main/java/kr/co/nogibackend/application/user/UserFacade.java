@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.github.GithubService;
+import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.domain.user.UserService;
@@ -63,10 +64,12 @@ public class UserFacade {
 			userResult.githubRepository() == null ||
 				!userResult.githubRepository().equals(command.getGithubRepository())
 		) {
-			githubService.createRepository(
+			GithubRepoInfo githubRepoInfo = githubService.createRepository(
 				command.getGithubRepository(),
 				userResult.githubAuthToken()
 			);
+			// default branch 수정
+			command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
 		}
 
 		// 3. DB 에 user 정보 업데이트

@@ -16,6 +16,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
@@ -258,8 +259,8 @@ public class GithubService {
 		);
 	}
 
-	public void createRepository(String repositoryName, String accessToken) {
-		githubClient.createUserRepository(
+	public GithubRepoInfo createRepository(String repositoryName, String accessToken) {
+		return githubClient.createUserRepository(
 			new GithubRepoRequest(repositoryName, true),
 			AuthTokenUtil.generateBearerToken(accessToken)
 		);
