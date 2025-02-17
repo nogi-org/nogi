@@ -16,20 +16,17 @@ export class UserManager {
   });
 
   async getUserInfo() {
-    const auth = this.#authStore.getAuth();
-    const response = await apiGetUserInfo(auth.value.userId);
+    const response = await apiGetUserInfo();
     return response.result;
   }
 
   async updateUserInfo(userInfo) {
     this.#spinnerStore.on();
-    const auth = this.#authStore.getAuth();
     // todo: validation check
     const response = await apiRegisterUserInfo({
-      ...userInfo,
-      userId: auth.value.userId,
-      githubDefaultBranch: 'main',
-      githubRepository: 'nogi_demo'
+      notionAuthToken: userInfo.notionAuthToken,
+      notionDatabaseId: userInfo.notionDatabaseId,
+      githubRepository: userInfo.githubRepository
     });
     this.#spinnerStore.off();
     this.#apiResponseModalStore.onActive(response);

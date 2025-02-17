@@ -16,7 +16,8 @@ export default {
         main: '#23263F',
         action: '#2F6BCC',
         danger: '#C12E3A',
-        warning: '#C98A2A'
+        warning: '#C98A2A',
+        neutral: '#9ca3af'
       },
       fontFamily: {
         noto_sans_l: ['NotoSansKR-Light'],
