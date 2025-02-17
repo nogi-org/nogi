@@ -52,7 +52,10 @@ public class SecurityConfig {
 
 		// USER 권한 설정
 		Map<HttpMethod, String> USER_URL =
-			Map.of();
+			Map.of(
+				HttpMethod.GET, "/users",
+				HttpMethod.PATCH, "/users/{id}"
+			);
 
 		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);
 		ROLE_PERMISSIONS.put(User.Role.USER.name(), USER_URL);

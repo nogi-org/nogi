@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.nogibackend.application.user.UserFacade;
+import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.interfaces.user.dto.UserResponse;
 import kr.co.nogibackend.interfaces.user.dto.UserUpdateRequest;
@@ -30,13 +31,9 @@ public class UserController {
 	private final UserService userService;
 	private final UserFacade userFacade;
 
-	@GetMapping("{id}")
-	public ResponseEntity<?> getUser(@PathVariable Long id) {
-		return Response.success(
-			UserResponse.from(
-				userService.findUserById(id)
-			)
-		);
+	@GetMapping
+	public ResponseEntity<?> getUser(Auth auth) {
+		return Response.success(UserResponse.from(userService.findUserById(auth.getUserId())));
 	}
 
 	@PatchMapping("{id}")
