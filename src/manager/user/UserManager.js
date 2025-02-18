@@ -125,4 +125,12 @@ export class UserManager {
   get infoUpdateValidation() {
     return this.#infoUpdateValidation;
   }
+
+  get demo() {
+    return this.#checkRepositoryName;
+  }
+
+  get demo1() {
+    return this.#spinnerStore;
+  }
 }
