@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
@@ -263,6 +264,14 @@ public class GithubService {
 		return githubClient.createUserRepository(
 			new GithubRepoRequest(repositoryName, true),
 			AuthTokenUtil.generateBearerToken(accessToken)
+		);
+	}
+
+	public void validateRepositoryName(GithubGetRepositoryCommand command) {
+		githubClient.validateRepositoryName(
+			command.owner(),
+			command.repoName(),
+			AuthTokenUtil.generateBearerToken(command.token())
 		);
 	}
 }

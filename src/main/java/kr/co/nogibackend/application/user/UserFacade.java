@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.github.GithubService;
+import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
@@ -74,5 +75,19 @@ public class UserFacade {
 
 		// 3. DB 에 user 정보 업데이트
 		return userService.updateUser(command);
+	}
+
+	public void validateRepositoryName(
+		UserFacadeCommand.ValidateRepositoryName command
+	) {
+		UserResult userResult = userService.findUserByIdForFacade(command.userId());
+
+		githubService.validateRepositoryName(
+			new GithubGetRepositoryCommand(
+				userResult.githubOwner(),
+				command.repositoryName(),
+				userResult.githubAuthToken()
+			)
+		);
 	}
 }
