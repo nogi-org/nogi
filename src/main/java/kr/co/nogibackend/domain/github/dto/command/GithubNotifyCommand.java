@@ -10,20 +10,6 @@ public record GithubNotifyCommand(
 	Map<Long, GithubUser> userMap,
 	GithubMasterUser masterUser
 ) {
-	public record GithubUser(
-		Long id,
-		String authToken,
-		String Repo,
-		String email,
-		String owner
-	) {
-	}
-
-	public record GithubMasterUser(
-		String authToken
-	) {
-	}
-
 	public static GithubNotifyCommand from(
 		List<UserResult> userResultList,
 		UserResult masterUser
@@ -39,5 +25,19 @@ public record GithubNotifyCommand(
 			githubUserMap,
 			new GithubMasterUser(masterUser.githubAuthToken())
 		);
+	}
+
+	public record GithubUser(
+		Long id,
+		String AuthToken,
+		String Repo,
+		String email,
+		String owner
+	) {
+	}
+
+	public record GithubMasterUser(
+		String AuthToken
+	) {
 	}
 }

@@ -30,21 +30,21 @@ public interface NotionFeignClient {
 
 	@PostMapping("/databases/{databaseId}/query")
 	ResponseEntity<NotionInfo<NotionPageInfo>> getPagesFromDatabase(
-		@RequestHeader("Authorization") String authToken,
+		@RequestHeader("Authorization") String AuthToken,
 		@PathVariable(value = "databaseId") String databaseId,
 		Map<String, Object> request
 	);
 
 	@GetMapping("/blocks/{pageId}/children?page_size=100")
 	ResponseEntity<NotionInfo<NotionBlockInfo>> getBlocksFromPage(
-		@RequestHeader("Authorization") String authToken,
+		@RequestHeader("Authorization") String AuthToken,
 		@PathVariable(value = "pageId") String pageId,
 		@RequestParam(value = "start_cursor", required = false) String startCursor
 	);
 
 	@RequestMapping(method = RequestMethod.PATCH, value = "/pages/{pageId}")
 	ResponseEntity<NotionPageInfo> updatePageStatus(
-		@RequestHeader("Authorization") String authToken,
+		@RequestHeader("Authorization") String AuthToken,
 		@PathVariable(value = "pageId") String pageId,
 		@RequestBody Map<String, Object> request
 	);

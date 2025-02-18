@@ -83,7 +83,7 @@ public class GithubService {
 				new GithubCommitResult(
 					command.userId(),
 					command.notionPageId(),
-					command.notionAuthToken(),
+					command.notionBotToken(),
 					command.newCategory(),
 					command.newTitle()
 				)
@@ -204,7 +204,7 @@ public class GithubService {
 					markdownMessage,
 					List.of(githubUser.owner())
 				),
-				command.masterUser().authToken()
+				command.masterUser().AuthToken()
 			);
 		});
 	}

@@ -40,21 +40,18 @@ import kr.co.nogibackend.domain.user.NogiHistoryType;
 @ActiveProfiles("test-github")
 class GithubFeignClientIntegrationTest {
 
+	private static Dotenv dotenv;// .env 파일 로드
+	private final String repo = "nogi-test-repo10";
 	@Autowired
 	private GithubFeignClient githubFeignClient;
-
 	@Autowired
 	private GithubService githubService;
-
 	@Value("${github.token}")
 	private String token;// 환경변수로 주입
-
 	@Value("${github.nogi-bot-token}")
-	private String nogiBotToken;// 환경변수로 주입
+	private String nogiAuthToken;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private final String repo = "nogi-test-repo10";
 	private String barerToken;// beforeEach 에서 초기화
-	private static Dotenv dotenv;// .env 파일 로드
 
 	@BeforeAll
 	static void setup() {
@@ -65,6 +62,11 @@ class GithubFeignClientIntegrationTest {
 	static void setProperties(DynamicPropertyRegistry registry) {
 		registry.add("github.token", () -> dotenv.get("TEST_GITHUB_TOKEN"));
 		registry.add("github.nogi-bot-token", () -> dotenv.get("NOGI_BOT_GITHUB_TOKEN"));
+	}
+
+	private static String getNowDate() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
+		return OffsetDateTime.now().format(formatter);
 	}
 
 	@BeforeEach
@@ -133,7 +135,7 @@ class GithubFeignClientIntegrationTest {
 		String mdContent = String.format("""
 			# Hello GitHub
 			This is a test markdown file with an image.4
-
+			
 			![Red Image](%s/이미지1.jpeg)
 			![Blue Image](%s/이미지2.jpeg)
 			""", rootImgPath, rootImgPath);
@@ -165,11 +167,6 @@ class GithubFeignClientIntegrationTest {
 		);
 	}
 
-	private static String getNowDate() {
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssXXX");
-		return OffsetDateTime.now().format(formatter);
-	}
-
 	/**
 	 * 📌 `resources/image` 폴더의 이미지를 읽고 Base64로 변환하는 유틸 메서드
 	 */
@@ -198,7 +195,7 @@ class GithubFeignClientIntegrationTest {
 				"Test Issue Body @" + owner,
 				List.of(owner)
 			),
-			"Bearer " + nogiBotToken);
+			"Bearer " + nogiAuthToken);
 	}
 
 	@Test

@@ -9,7 +9,7 @@ import lombok.Getter;
 public class NotionStartTILCommand {
 
 	private Long userId;
-	private String notionAuthToken;
+	private String notionBotToken;
 	private String notionDatabaseId;
 
 	public static NotionStartTILCommand from(
@@ -17,7 +17,7 @@ public class NotionStartTILCommand {
 	) {
 		return NotionStartTILCommand.builder()
 			.userId(userResult.id())
-			.notionAuthToken(userResult.notionAuthToken())
+			.notionBotToken(userResult.notionBotToken())
 			.notionDatabaseId(userResult.notionDatabaseId())
 			.build();
 	}

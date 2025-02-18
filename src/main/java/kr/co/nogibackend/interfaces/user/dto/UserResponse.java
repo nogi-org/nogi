@@ -14,7 +14,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserResponse {
 	private Long id;
-	private String notionAuthToken;
+	private String notionBotToken;
 	private String notionDatabaseId;
 	private String githubAuthToken;
 	private String githubRepository;
@@ -25,7 +25,7 @@ public class UserResponse {
 	public static UserResponse from(UserInfo userInfo) {
 		return UserResponse.builder()
 			.id(userInfo.id())
-			.notionAuthToken(userInfo.notionAuthToken())
+			.notionBotToken(userInfo.notionBotToken())
 			.notionDatabaseId(userInfo.notionDatabaseId())
 			.githubAuthToken(userInfo.githubAuthToken())
 			.githubRepository(userInfo.githubRepository())

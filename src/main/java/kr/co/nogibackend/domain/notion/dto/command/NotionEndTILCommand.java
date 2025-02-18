@@ -4,7 +4,7 @@ import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 
 public record NotionEndTILCommand(
 	Long userId,// 유저 ID
-	String notionAuthToken, // notion auth token
+	String notionBotToken, // notion auth token
 	String notionPageId, // notion page id
 	String category,// 디렉터리 하위 구조
 	String title,// 제목(ex 파일명.md 에서 파일명으로 사용할 값)
@@ -16,7 +16,7 @@ public record NotionEndTILCommand(
 	) {
 		return new NotionEndTILCommand(
 			githubCommitResult.userId(),
-			githubCommitResult.notionAuthToken(),
+			githubCommitResult.notionBotToken(),
 			githubCommitResult.notionPageId(),
 			githubCommitResult.category(),
 			githubCommitResult.title(),

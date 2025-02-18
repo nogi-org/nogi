@@ -93,7 +93,7 @@ public class UserService {
 				user.getGithubDefaultBranch(),
 				user.getGithubEmail(),
 				command.notionPageId(),
-				user.getNotionAuthToken(),
+				user.getNotionBotToken(),
 				NogiHistoryType.CREATE_OR_UPDATE_CONTENT,
 				command.category(),
 				command.title(),
@@ -116,7 +116,7 @@ public class UserService {
 			user.getGithubDefaultBranch(),
 			user.getGithubEmail(),
 			command.notionPageId(),
-			user.getNotionAuthToken(),
+			user.getNotionBotToken(),
 			historyType,
 			command.category(),
 			command.title(),
@@ -212,7 +212,7 @@ public class UserService {
 				User newUser =
 					User.builder()
 						.role(Role.USER)
-						.notionAuthToken(command.getNotionAuthToken())
+						.notionBotToken(command.getNotionBotToken())
 						.notionDatabaseId(command.getNotionDatabaseId())
 						.githubAuthToken(command.getGithubAuthToken())
 						.githubRepository(command.getGithubRepository())

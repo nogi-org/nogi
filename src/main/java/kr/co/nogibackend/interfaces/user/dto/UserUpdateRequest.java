@@ -4,7 +4,7 @@ import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 
 public record UserUpdateRequest(
 	Long id,
-	String notionAuthToken,
+	String notionBotToken,
 	String notionDatabaseId,
 	String githubAuthToken,
 	String githubRepository,
@@ -16,7 +16,7 @@ public record UserUpdateRequest(
 	public UserUpdateCommand toCommand(Long id) {
 		return UserUpdateCommand.builder()
 			.id(id)
-			.notionAuthToken(notionAuthToken())
+			.notionBotToken(notionBotToken())
 			.notionDatabaseId(notionDatabaseId())
 			.githubAuthToken(githubAuthToken())
 			.githubRepository(githubRepository())

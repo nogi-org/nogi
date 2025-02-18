@@ -9,7 +9,7 @@ public record UserCheckTILResult(
 	String branch, // 브랜치 이름
 	String githubEmail,// 깃허브 이메일
 	String notionPageId,// 노션 페이지 ID
-	String notionAuthToken,// 노션 인증 토큰
+	String notionBotToken,// 노션 인증 토큰
 	NogiHistoryType type,// 히스토리 타입
 	String newCategory,// 디렉터리 하위 구조
 	String newTitle,// md 파일 제목
@@ -47,7 +47,7 @@ public record UserCheckTILResult(
 		String branch,
 		String githubEmail,
 		String notionPageId,
-		String notionAuthToken,
+		String notionBotToken,
 		NogiHistoryType type,
 		String newCategory,
 		String newTitle,
@@ -61,7 +61,7 @@ public record UserCheckTILResult(
 			branch,
 			githubEmail,
 			notionPageId,
-			notionAuthToken,
+			notionBotToken,
 			type,
 			newCategory,
 			newTitle,
@@ -79,7 +79,7 @@ public record UserCheckTILResult(
 		String branch,
 		String githubEmail,
 		String notionPageId,
-		String notionAuthToken,
+		String notionBotToken,
 		NogiHistoryType type,
 		String newCategory,
 		String newTitle,
@@ -95,7 +95,7 @@ public record UserCheckTILResult(
 			branch,
 			githubEmail,
 			notionPageId,
-			notionAuthToken,
+			notionBotToken,
 			type,
 			newCategory,
 			newTitle,
