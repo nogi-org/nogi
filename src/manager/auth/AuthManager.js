@@ -12,7 +12,7 @@ export class AuthManager {
   #spinnerStore = useSpinnerStore();
 
   static get AUTH_KEY() {
-    return 'auth';
+    return 'nogi_auth';
   }
 
   static get ROLE() {

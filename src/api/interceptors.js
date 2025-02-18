@@ -9,10 +9,10 @@ import { useAuthStore } from '@/stores/authStore.js';
 export function setInterceptors(instance) {
   //요청 인터셉터
   instance.interceptors.request.use(
-    config => {
+    (config) => {
       return config;
     },
-    error => {
+    (error) => {
       //요청 에러 시 수행 로직
       return Promise.reject(error);
     }
@@ -20,17 +20,15 @@ export function setInterceptors(instance) {
 
   //응답 인터셉터
   instance.interceptors.response.use(
-    response => {
-      //응답에 대한 로직
+    (response) => {
       return convertResponseFormat(response.data);
     },
-    error => {
+    (error) => {
       const response = convertResponseFormat(error.response.data);
       handleInterceptorCommonError(response);
       return Promise.reject(response);
     }
   );
-
   return instance;
 }
 

@@ -23,9 +23,15 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(payload));
   }
 
+  function updateRequireUserInfo(isRequire) {
+    auth.value.requireUserInfo = isRequire;
+    localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(auth.value));
+  }
+
   return {
     getAuth,
     deleteAuth,
-    setAuth
+    setAuth,
+    updateRequireUserInfo
   };
 });

@@ -1,33 +1,37 @@
 <script setup>
-import { onBeforeMount, ref } from 'vue';
+import { onMounted, watch } from 'vue';
 import { UserManager } from '@/manager/user/UserManager.js';
 import Validation from '@/components/common/Validation.vue';
 
 const user = new UserManager();
-const validation = ref({});
-const userInfo = ref({});
+const userInfo = user.info;
+const validation = user.infoUpdateValidation;
 
-// todo: userInfo 매니저에 넣고 매니저에서 ref 전체를 리턴한다.(테스트해보기)
-// const usersss = user.getUserInfo();
-
-onBeforeMount(async () => {
-  await getUserInfo();
+onMounted(async () => {
+  await user.getInfo();
 });
 
-const getUserInfo = async () => {
-  userInfo.value = await user.getUserInfo();
-  console.log('userInfo.value : ', userInfo.value);
-};
+watch(
+  () => userInfo.value.githubRepository,
+  (newValue) => {
+    user.watchRepositoryName(newValue);
+  }
+);
 
 const updateUserInfo = async () => {
-  // todo: 유효성검사를 매니저에 넣는 방법으로 생각해보기
-  const check = user.checkInfoValidation(userInfo.value);
-  if (!check.isResult) {
-    validation.value = check.result;
+  user.checkInfoValidation();
+  if (!validation.value.isResult) {
     return;
   }
-  await user.updateUserInfo(userInfo.value);
-  validation.value = {};
+  await user.updateInfo();
+};
+
+const checkRepositoryName = async () => {
+  await user.checkRepositoryName();
+};
+
+const onManualNogi = async () => {
+  await user.onManualNogi();
 };
 </script>
 
@@ -36,6 +40,7 @@ const updateUserInfo = async () => {
     <div class="border border-main rounded-md p-4 mb-10">
       <button
         class="mb-3 bg-action text-xs px-3 py-2 tracking-widest font-medium rounded-md sm:px-2.5"
+        @click="onManualNogi"
       >
         수동실행
       </button>
@@ -45,8 +50,8 @@ const updateUserInfo = async () => {
           class="text-neutral mr-1 text-sm"
         />
         <span>
-          버튼을 클릭하면 NOGI의 자동 실행 주기를 기다릴 필요 없이, 원하는
-          시점에 즉시 수동으로 실행할 수 있어요.
+          버튼을 클릭하면 NOGI의 자동 실행 주기를 기다릴 필요 없이, 즉시 실행할
+          수 있어요.
         </span>
       </div>
     </div>
@@ -64,12 +69,13 @@ const updateUserInfo = async () => {
         <input
           v-model="userInfo.notionAuthToken"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{ 'ring-danger ring-1': validation.notionAuthToken }"
+          :class="{ 'ring-danger ring-1': validation?.result?.notionAuthToken }"
           placeholder="Notion Auth Token을 입력해주세요."
         />
+        {{ validation?.result?.notionAuthToken }}
         <Validation
-          v-if="validation?.notionAuthToken"
-          :notice="validation?.notionAuthToken"
+          v-if="validation?.result?.notionAuthToken"
+          :notice="validation?.result?.notionAuthToken"
           class="mt-1"
         />
       </li>
@@ -86,15 +92,18 @@ const updateUserInfo = async () => {
         <input
           v-model="userInfo.notionDatabaseId"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{ 'ring-danger ring-1': validation.notionDatabaseId }"
+          :class="{
+            'ring-danger ring-1': validation?.result?.notionDatabaseId
+          }"
           placeholder="Notion Database Id를 입력해주세요."
         />
         <Validation
-          v-if="validation?.notionDatabaseId"
-          :notice="validation?.notionDatabaseId"
+          v-if="validation?.result?.notionDatabaseId"
+          :notice="validation?.result?.notionDatabaseId"
           class="mt-1"
         />
       </li>
+
       <li class="mb-5">
         <label
           for=""
@@ -105,15 +114,26 @@ const updateUserInfo = async () => {
         <input
           v-model="userInfo.githubRepository"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{ 'ring-danger ring-1': validation.githubRepository }"
+          :class="{
+            'ring-danger ring-1': validation?.result?.githubRepository
+          }"
           placeholder="TIL을 기록할 멋진 Repository 이름을 작성해주세요."
         />
         <Validation
-          v-if="validation?.githubRepository"
-          :notice="validation?.githubRepository"
+          v-if="validation?.result?.githubRepository"
+          :notice="validation?.result?.githubRepository"
           class="mt-1"
         />
+        <div class="text-right mt-1">
+          <button
+            class="bg-action text-xs px-2.5 py-1 rounded-md sm:text-sm"
+            @click="checkRepositoryName"
+          >
+            확인
+          </button>
+        </div>
       </li>
+
       <li class="mb-5">
         <label for="" class="relative text-neutral text-sm font-noto_sans_b">
           Github Branch Name
@@ -124,6 +144,7 @@ const updateUserInfo = async () => {
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider text-neutral"
         />
       </li>
+
       <li class="mb-5">
         <label for="" class="relative text-neutral text-sm font-noto_sans_b">
           Github Email
@@ -134,6 +155,7 @@ const updateUserInfo = async () => {
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider text-neutral"
         />
       </li>
+
       <li class="flex justify-end">
         <button
           @click="updateUserInfo"
