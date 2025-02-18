@@ -83,7 +83,7 @@ public class AuthController {
 		return Response.success();
 	}
 
-	@PutMapping("/logout")
+	@PutMapping("logout")
 	public ResponseEntity<?> logout(HttpServletResponse response) {
 		cookieUtil.deleteCookie(response, ACCESS_COOKIE_NAME);
 		return Response.success();

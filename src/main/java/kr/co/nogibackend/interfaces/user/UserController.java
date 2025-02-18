@@ -4,10 +4,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import kr.co.nogibackend.application.nogi.NogiFacade;
 import kr.co.nogibackend.application.user.UserFacade;
 import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.domain.user.UserService;
@@ -24,12 +26,13 @@ import lombok.RequiredArgsConstructor;
   Description  :
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
 
 	private final UserService userService;
 	private final UserFacade userFacade;
+	private final NogiFacade nogiFacade;
 
 	@GetMapping
 	public ResponseEntity<?> getUser(Auth auth) {
@@ -46,6 +49,12 @@ public class UserController {
 				userFacade.updateUserAndCreateRepo(request.toCommand(id))
 			)
 		);
+	}
+
+	@PostMapping("manual-nogi")
+	public ResponseEntity<?> onManualNogi(Auth auth) {
+		nogiFacade.onManual(auth.getUserId());
+		return Response.success();
 	}
 
 }
