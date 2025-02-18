@@ -67,15 +67,15 @@ const onManualNogi = async () => {
           Notion Bot Token
         </label>
         <input
-          v-model="userInfo.notionAuthToken"
+          v-model="userInfo.notionBotToken"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{ 'ring-danger ring-1': validation?.result?.notionAuthToken }"
-          placeholder="Notion Auth Token을 입력해주세요."
+          :class="{ 'ring-danger ring-1': validation?.result?.notionBotToken }"
+          placeholder="Notion Bot Token을 입력해주세요."
         />
-        {{ validation?.result?.notionAuthToken }}
+        {{ validation?.result?.notionBotToken }}
         <Validation
-          v-if="validation?.result?.notionAuthToken"
-          :notice="validation?.result?.notionAuthToken"
+          v-if="validation?.result?.notionBotToken"
+          :notice="validation?.result?.notionBotToken"
           class="mt-1"
         />
       </li>

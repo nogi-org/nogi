@@ -28,11 +28,12 @@ export class UserManager {
         isSuccess: false,
         message: '아래 필수정보를 등록해주세요!'
       });
+      return;
     }
-
-    // todo: 결과 알림
+    this.#spinnerStore.on();
     const response = await onManualNogiApi();
-    console.log('수동실행 결과: ', response);
+    this.#spinnerStore.off();
+    this.#apiResponseModalStore.onActive(response);
   }
 
   async getInfo() {
@@ -75,7 +76,7 @@ export class UserManager {
   async updateInfo() {
     this.#spinnerStore.on();
     const response = await updateUserInfoApi({
-      notionAuthToken: this.#info.value.notionAuthToken,
+      notionBotToken: this.#info.value.notionBotToken,
       notionDatabaseId: this.#info.value.notionDatabaseId,
       githubRepository: this.#info.value.githubRepository
     });
@@ -92,8 +93,8 @@ export class UserManager {
     const validation = this.#infoUpdateValidation.value;
     validation.result = {};
 
-    if (!info.notionAuthToken || !info.notionAuthToken.trim()) {
-      validation.result.notionAuthToken = '꼭 필요한 정보에요!';
+    if (!info.notionBotToken || !info.notionBotToken.trim()) {
+      validation.result.notionBotToken = '꼭 필요한 정보에요!';
     }
 
     if (!info.notionDatabaseId || !info.notionDatabaseId.trim()) {

@@ -31,26 +31,18 @@ const toggleFullImage = (hasAction) => {
 };
 </script>
 
-<!--
-가이드 순서
-1. 노션 봇 만들기
-2. 노션 봇 연결하기
-3. 데이터베이스 가져오기
-4. nogi 페이지에서 회원가입 및 로그인 하기
-5. 내정보 관리에서 정보 등록하기
--->
 <template>
   <div>
     <ul>
       <li
         v-for="guide in userGuides"
         :key="guide.id"
-        class="mb-10 last:mb-0 rounded-md gap-5 flex flex-col md:flex-row md:justify-between md:items-center"
+        class="mb-16 last:mb-0 rounded-md gap-5 flex flex-col md:flex-row md:justify-between md:items-center"
       >
         <img
           :src="guide.image"
           alt="가이드 이미지"
-          class="rounded-md md:w-[60%] cursor-pointer"
+          class="rounded-md md:w-[60%] cursor-pointer border-main border"
           @click="showFullProfileImage(guide.image)"
         />
         <TextEditorContent

@@ -19,9 +19,10 @@ export const checkUserGithubRepositoryApi = (payload) => {
     .catch((error) => handleUserInfo(error));
 };
 
+// todo: response 객체 변경
 export const onManualNogiApi = () => {
   return api
-    .get(`/user/manual-nogi`)
+    .post(`/user/manual-nogi`)
     .then((success) => handleUserInfo(success))
     .catch((error) => handleUserInfo(error));
 };
