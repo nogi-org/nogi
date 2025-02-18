@@ -125,8 +125,4 @@ export class UserManager {
   get infoUpdateValidation() {
     return this.#infoUpdateValidation;
   }
-
-  get demo() {
-    return 'demo';
-  }
 }
