@@ -13,7 +13,13 @@ const spinnerStore = useSpinnerStore();
     <div class="border-b border-main">
       <Header class="layout" />
     </div>
-    <div class="layout py-12">
+    <!-- 현재 라우트가 Home일 경우 layout 및 py-12 스타일 제거 -->
+    <div
+      :class="{
+        'layout': $route.name !== 'home',
+        'py-12': $route.name !== 'home'
+      }"
+    >
       <RouterView />
     </div>
     <div>
