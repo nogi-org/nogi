@@ -47,8 +47,8 @@ public class SecurityConfig {
 		// USER 권한 설정
 		Map<HttpMethod, List<String>> USER_URL =
 			Map.ofEntries(
-				Map.entry(HttpMethod.GET, List.of("/users", "/users/{id}/validate-repository-name")),
-				Map.entry(HttpMethod.PATCH, List.of("/users/{id}")),
+				Map.entry(HttpMethod.GET, List.of("/users", "/users/validate-repository-name")),
+				Map.entry(HttpMethod.PATCH, List.of("/users")),
 				Map.entry(HttpMethod.POST, List.of("/users/manual-nogi"))
 			);
 
