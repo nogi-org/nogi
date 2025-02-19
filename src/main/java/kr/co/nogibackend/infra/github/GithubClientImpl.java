@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import feign.FeignException;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.github.GithubClient;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
@@ -22,6 +24,8 @@ import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
+import kr.co.nogibackend.response.code.GitResponseCode;
+import kr.co.nogibackend.util.GithubErrorParser;
 import lombok.RequiredArgsConstructor;
 
 /*
@@ -44,8 +48,36 @@ public class GithubClientImpl implements GithubClient {
 	}
 
 	@Override
+	public boolean validateRepositoryName(String owner, String repoName, String token) {
+		try {
+			githubFeignClient.getOwnerRepositoryInfo(owner, repoName, token);
+			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+		} catch (FeignException e) {
+			// TODO GithubException 처리 공통으로 처리하도록 수정
+			String detailMessage = GithubErrorParser.extractErrorMessage(e);
+			if (detailMessage.contains("Not Found")) {
+				return true;// 존재하지 않는 레포지토리
+			}
+			throw new GlobalException(GitResponseCode.F_GIT_UNKNOWN, e.getMessage());
+		} catch (Exception e) {
+			throw new GlobalException(GitResponseCode.F_GIT_UNKNOWN, e.getMessage());
+		}
+	}
+
+	@Override
 	public GithubRepoInfo createUserRepository(GithubRepoRequest request, String token) {
-		return githubFeignClient.createUserRepository(request, token);
+		try {
+			return githubFeignClient.createUserRepository(request, token);
+		} catch (FeignException e) {
+			// TODO GithubException 처리 공통으로 처리하도록 수정
+			String detailMessage = GithubErrorParser.extractErrorMessage(e);
+			if (detailMessage.contains("name already exists on this account")) {
+				throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+			}
+			throw new GlobalException(GitResponseCode.F_GIT_UNKNOWN, e.getMessage());
+		} catch (Exception e) {
+			throw new GlobalException(GitResponseCode.F_GIT_UNKNOWN, e.getMessage());
+		}
 	}
 
 	@Override

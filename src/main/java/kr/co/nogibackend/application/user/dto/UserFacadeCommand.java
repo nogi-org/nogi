@@ -9,4 +9,11 @@ public class UserFacadeCommand {
 	) {
 
 	}
+
+	public record ValidateRepositoryName(
+		Long userId,
+		String repositoryName
+	) {
+
+	}
 }

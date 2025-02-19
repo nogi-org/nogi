@@ -7,10 +7,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.co.nogibackend.application.nogi.NogiFacade;
 import kr.co.nogibackend.application.user.UserFacade;
+import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.interfaces.user.dto.UserResponse;
@@ -49,6 +51,17 @@ public class UserController {
 				userFacade.updateUserAndCreateRepo(request.toCommand(id))
 			)
 		);
+	}
+
+	@GetMapping("{id}/validate-repository-name")
+	public ResponseEntity<?> updateUser(
+		@PathVariable(name = "id") Long id,
+		@RequestParam String repositoryName
+	) {
+		userFacade.validateRepositoryName(
+			new UserFacadeCommand.ValidateRepositoryName(id, repositoryName)
+		);
+		return Response.success();
 	}
 
 	@PostMapping("manual-nogi")

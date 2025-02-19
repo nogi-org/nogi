@@ -3,7 +3,6 @@ package kr.co.nogibackend.interfaces.user.dto;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 
 public record UserUpdateRequest(
-	Long id,
 	String notionBotToken,
 	String notionDatabaseId,
 	String githubAuthToken,

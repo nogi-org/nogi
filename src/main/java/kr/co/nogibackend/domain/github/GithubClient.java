@@ -22,6 +22,12 @@ import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 
 public interface GithubClient {
 
+	boolean validateRepositoryName(
+		String owner,
+		String repoName,
+		String token
+	);
+
 	GithubRepoInfo createUserRepository(
 		GithubRepoRequest request,
 		String token

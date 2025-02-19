@@ -19,6 +19,7 @@ public class UserUpdateCommand {
 	private String notionDatabaseId;
 	private String githubAuthToken;
 	private String githubRepository;
+	@Setter
 	private String githubDefaultBranch;
 	private String githubEmail;
 	private String githubOwner;
