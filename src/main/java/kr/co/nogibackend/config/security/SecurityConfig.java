@@ -32,12 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-	private final SecurityTokenFilter securityTokenFilter;
-	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
-	private final CustomAccessDeniedHandler customAccessDeniedHandler;
-	@Value("${cors-config.allowed-origin}")
-	private String allowedOrigin;
-
 	// 권한(Role)별 URL 매핑
 	private static final Map<String, Map<HttpMethod, String>> ROLE_PERMISSIONS = new HashMap<>();
 
@@ -60,6 +54,12 @@ public class SecurityConfig {
 		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);
 		ROLE_PERMISSIONS.put(User.Role.USER.name(), USER_URL);
 	}
+
+	private final SecurityTokenFilter securityTokenFilter;
+	private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+	private final CustomAccessDeniedHandler customAccessDeniedHandler;
+	@Value("${cors-config.allowed-origin}")
+	private List<String> allowedOrigin;
 
 	@Bean
 	protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
@@ -108,10 +108,8 @@ public class SecurityConfig {
 	// CORS 설정
 	private CorsConfigurationSource apiConfigurationSource() {
 		CorsConfiguration configuration = new CorsConfiguration();
-
-		List<String> origins = List.of(this.allowedOrigin);
 		configuration.addAllowedHeader("*");
-		configuration.setAllowedOrigins(origins);
+		configuration.setAllowedOrigins(this.allowedOrigin);
 		configuration.setAllowCredentials(true);
 		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "DELETE", "PUT", "OPTIONS", "PATCH"));
 
