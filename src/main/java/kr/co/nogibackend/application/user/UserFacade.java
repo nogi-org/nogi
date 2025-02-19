@@ -1,10 +1,14 @@
 package kr.co.nogibackend.application.user;
 
+import static kr.co.nogibackend.response.code.UserResponseCode.*;
+
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.github.GithubService;
+import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
@@ -71,6 +75,18 @@ public class UserFacade {
 			);
 			// default branch 수정
 			command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
+
+			// nogi-bot 을 collaborator 로 추가
+			UserResult nogiBot = userService.findNogiBot()
+				.orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+			githubService.addCollaborator(
+				new GithubAddCollaboratorCommand(
+					userResult.githubOwner(),
+					command.getGithubRepository(),
+					nogiBot.githubOwner(),
+					userResult.githubAuthToken()
+				)
+			);
 		}
 
 		// 3. DB 에 user 정보 업데이트

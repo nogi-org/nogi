@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
@@ -20,6 +21,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
+import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
@@ -272,6 +274,16 @@ public class GithubService {
 			command.owner(),
 			command.repoName(),
 			AuthTokenUtil.generateBearerToken(command.token())
+		);
+	}
+
+	public void addCollaborator(GithubAddCollaboratorCommand command) {
+		githubClient.addCollaborator(
+			command.owner(),
+			command.repo(),
+			command.username(),
+			new GithubAddCollaboratorRequest(null),
+			AuthTokenUtil.generateBearerToken(command.accessToken())
 		);
 	}
 }
