@@ -71,17 +71,19 @@ public class NogiFacade {
 			notionEndTILResults.stream().map(UserStoreNogiHistoryCommand::from).toList();
 		userService.storeNogiHistory(userStoreNogiHistoryCommands);
 
-		// github issue 를 통해 유저에게 알림 전송(master user 가 있을 경우)
-		List<UserResult> userResult = userService.getUsersByIds(
-			ExecutionResultContext.getResults()
-				.stream()
-				.map(ExecutionResultContext.ProcessingResult::userId)
-				.distinct()
-				.toArray(Long[]::new)
-		);
-		userService.findNogiBot().ifPresent((masterUser) -> {
-			githubService.notify(GithubNotifyCommand.from(userResult, masterUser));
-		});
+		// user 가 알림을 동의 했을 경우 github issue 를 통해 유저에게 알림 전송
+		if (user.isNotificationAllowed()) {
+			List<UserResult> userResult = userService.getUsersByIds(
+				ExecutionResultContext.getResults()
+					.stream()
+					.map(ExecutionResultContext.ProcessingResult::userId)
+					.distinct()
+					.toArray(Long[]::new)
+			);
+			userService.findNogiBot().ifPresent((masterUser) -> {
+				githubService.notify(GithubNotifyCommand.from(userResult, masterUser));
+			});
+		}
 	}
 
 }
