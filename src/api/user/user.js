@@ -1,5 +1,8 @@
 import api from '@/api/index.js';
-import { handleUserInfo } from '@/api/apiResponse.js';
+import {
+  handleUserInfo,
+  handleValidationGithubRepository
+} from '@/api/apiResponse.js';
 
 export const getUserInfoApi = () => {
   return api.get(`/users`).then(success => success);
@@ -12,11 +15,11 @@ export const updateUserInfoApi = payload => {
     .catch(error => handleUserInfo(error));
 };
 
-export const checkUserGithubRepositoryApi = payload => {
+export const checkValidationGithubRepositoryApi = params => {
   return api
-    .get(`/users/validate-repository-name`, payload)
-    .then(success => handleUserInfo(success))
-    .catch(error => handleUserInfo(error));
+    .get(`/users/validate-repository-name`, { params: params })
+    .then(success => handleValidationGithubRepository(success))
+    .catch(error => handleValidationGithubRepository(error));
 };
 
 // todo: response 객체 변경

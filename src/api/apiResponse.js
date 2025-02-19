@@ -14,6 +14,8 @@ export const ApiResponse = Object.freeze({
   USER_2: 'USER-2',
   USER_3: 'USER-3',
   USER_4: 'USER-4',
+  // github
+  GIT_2: 'GIT-2',
   // 외부
   EXTERNAL_0: 'EXTERNAL-0',
   EXTERNAL_1: 'EXTERNAL-1',
@@ -37,6 +39,18 @@ export const handleUserInfo = response => {
       break;
     case ApiResponse.AUTH_0:
       response.message = '요청한 유저정보를 찾을 수 없습니다.';
+      break;
+  }
+  return response;
+};
+
+export const handleValidationGithubRepository = response => {
+  switch (response.code) {
+    case ApiResponse.S_0:
+      response.message = '사용 가능한 이름입니다.';
+      break;
+    case ApiResponse.GIT_2:
+      response.message = '이미 등록된 이름이에요.';
       break;
   }
   return response;

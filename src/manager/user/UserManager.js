@@ -1,5 +1,6 @@
 import { useAuthStore } from '@/stores/authStore.js';
 import {
+  checkValidationGithubRepositoryApi,
   getUserInfoApi,
   onManualNogiApi,
   updateUserInfoApi
@@ -60,17 +61,16 @@ export class UserManager {
       return;
     }
     // todo: 이름 최소 길이, 최대 길이 체크
-
-    // const response = await checkUserGithubRepositoryApi();
-    const response = { result: true };
+    const params = { repositoryName: this.#info.value.githubRepository };
+    const response = await checkValidationGithubRepositoryApi(params);
     this.#infoUpdateValidation.value.result.githubRepository = '';
 
-    if (response.result) {
+    if (response.isSuccess) {
       this.#checkRepositoryName.value.isCheck = true;
       this.#checkRepositoryName.value.prevName =
         this.#info.value.githubRepository;
     }
-    // TODO: 알림(사용가능한 이름입니다. or 이미 사용중인 이름입니다.)
+    this.#apiResponseModalStore.onActive(response);
   }
 
   async updateInfo() {
@@ -106,7 +106,7 @@ export class UserManager {
     }
 
     if (!this.#checkRepositoryName.value.isCheck) {
-      validation.result.githubRepository = '이름을 확인해주세요!';
+      validation.result.githubRepository = 'Repository 이름을 확인해주세요!';
     }
 
     if (Object.keys(validation.result).length <= 0) {
