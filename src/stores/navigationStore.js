@@ -14,7 +14,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
       isVisible: true
     },
     {
-      title: '내정보',
+      title: 'My Page',
       routeName: 'myPage',
       category: 'myPage',
       isActive: false,
@@ -30,19 +30,19 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
   ]);
 
   function getNavigations() {
-    return computed(() => navigations.filter(item => item.isVisible));
+    return computed(() => navigations.filter((item) => item.isVisible));
   }
 
   function setIsActiveByRoute(route) {
     const category = route.meta.category;
-    navigations.find(navigation => {
+    navigations.find((navigation) => {
       navigation.isActive = navigation.category === category;
     });
   }
 
   function setIsVisibleByAuth() {
-    const myPage = navigations.find(nav => nav.category === 'myPage');
-    const adminPage = navigations.find(nav => nav.category === 'admin');
+    const myPage = navigations.find((nav) => nav.category === 'myPage');
+    const adminPage = navigations.find((nav) => nav.category === 'admin');
 
     if (!authStore.getAuth().value) {
       if (myPage) myPage.isVisible = false;
