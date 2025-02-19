@@ -41,6 +41,7 @@ public class Guide {
 	@Column(columnDefinition = "LONGTEXT")
 	private String image;
 
+	@Column(columnDefinition = "LONGTEXT")
 	private String content;
 
 	private int step;

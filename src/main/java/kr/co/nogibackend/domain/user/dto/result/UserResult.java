@@ -5,7 +5,7 @@ import kr.co.nogibackend.domain.user.User;
 public record UserResult(
 	Long id,
 	User.Role role,
-	String notionAuthToken,
+	String notionBotToken,
 	String notionDatabaseId,
 	String githubAuthToken,
 	String githubRepository,
@@ -20,7 +20,7 @@ public record UserResult(
 		return new UserResult(
 			user.getId(),
 			user.getRole(),
-			user.getNotionAuthToken(),
+			user.getNotionBotToken(),
 			user.getNotionDatabaseId(),
 			user.getGithubAuthToken(),
 			user.getGithubRepository(),

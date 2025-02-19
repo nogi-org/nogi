@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.github.GithubService;
+import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
+import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.domain.user.UserService;
@@ -56,22 +58,36 @@ public class UserFacade {
 	public UserInfo updateUserAndCreateRepo(UserUpdateCommand command) {
 
 		// 1. user 정보 가져오기
-		UserInfo userInfo = userService.findUserById(command.getId());
+		UserResult userResult = userService.findUserByIdForFacade(command.getId());
 
-		// TODO repository 생성 실패일 경우 에러 메시지 처리
-		// TODO repository 명이 바뀌었을 경우 어떻게 할지 고민 -> 일단 지금은 새롭게 생성
 		// 2. user 에 repository 가 없거나 변경된 경우 repository 생성
 		if (
-			userInfo.githubRepository() == null ||
-				!userInfo.githubRepository().equals(command.getGithubRepository())
+			userResult.githubRepository() == null ||
+				!userResult.githubRepository().equals(command.getGithubRepository())
 		) {
-			githubService.createRepository(
+			GithubRepoInfo githubRepoInfo = githubService.createRepository(
 				command.getGithubRepository(),
-				userInfo.githubAuthToken()
+				userResult.githubAuthToken()
 			);
+			// default branch 수정
+			command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
 		}
 
 		// 3. DB 에 user 정보 업데이트
 		return userService.updateUser(command);
+	}
+
+	public void validateRepositoryName(
+		UserFacadeCommand.ValidateRepositoryName command
+	) {
+		UserResult userResult = userService.findUserByIdForFacade(command.userId());
+
+		githubService.validateRepositoryName(
+			new GithubGetRepositoryCommand(
+				userResult.githubOwner(),
+				command.repositoryName(),
+				userResult.githubAuthToken()
+			)
+		);
 	}
 }

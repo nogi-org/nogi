@@ -25,7 +25,7 @@ public class UserLoginByGithubInfo {
 					new UserInfo(
 						userresult.id(),
 						userresult.role(),
-						userresult.notionAuthToken(),
+						userresult.notionBotToken(),
 						userresult.notionDatabaseId(),
 						userresult.githubAuthToken(),
 						userresult.githubRepository(),
@@ -42,14 +42,9 @@ public class UserLoginByGithubInfo {
 	사용자가 입력해야할 정보가 있는지 확인하기 위한 메서드
 	 */
 	public boolean isRequireUserInfo() {
-		if (
-			userInfo.notionAuthToken() == null ||
-				userInfo.notionDatabaseId() == null ||
-				userInfo.githubRepository() == null ||
-				userInfo.githubDefaultBranch() == null
-		) {
-			return true;
-		}
-		return false;
+		return userInfo.notionBotToken() == null ||
+			userInfo.notionDatabaseId() == null ||
+			userInfo.githubRepository() == null ||
+			userInfo.githubDefaultBranch() == null;
 	}
 }

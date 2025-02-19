@@ -17,7 +17,7 @@ public record GithubCommitCommand(
 	String githubBranch,       // 깃허브 브랜치
 	String githubEmail,       // 깃허브 이메일
 	String notionPageId,        // 노션 페이지 ID
-	String notionAuthToken,     // 노션 인증 토큰
+	String notionBotToken,     // 노션 인증 토큰
 	NogiHistoryType type,       // 히스토리 타입 (생성, 수정 등)
 	String newCategory,         // 새로운 카테고리 (디렉토리 하위 구조)
 	String newTitle,            // 새로운 제목 (파일명)
@@ -28,18 +28,44 @@ public record GithubCommitCommand(
 	String githubToken,         // 깃허브 토큰
 	List<ImageOfGithub> images // 이미지 정보
 ) {
-	public record ImageOfGithub(
-		String fileEnc64, // 이미지 파일
-		String fileName,  // 이미지 파일명
-		String filePath   // 이미지 파일 경로
+	/**
+	 📌 List<NotionStartTILResult>와 List<UserCheckTILResult>를 조합하여 List<GithubCommitCommand> 생성
+	 */
+	public static List<GithubCommitCommand> of(
+		List<NotionStartTILResult> notionResults,
+		List<UserCheckTILResult> userCheckResults
 	) {
-		public String getImageFilePath(String category) {
-			return category + "/" + filePath + "/" + fileName;
-		}
+		// ✅ userCheckResults를 notionPageId 기준으로 매핑 (빠른 조회를 위해 Map 사용)
+		Map<String, UserCheckTILResult> userCheckMap = userCheckResults.stream()
+			.collect(Collectors.toMap(UserCheckTILResult::notionPageId, Function.identity()));
 
-		public String getImageFile() {
-			return fileEnc64;
-		}
+		// ✅ notionResults를 기반으로 GithubCommitCommand 리스트 생성
+		return notionResults.stream()
+			.map(notion -> {
+				UserCheckTILResult userCheckTILResult = userCheckMap.get(notion.notionPageId());
+
+				return new GithubCommitCommand(
+					notion.userId(),
+					userCheckTILResult.userName(),
+					userCheckTILResult.repository(),
+					userCheckTILResult.branch(),
+					userCheckTILResult.githubEmail(),
+					notion.notionPageId(),
+					userCheckTILResult.notionBotToken(),
+					userCheckTILResult.type(),
+					notion.category(),
+					notion.title(),
+					userCheckTILResult.prevCategory(),
+					userCheckTILResult.prevTitle(),
+					notion.commitDate(),
+					notion.content(),
+					userCheckTILResult.githubToken(),
+					notion.images().stream()
+						.map(image -> new ImageOfGithub(image.fileEnc64(), image.fileName(), image.filePath()))
+						.collect(Collectors.toList())
+				);
+			})
+			.collect(Collectors.toList());
 	}
 
 	private String getMarkdownFilePath() {
@@ -86,43 +112,17 @@ public record GithubCommitCommand(
 		}
 	}
 
-	/**
-	 📌 List<NotionStartTILResult>와 List<UserCheckTILResult>를 조합하여 List<GithubCommitCommand> 생성
-	 */
-	public static List<GithubCommitCommand> of(
-		List<NotionStartTILResult> notionResults,
-		List<UserCheckTILResult> userCheckResults
+	public record ImageOfGithub(
+		String fileEnc64, // 이미지 파일
+		String fileName,  // 이미지 파일명
+		String filePath   // 이미지 파일 경로
 	) {
-		// ✅ userCheckResults를 notionPageId 기준으로 매핑 (빠른 조회를 위해 Map 사용)
-		Map<String, UserCheckTILResult> userCheckMap = userCheckResults.stream()
-			.collect(Collectors.toMap(UserCheckTILResult::notionPageId, Function.identity()));
+		public String getImageFilePath(String category) {
+			return category + "/" + filePath + "/" + fileName;
+		}
 
-		// ✅ notionResults를 기반으로 GithubCommitCommand 리스트 생성
-		return notionResults.stream()
-			.map(notion -> {
-				UserCheckTILResult userCheckTILResult = userCheckMap.get(notion.notionPageId());
-
-				return new GithubCommitCommand(
-					notion.userId(),
-					userCheckTILResult.userName(),
-					userCheckTILResult.repository(),
-					userCheckTILResult.branch(),
-					userCheckTILResult.githubEmail(),
-					notion.notionPageId(),
-					userCheckTILResult.notionAuthToken(),
-					userCheckTILResult.type(),
-					notion.category(),
-					notion.title(),
-					userCheckTILResult.prevCategory(),
-					userCheckTILResult.prevTitle(),
-					notion.commitDate(),
-					notion.content(),
-					userCheckTILResult.githubToken(),
-					notion.images().stream()
-						.map(image -> new ImageOfGithub(image.fileEnc64(), image.fileName(), image.filePath()))
-						.collect(Collectors.toList())
-				);
-			})
-			.collect(Collectors.toList());
+		public String getImageFile() {
+			return fileEnc64;
+		}
 	}
 }

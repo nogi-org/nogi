@@ -1,6 +1,6 @@
 package kr.co.nogibackend.interfaces.notion;
 
-import kr.co.nogibackend.application.notion.NotionFacade;
+import kr.co.nogibackend.application.nogi.NogiFacade;
 import lombok.RequiredArgsConstructor;
 
 /*
@@ -13,11 +13,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class NotionScheduler {
 
-	private final NotionFacade notionFacade;
+	private final NogiFacade nogiFacade;
 
 	// todo: 여기서 nogi 스케쥴 돌림
 	public void on() {
-		notionFacade.onNogi();
+		nogiFacade.onAuto();
 	}
 
 }

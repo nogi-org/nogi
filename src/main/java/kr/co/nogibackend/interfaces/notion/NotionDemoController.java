@@ -21,14 +21,14 @@ public class NotionDemoController {
 
 	@GetMapping("/demo/notion")
 	public ResponseEntity<?> getNotion(
-		@RequestParam("authToken") String authToken,
+		@RequestParam("AuthToken") String AuthToken,
 		@RequestParam("databaseId") String databaseId
 	) {
-		User user = User.builder().notionAuthToken(authToken).notionDatabaseId(databaseId).build();
+		User user = User.builder().notionBotToken(AuthToken).notionDatabaseId(databaseId).build();
 		return Response.success(
 			notionService.startTIL(NotionStartTILCommand
 				.builder()
-				.notionAuthToken(user.getNotionAuthToken())
+				.notionBotToken(user.getNotionBotToken())
 				.notionDatabaseId(user.getNotionDatabaseId())
 				.build())
 		);
@@ -36,7 +36,7 @@ public class NotionDemoController {
 
 	@GetMapping("/demo/notion/update")
 	public ResponseEntity<?> getNotionUpdate(
-		@RequestParam("authToken") String authToken,
+		@RequestParam("AuthToken") String AuthToken,
 		@RequestParam("pageId") String pageId
 	) {
 		return Response.success(

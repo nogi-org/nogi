@@ -38,7 +38,7 @@ public class User {
 	private Long id;
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	private String notionAuthToken;
+	private String notionBotToken;
 	private String notionDatabaseId;
 	private String githubAuthToken;
 	private String githubRepository;
@@ -47,8 +47,8 @@ public class User {
 	private String githubOwner;
 
 	public User update(UserUpdateCommand command) {
-		if (StringUtils.hasText(command.getNotionAuthToken()))
-			this.notionAuthToken = command.getNotionAuthToken();
+		if (StringUtils.hasText(command.getNotionBotToken()))
+			this.notionBotToken = command.getNotionBotToken();
 		if (StringUtils.hasText(command.getNotionDatabaseId()))
 			this.notionDatabaseId = command.getNotionDatabaseId();
 		if (StringUtils.hasText(command.getGithubAuthToken()))

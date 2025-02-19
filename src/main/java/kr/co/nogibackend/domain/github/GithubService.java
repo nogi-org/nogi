@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
@@ -27,6 +29,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
+import kr.co.nogibackend.util.AuthTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,7 +86,7 @@ public class GithubService {
 				new GithubCommitResult(
 					command.userId(),
 					command.notionPageId(),
-					command.notionAuthToken(),
+					command.notionBotToken(),
 					command.newCategory(),
 					command.newTitle()
 				)
@@ -204,7 +207,7 @@ public class GithubService {
 					markdownMessage,
 					List.of(githubUser.owner())
 				),
-				command.masterUser().authToken()
+				command.masterUser().AuthToken()
 			);
 		});
 	}
@@ -246,7 +249,7 @@ public class GithubService {
 	}
 
 	public GithubUserResult getUserInfo(String accessToken) {
-		String token = "Bearer " + accessToken;
+		String token = AuthTokenUtil.generateBearerToken(accessToken);
 
 		GithubUserInfo userInfo = githubClient.getUserInfo(token);
 		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
@@ -257,10 +260,18 @@ public class GithubService {
 		);
 	}
 
-	public void createRepository(String repositoryName, String accessToken) {
-		githubClient.createUserRepository(
+	public GithubRepoInfo createRepository(String repositoryName, String accessToken) {
+		return githubClient.createUserRepository(
 			new GithubRepoRequest(repositoryName, true),
-			accessToken
+			AuthTokenUtil.generateBearerToken(accessToken)
+		);
+	}
+
+	public void validateRepositoryName(GithubGetRepositoryCommand command) {
+		githubClient.validateRepositoryName(
+			command.owner(),
+			command.repoName(),
+			AuthTokenUtil.generateBearerToken(command.token())
 		);
 	}
 }

@@ -53,6 +53,17 @@ public interface GithubFeignClient {
 	List<GithubUserEmailInfo> getUserEmailInfo(@RequestHeader("Authorization") String token);
 
 	/*
+	➡️ repository 사용자의 repository 정보 가져오기
+	doc: https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#get-a-repository
+	 */
+	@GetMapping("/repos/{owner}/{repo}")
+	GithubRepoInfo getOwnerRepositoryInfo(
+		@PathVariable("owner") String owner,
+		@PathVariable("repo") String repoName,
+		@RequestHeader("Authorization") String token
+	);
+
+	/*
 	➡️ repository 생성
 	doc: https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-for-the-authenticated-user
 	 */

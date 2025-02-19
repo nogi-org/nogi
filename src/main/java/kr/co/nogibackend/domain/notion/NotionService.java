@@ -54,13 +54,13 @@ public class NotionService {
 	public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
 		// 작성완료 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages =
-			this.getCompletedPages(command.getNotionAuthToken(), command.getNotionDatabaseId(), command.getUserId());
+			this.getCompletedPages(command.getNotionBotToken(), command.getNotionDatabaseId(), command.getUserId());
 
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
 			// 블럭 조회
 			NotionInfo<NotionBlockInfo> blocks =
-				this.getBlocksOfPage(command.getNotionAuthToken(), page, command.getUserId());
+				this.getBlocksOfPage(command.getNotionBotToken(), page, command.getUserId());
 
 			// 블럭 markdown 으로 변환
 			NotionBlockConversionInfo encodingOfBlock =
@@ -87,7 +87,7 @@ public class NotionService {
 
 	public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
 		boolean isUpdateResult =
-			this.updateTILResultStatus(command.isSuccess(), command.notionAuthToken(), command.notionPageId(),
+			this.updateTILResultStatus(command.isSuccess(), command.notionBotToken(), command.notionPageId(),
 				command.userId());
 
 		return
@@ -102,10 +102,10 @@ public class NotionService {
 				: Optional.empty();
 	}
 
-	private boolean updateTILResultStatus(boolean isSuccess, String authToken, String pageId, Long userId) {
+	private boolean updateTILResultStatus(boolean isSuccess, String AuthToken, String pageId, Long userId) {
 		try {
 			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
-			notionClient.updatePageStatus(authToken, pageId, request);
+			notionClient.updatePageStatus(AuthToken, pageId, request);
 			return true;
 		} catch (Exception error) {
 			ExecutionResultContext.addNotionPageErrorResult("TIL 결과를 Notion에 반영 중 문제가 발생했어요.", userId);
@@ -114,15 +114,15 @@ public class NotionService {
 	}
 
 	// 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
-	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionAuthToken, NotionPageInfo page, Long userId) {
-		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionAuthToken, page.getId(), null, userId);
+	private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionBotToken, NotionPageInfo page, Long userId) {
+		NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionBotToken, page.getId(), null, userId);
 
 		// hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
 		boolean hasMore = blocks.isHas_more();
 		String nextCursor = blocks.getNext_cursor();
 
 		while (hasMore) {
-			NotionInfo<NotionBlockInfo> nextBlocks = this.getBlocks(notionAuthToken, page.getId(), nextCursor, userId);
+			NotionInfo<NotionBlockInfo> nextBlocks = this.getBlocks(notionBotToken, page.getId(), nextCursor, userId);
 			blocks.getResults().addAll(nextBlocks.getResults());
 			hasMore = nextBlocks.isHas_more();
 			nextCursor = nextBlocks.getNext_cursor();
@@ -132,22 +132,22 @@ public class NotionService {
 	}
 
 	// 노션 페이지의 블럭 요청
-	private NotionInfo<NotionBlockInfo> getBlocks(String authToken, String pageId, String startCursor, Long userId) {
+	private NotionInfo<NotionBlockInfo> getBlocks(String AuthToken, String pageId, String startCursor, Long userId) {
 		try {
-			return notionClient.getBlocksFromPage(authToken, pageId, startCursor);
+			return notionClient.getBlocksFromPage(AuthToken, pageId, startCursor);
 		} catch (Exception error) {
 			ExecutionResultContext.addNotionPageErrorResult("Notion Block을 불러오는 중 문제가 발생했어요.", userId);
 			return NotionInfo.empty();
 		}
 	}
 
-	private List<NotionPageInfo> getCompletedPages(String authToken, String databaseId, Long userId) {
+	private List<NotionPageInfo> getCompletedPages(String AuthToken, String databaseId, Long userId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
 		try {
 			Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
 			return
 				notionClient
-					.getPagesFromDatabase(authToken, databaseId, filter)
+					.getPagesFromDatabase(AuthToken, databaseId, filter)
 					.getResults();
 		} catch (Exception error) {
 			ExecutionResultContext.addUserErrorResult("Notion Page를 불러오는 중 문제가 발생했어요.", userId);

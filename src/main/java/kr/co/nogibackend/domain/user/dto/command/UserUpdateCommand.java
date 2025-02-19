@@ -15,10 +15,11 @@ import lombok.Setter;
 public class UserUpdateCommand {
 
 	private Long id;
-	private String notionAuthToken;
+	private String notionBotToken;
 	private String notionDatabaseId;
 	private String githubAuthToken;
 	private String githubRepository;
+	@Setter
 	private String githubDefaultBranch;
 	private String githubEmail;
 	private String githubOwner;

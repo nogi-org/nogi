@@ -25,14 +25,14 @@ public class NotionClientImpl implements NotionClient {
 
 	@Override
 	public NotionInfo<NotionPageInfo> getPagesFromDatabase(
-		String authToken,
+		String AuthToken,
 		String databaseId,
 		Map<String, Object> request
 	) {
 		try {
 			return
 				notionFeignClient
-					.getPagesFromDatabase(authToken, databaseId, request)
+					.getPagesFromDatabase(AuthToken, databaseId, request)
 					.getBody();
 		} catch (Exception error) {
 			throw new GlobalException(F_GET_NOTION_PAGE);
@@ -41,14 +41,14 @@ public class NotionClientImpl implements NotionClient {
 
 	@Override
 	public NotionInfo<NotionBlockInfo> getBlocksFromPage(
-		String authToken,
+		String AuthToken,
 		String pageId,
 		String startCursor
 	) {
 		try {
 			return
 				notionFeignClient
-					.getBlocksFromPage(authToken, pageId, startCursor)
+					.getBlocksFromPage(AuthToken, pageId, startCursor)
 					.getBody();
 		} catch (Exception error) {
 			throw new GlobalException(F_GET_NOTION_BLOCK);
@@ -66,14 +66,14 @@ public class NotionClientImpl implements NotionClient {
 
 	@Override
 	public NotionPageInfo updatePageStatus(
-		String authToken
+		String AuthToken
 		, String pageId
 		, Map<String, Object> request
 	) {
 		try {
 			return
 				notionFeignClient
-					.updatePageStatus(authToken, pageId, request)
+					.updatePageStatus(AuthToken, pageId, request)
 					.getBody();
 		} catch (Exception error) {
 			throw new GlobalException(F_UPDATE_TIL_STATUS);
