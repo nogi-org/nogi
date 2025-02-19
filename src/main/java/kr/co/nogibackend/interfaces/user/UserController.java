@@ -3,7 +3,6 @@ package kr.co.nogibackend.interfaces.user;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +27,7 @@ import lombok.RequiredArgsConstructor;
   Description  :
  */
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -41,25 +40,25 @@ public class UserController {
 		return Response.success(UserResponse.from(userService.findUserById(auth.getUserId())));
 	}
 
-	@PatchMapping("{id}")
+	@PatchMapping
 	public ResponseEntity<?> updateUser(
-		@PathVariable Long id,
-		@RequestBody UserUpdateRequest request
+		@RequestBody UserUpdateRequest request,
+		Auth auth
 	) {
 		return Response.success(
 			UserResponse.from(
-				userFacade.updateUserAndCreateRepo(request.toCommand(id))
+				userFacade.updateUserAndCreateRepo(request.toCommand(auth.getUserId()))
 			)
 		);
 	}
 
-	@GetMapping("{id}/validate-repository-name")
+	@GetMapping("validate-repository-name")
 	public ResponseEntity<?> updateUser(
-		@PathVariable(name = "id") Long id,
-		@RequestParam String repositoryName
+		@RequestParam String repositoryName,
+		Auth auth
 	) {
 		userFacade.validateRepositoryName(
-			new UserFacadeCommand.ValidateRepositoryName(id, repositoryName)
+			new UserFacadeCommand.ValidateRepositoryName(auth.getUserId(), repositoryName)
 		);
 		return Response.success();
 	}
