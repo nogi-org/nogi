@@ -1,5 +1,5 @@
 import api from '@/api/index.js';
 
 export const getUserGuidesApi = () => {
-  return api.get(`/guide/list`).then(success => success.result);
+  return api.get(`/guides`).then(success => success.result);
 };
