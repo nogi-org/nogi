@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
@@ -31,6 +32,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
+import kr.co.nogibackend.response.code.GitResponseCode;
 import kr.co.nogibackend.util.AuthTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -255,10 +257,14 @@ public class GithubService {
 
 		GithubUserInfo userInfo = githubClient.getUserInfo(token);
 		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
+		GithubUserEmailInfo primaryEmail = userEmails.stream()
+			.filter(GithubUserEmailInfo::primary)
+			.findFirst()
+			.orElseThrow(() -> new GlobalException(GitResponseCode.F_PRIMARY_EMAIL_NOTFOUND));
 
 		return GithubUserResult.from(
 			userInfo,
-			userEmails.get(0) // 첫 번째 이메일 사용
+			primaryEmail // primary 이메일 사용
 		);
 	}
 
