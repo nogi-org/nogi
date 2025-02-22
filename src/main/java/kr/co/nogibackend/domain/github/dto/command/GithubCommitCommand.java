@@ -96,7 +96,7 @@ public record GithubCommitCommand(
 
 	private void addImageFiles(Map<String, String> fileMap) {
 		images.forEach(image ->
-			fileMap.put(image.getImageFilePath(newCategory), image.getImageFile())
+			fileMap.put(image.getImageFilePath(), image.getImageFile())
 		);
 	}
 
@@ -113,8 +113,8 @@ public record GithubCommitCommand(
 		String fileName,  // 이미지 파일명
 		String filePath   // 이미지 파일 경로
 	) {
-		public String getImageFilePath(String category) {
-			return category + "/" + filePath + "/" + fileName;
+		public String getImageFilePath() {
+			return filePath;
 		}
 
 		public String getImageFile() {
