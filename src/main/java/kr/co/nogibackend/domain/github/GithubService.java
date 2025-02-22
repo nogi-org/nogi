@@ -33,7 +33,6 @@ import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
-import kr.co.nogibackend.util.AuthTokenUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -253,10 +252,9 @@ public class GithubService {
 	}
 
 	public GithubUserResult getUserInfo(String accessToken) {
-		String token = AuthTokenUtil.generateBearerToken(accessToken);
 
-		GithubUserInfo userInfo = githubClient.getUserInfo(token);
-		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
+		GithubUserInfo userInfo = githubClient.getUserInfo(accessToken);
+		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(accessToken);
 		GithubUserEmailInfo primaryEmail = userEmails.stream()
 			.filter(GithubUserEmailInfo::primary)
 			.findFirst()
@@ -271,16 +269,19 @@ public class GithubService {
 	public GithubRepoInfo createRepository(String repositoryName, String accessToken) {
 		return githubClient.createUserRepository(
 			new GithubRepoRequest(repositoryName, true),
-			AuthTokenUtil.generateBearerToken(accessToken)
+			accessToken
 		);
 	}
 
 	public void validateRepositoryName(GithubGetRepositoryCommand command) {
-		githubClient.validateRepositoryName(
+		boolean isUniqueName = githubClient.validateRepositoryName(
 			command.owner(),
 			command.repoName(),
-			AuthTokenUtil.generateBearerToken(command.token())
+			command.token()
 		);
+		if (!isUniqueName) {
+			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+		}
 	}
 
 	public void addCollaborator(GithubAddCollaboratorCommand command) {
@@ -289,7 +290,7 @@ public class GithubService {
 			command.repo(),
 			command.username(),
 			new GithubAddCollaboratorRequest(null),
-			AuthTokenUtil.generateBearerToken(command.accessToken())
+			command.accessToken()
 		);
 	}
 }

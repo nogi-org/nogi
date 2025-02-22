@@ -52,7 +52,7 @@ public class GithubClientImpl implements GithubClient {
 	public boolean validateRepositoryName(String owner, String repoName, String token) {
 		try {
 			githubFeignClient.getOwnerRepositoryInfo(owner, repoName, token);
-			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+			return false;
 		} catch (FeignException e) {
 			// TODO GithubException 처리 공통으로 처리하도록 수정
 			String detailMessage = GithubErrorParser.extractErrorMessage(e);
