@@ -10,6 +10,8 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.config.exception.GlobalException;
+import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
@@ -20,6 +22,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
+import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
@@ -29,7 +32,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
-import kr.co.nogibackend.util.AuthTokenUtil;
+import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -249,29 +252,45 @@ public class GithubService {
 	}
 
 	public GithubUserResult getUserInfo(String accessToken) {
-		String token = AuthTokenUtil.generateBearerToken(accessToken);
 
-		GithubUserInfo userInfo = githubClient.getUserInfo(token);
-		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(token);
+		GithubUserInfo userInfo = githubClient.getUserInfo(accessToken);
+		List<GithubUserEmailInfo> userEmails = githubClient.getUserEmails(accessToken);
+		GithubUserEmailInfo primaryEmail = userEmails.stream()
+			.filter(GithubUserEmailInfo::primary)
+			.findFirst()
+			.orElseThrow(() -> new GlobalException(GitResponseCode.F_PRIMARY_EMAIL_NOTFOUND));
 
 		return GithubUserResult.from(
 			userInfo,
-			userEmails.get(0) // 첫 번째 이메일 사용
+			primaryEmail // primary 이메일 사용
 		);
 	}
 
 	public GithubRepoInfo createRepository(String repositoryName, String accessToken) {
 		return githubClient.createUserRepository(
 			new GithubRepoRequest(repositoryName, true),
-			AuthTokenUtil.generateBearerToken(accessToken)
+			accessToken
 		);
 	}
 
 	public void validateRepositoryName(GithubGetRepositoryCommand command) {
-		githubClient.validateRepositoryName(
+		boolean isUniqueName = githubClient.validateRepositoryName(
 			command.owner(),
 			command.repoName(),
-			AuthTokenUtil.generateBearerToken(command.token())
+			command.token()
+		);
+		if (!isUniqueName) {
+			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+		}
+	}
+
+	public void addCollaborator(GithubAddCollaboratorCommand command) {
+		githubClient.addCollaborator(
+			command.owner(),
+			command.repo(),
+			command.username(),
+			new GithubAddCollaboratorRequest(null),
+			command.accessToken()
 		);
 	}
 }

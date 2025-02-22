@@ -23,6 +23,7 @@ public class UserUpdateCommand {
 	private String githubDefaultBranch;
 	private String githubEmail;
 	private String githubOwner;
+	private Boolean isNotificationAllowed;
 
 	public static UserUpdateCommand from(GithubUserResult githubUserResult, String accessToken) {
 		return UserUpdateCommand.builder()

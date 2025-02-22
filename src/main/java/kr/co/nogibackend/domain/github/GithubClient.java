@@ -12,6 +12,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
+import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
@@ -83,4 +84,12 @@ public interface GithubClient {
 	);
 
 	List<GithubUserEmailInfo> getUserEmails(String token);
+
+	void addCollaborator(
+		String owner,
+		String repo,
+		String username,
+		GithubAddCollaboratorRequest request,
+		String token
+	);
 }

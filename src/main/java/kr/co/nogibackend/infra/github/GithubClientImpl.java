@@ -17,6 +17,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
+import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
@@ -51,7 +52,7 @@ public class GithubClientImpl implements GithubClient {
 	public boolean validateRepositoryName(String owner, String repoName, String token) {
 		try {
 			githubFeignClient.getOwnerRepositoryInfo(owner, repoName, token);
-			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+			return false;
 		} catch (FeignException e) {
 			// TODO GithubException 처리 공통으로 처리하도록 수정
 			String detailMessage = GithubErrorParser.extractErrorMessage(e);
@@ -121,5 +122,16 @@ public class GithubClientImpl implements GithubClient {
 	@Override
 	public List<GithubUserEmailInfo> getUserEmails(String token) {
 		return githubFeignClient.getUserEmailInfo(token);
+	}
+
+	@Override
+	public void addCollaborator(
+		String owner,
+		String repo,
+		String username,
+		GithubAddCollaboratorRequest request,
+		String token
+	) {
+		githubFeignClient.addCollaborator(owner, repo, username, request, token);
 	}
 }

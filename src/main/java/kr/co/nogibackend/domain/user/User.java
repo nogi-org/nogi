@@ -45,6 +45,8 @@ public class User {
 	private String githubDefaultBranch;
 	private String githubEmail;
 	private String githubOwner;
+	@Builder.Default
+	private Boolean isNotificationAllowed = true;
 
 	public User update(UserUpdateCommand command) {
 		if (StringUtils.hasText(command.getNotionBotToken()))

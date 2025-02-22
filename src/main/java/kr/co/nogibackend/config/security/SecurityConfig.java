@@ -33,22 +33,23 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityConfig {
 
 	// 권한(Role)별 URL 매핑
-	private static final Map<String, Map<HttpMethod, String>> ROLE_PERMISSIONS = new HashMap<>();
+	private static final Map<String, Map<HttpMethod, List<String>>> ROLE_PERMISSIONS = new HashMap<>();
 
 	static {
 		// ADMIN 권한 설정
-		Map<HttpMethod, String> ADMIN_URL =
-			Map.of(
-				HttpMethod.POST, "/guide",
-				HttpMethod.PUT, "/guide",
-				HttpMethod.DELETE, "/guide"
+		Map<HttpMethod, List<String>> ADMIN_URL =
+			Map.ofEntries(
+				Map.entry(HttpMethod.POST, List.of("/guides")),
+				Map.entry(HttpMethod.PUT, List.of("/guides")),
+				Map.entry(HttpMethod.DELETE, List.of("/guides"))
 			);
 
 		// USER 권한 설정
-		Map<HttpMethod, String> USER_URL =
-			Map.of(
-				HttpMethod.GET, "/users",
-				HttpMethod.PATCH, "/users/{id}"
+		Map<HttpMethod, List<String>> USER_URL =
+			Map.ofEntries(
+				Map.entry(HttpMethod.GET, List.of("/users", "/users/validate-repository-name")),
+				Map.entry(HttpMethod.PATCH, List.of("/users")),
+				Map.entry(HttpMethod.POST, List.of("/users/manual-nogi"))
 			);
 
 		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);
@@ -78,8 +79,8 @@ public class SecurityConfig {
 			)
 			.authorizeHttpRequests(authorizeRequests -> {
 				ROLE_PERMISSIONS.forEach((role, methodUrls) ->
-					methodUrls.forEach((method, url) ->
-						authorizeRequests.requestMatchers(method, url).hasAuthority(role)
+					methodUrls.forEach((method, urls) ->
+						urls.forEach(url -> authorizeRequests.requestMatchers(method, url).hasAuthority(role))
 					)
 				);
 				// 그 외 모든 요청은 허용

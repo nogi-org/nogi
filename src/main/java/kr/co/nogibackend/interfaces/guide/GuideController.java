@@ -19,7 +19,7 @@ import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/guide")
+@RequestMapping("/guides")
 @RequiredArgsConstructor
 public class GuideController {
 
@@ -31,7 +31,7 @@ public class GuideController {
 		return Response.success(guideService.registerGuide(request.toCommand()));
 	}
 
-	@GetMapping("/list")
+	@GetMapping
 	public ResponseEntity<?> getGuides() {
 		return Response.success(guideService.getGuides());
 	}

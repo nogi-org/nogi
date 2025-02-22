@@ -219,6 +219,7 @@ public class UserService {
 						.githubDefaultBranch(command.getGithubDefaultBranch())
 						.githubEmail(command.getGithubEmail())
 						.githubOwner(command.getGithubOwner())
+						.isNotificationAllowed(true)
 						.build();
 				return userRepository.saveUser(newUser);
 			});
