@@ -76,10 +76,6 @@ public record GithubCommitCommand(
 		return prevCategory + "/" + prevTitle + ".md";
 	}
 
-	private String getMarkdownFileName() {
-		return newTitle + ".md";
-	}
-
 	public Map<String, String> prepareFiles() {
 		Map<String, String> fileMap = new HashMap<>();
 		addMarkdownFile(fileMap);
@@ -95,7 +91,7 @@ public record GithubCommitCommand(
 	}
 
 	private void addMarkdownFile(Map<String, String> fileMap) {
-		fileMap.put(getMarkdownFilePath(), getMarkdownFileName());
+		fileMap.put(getMarkdownFilePath(), this.content);
 	}
 
 	private void addImageFiles(Map<String, String> fileMap) {
