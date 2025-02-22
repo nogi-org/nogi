@@ -20,7 +20,7 @@ onBeforeMount(async () => {});
         <p class="mt-4 text-lg md:text-xl">
           공부한 내용을 쉽게 관리하고,
           <span class="font-bold text-yellow-300"
-            >GitHub Contributions(잔디)</span
+            >GitHub Contributions(🌱 잔디)</span
           >도 채우세요!
         </p>
         <router-link to="/user-guide">
@@ -45,7 +45,7 @@ onBeforeMount(async () => {});
             <p class="mt-4 text-gray-300">
               Notion에 공부 내용을 정리하지만, GitHub에 올리는 과정이
               번거롭다.<br />
-              <span class="text-yellow-300 font-bold">GitHub 잔디</span>를
+              <span class="text-yellow-300 font-bold">GitHub 🌱 잔디</span>를
               꾸준히 채우고 싶지만, 매번 직접 커밋하기 귀찮다.<br />
               학습 기록을 한 곳에서 체계적으로 관리하고 싶다.
             </p>
@@ -77,11 +77,26 @@ onBeforeMount(async () => {});
           Notion에서 글을 작성하면 자동으로 GitHub에 업로드됩니다! 마크다운 형식
           & 이미지를 포함한 자동 연동
         </p>
-        <div class="flex justify-center mt-8">
-          <img
-            alt="Notion to GitHub 과정을 보여주는 이미지"
-            class="rounded-lg shadow-lg w-2/3"
-          />
+        <div class="flex justify-center items-center mt-8 flex-col md:flex-row">
+          <!-- Notion 이미지 -->
+          <div class="w-full md:max-w-[45%] h-auto">
+            <img src="/assets/images/notion_til.png" />
+            <p class="text-gray-400 text-sm md:text-base mt-2">
+              📌 Notion에 작성한 학습 내용
+            </p>
+          </div>
+
+          <!-- 화살표 (데스크톱: →, 모바일: ↓) -->
+          <span class="text-4xl mx-4 text-gray-300 hidden md:block">→</span>
+          <span class="text-3xl my-4 text-gray-300 md:hidden">↓</span>
+
+          <!-- GitHub 이미지 -->
+          <div class="w-full md:max-w-[45%] h-auto">
+            <img src="/assets/images/github_til.png" />
+            <p class="text-gray-400 text-sm md:text-base mt-2">
+              📤 GitHub에 자동 업로드된 기록
+            </p>
+          </div>
         </div>
       </div>
     </section>
@@ -138,7 +153,7 @@ onBeforeMount(async () => {});
               🌿 GitHub Contributions 유지
             </h3>
             <p class="mt-2 text-gray-300">
-              GitHub 잔디를 꾸준히 채우고, 개발 활동을 기록할 수 있습니다.
+              GitHub 🌱 잔디를 꾸준히 채우고, 개발 활동을 기록할 수 있습니다.
             </p>
           </div>
           <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
