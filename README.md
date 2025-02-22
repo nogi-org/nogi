@@ -1,6 +1,8 @@
 # 📖 Notion Github 자동 커밋 서비스
 
 - 운영 URL : [https://nogi.co.kr](https://nogi.co.kr)
+- Backend 저장소 : https://github.com/nogi-org/nogi-backend
+- Frontend 저장소 : https://github.com/nogi-org/nogi-frontend
 
 ## 🚀 프로젝트 소개
 
