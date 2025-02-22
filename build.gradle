@@ -62,6 +62,8 @@ dependencies {
     // slack
     implementation 'com.github.maricn:logback-slack-appender:1.6.1'
     implementation 'com.slack.api:slack-api-client:1.30.0'
+    // p6spy
+    implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
 
     // JWT 라이브러리 (JJWT)
     implementation 'io.jsonwebtoken:jjwt-api:0.12.3'  // API 의존성
