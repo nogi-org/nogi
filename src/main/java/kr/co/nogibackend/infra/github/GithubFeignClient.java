@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
+import kr.co.nogibackend.config.openfeign.GitHubFeignClientConfig;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
@@ -35,7 +36,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
   Created Date : 25. 2. 9.
   Description  : GIT API를 호출하기 위한 Feign Client
  */
-@FeignClient(name = "GithubClient", url = "https://api.github.com")
+@FeignClient(name = "GithubClient", url = "https://api.github.com", configuration = GitHubFeignClientConfig.class)
 public interface GithubFeignClient {
 
 	/*

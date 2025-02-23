@@ -191,7 +191,7 @@ public class NotionService {
 						} else {
 							markDown
 								.append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(), true))
-								.append("<br>");
+								.append("\n");
 						}
 						break;
 
@@ -250,6 +250,9 @@ public class NotionService {
 						String imagePath =
 							block.getImage().createMarkdownPath(page.getProperties().getCategory(), fileName);
 
+						// 마크 다운에 들어갈 이미지 경로 생성
+						String markdownImagePath = "./image/" + fileName;
+
 						// 캡션 생성
 						String caption = block.getImage().createCaption();
 
@@ -257,7 +260,7 @@ public class NotionService {
 							.append("![")
 							.append(caption)
 							.append("](")
-							.append(imagePath)
+							.append(markdownImagePath)
 							.append(")")
 							.append("\n");
 

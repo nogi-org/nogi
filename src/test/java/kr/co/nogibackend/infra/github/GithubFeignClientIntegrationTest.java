@@ -41,7 +41,7 @@ import kr.co.nogibackend.domain.user.NogiHistoryType;
 class GithubFeignClientIntegrationTest {
 
 	private static Dotenv dotenv;// .env 파일 로드
-	private final String repo = "nogi-test-repo10";
+	private final String repo = "nogi-test-repo-202502022";
 	@Autowired
 	private GithubFeignClient githubFeignClient;
 	@Autowired
@@ -51,7 +51,6 @@ class GithubFeignClientIntegrationTest {
 	@Value("${github.nogi-bot-token}")
 	private String nogiAuthToken;// 환경변수로 주입
 	private String owner;// beforeEach 에서 초기화
-	private String barerToken;// beforeEach 에서 초기화
 
 	@BeforeAll
 	static void setup() {
@@ -71,17 +70,16 @@ class GithubFeignClientIntegrationTest {
 
 	@BeforeEach
 	public void setUp() {
-		barerToken = "Bearer " + token;
 		owner = "5wontaek";
 		try {
 			// 저장소 삭제
-			githubFeignClient.deleteRepository(owner, repo, barerToken);
+			githubFeignClient.deleteRepository(owner, repo, token);
 		} catch (Exception ignored) {
 			// 저장소가 없을 경우 무시
 		} finally {
 			// 저장소 생성
 			githubFeignClient.createUserRepository(
-				new GithubRepoRequest(repo, true), barerToken
+				new GithubRepoRequest(repo, true), token
 			);
 		}
 	}
@@ -135,7 +133,7 @@ class GithubFeignClientIntegrationTest {
 		String mdContent = String.format("""
 			# Hello GitHub
 			This is a test markdown file with an image.4
-			
+						
 			![Red Image](%s/이미지1.jpeg)
 			![Blue Image](%s/이미지2.jpeg)
 			""", rootImgPath, rootImgPath);
@@ -162,7 +160,7 @@ class GithubFeignClientIntegrationTest {
 			prevTitle,
 			getNowDate(),
 			mdContent,
-			barerToken,
+			token,
 			images
 		);
 	}
@@ -184,7 +182,7 @@ class GithubFeignClientIntegrationTest {
 			repo,
 			"nogi-bot",
 			new GithubAddCollaboratorRequest(null),
-			barerToken
+			token
 		);
 
 		githubFeignClient.createIssue(
@@ -200,13 +198,13 @@ class GithubFeignClientIntegrationTest {
 
 	@Test
 	public void getUserInfo() {
-		GithubUserInfo userInfo = githubFeignClient.getUserInfo(barerToken);
+		GithubUserInfo userInfo = githubFeignClient.getUserInfo(token);
 		System.out.println("userInfo = " + userInfo);
 	}
 
 	@Test
 	public void getUserEmailInfo() {
-		List<GithubUserEmailInfo> userEmailInfo = githubFeignClient.getUserEmailInfo(barerToken);
+		List<GithubUserEmailInfo> userEmailInfo = githubFeignClient.getUserEmailInfo(token);
 		System.out.println("userEmailInfo = " + userEmailInfo);
 	}
 }
