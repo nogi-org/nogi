@@ -7,7 +7,7 @@ const auth = new AuthManager();
 onMounted(async () => {
   const { requireUserInfo, userId, role } = auth.getLoginInfoFromRedirectURL();
   auth.setAuthInfo(requireUserInfo, userId, role);
-  await auth.goPageAfterSuccessLogin(requireUserInfo);
+  await auth.goPageAfterSuccessLogin();
 });
 </script>
 

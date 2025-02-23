@@ -24,7 +24,7 @@ export class UserManager {
   });
 
   async onManualNogi() {
-    if (this.#authStore.getAuth().value.requireUserInfo) {
+    if (this.#authStore.getAuth().value.isRequireInfo) {
       this.#apiResponseModalStore.onActive({
         isSuccess: false,
         message: '필수 정보를 입력하면 바로 서비스를 이용할 수 있어요! 🚀'
@@ -84,7 +84,7 @@ export class UserManager {
     this.#apiResponseModalStore.onActive(response);
     this.#initInfoUpdateValidation();
     if (response.isSuccess) {
-      this.#authStore.updateRequireUserInfo(false);
+      this.#authStore.updateIsRequireInfo(false);
     }
   }
 

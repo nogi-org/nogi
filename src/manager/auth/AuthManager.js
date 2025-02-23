@@ -22,7 +22,11 @@ export class AuthManager {
     };
   }
 
-  // github 로그인 URL 요청
+  /*
+  github 로그인 URL 요청
+  로그인 요청하면 깃허브 로그인 URL을 서버에서 받음 -> 깃허브 로그인 페이지로 이동
+  -> 로그인 -> 서버에서 AuthorizeRedirect 페이지로 리다이렉트 -> 로그인 후 작업처리(프론트)
+   */
   async toGithubLoginPage() {
     this.#spinnerStore.on();
     const response = await getGithubLoginURL();
@@ -38,7 +42,8 @@ export class AuthManager {
 
   // 접속 정보 저장
   setAuthInfo(requireUserInfo, userId, role) {
-    if (requireUserInfo == null || !userId || !role) {
+    if (!requireUserInfo || !userId || !role) {
+      console.error('접속 정보가 없습니다.');
       return;
     }
     this.#authStore.setAuth({ requireUserInfo, userId, role });
@@ -55,11 +60,12 @@ export class AuthManager {
   }
 
   // 로그인 성공 후 페이지 이동
-  async goPageAfterSuccessLogin(requireUserInfo) {
+  async goPageAfterSuccessLogin() {
     this.#spinnerStore.on();
-    const routeName = requireUserInfo ? 'myPage' : 'home';
+    const auth = this.#authStore.getAuth().value;
+    const routeName = auth.isRequireInfo ? 'myPage' : 'home';
     await this.#router.push({ name: routeName });
-    this.#noticeLogin(requireUserInfo);
+    this.#noticeLogin(auth.isRequireInfo);
     this.#spinnerStore.off();
   }
 
@@ -73,8 +79,8 @@ export class AuthManager {
     this.#apiResponseModalStore.onActive(response);
   }
 
-  #noticeLogin(requireUserInfo) {
-    const message = requireUserInfo
+  #noticeLogin(isRequireInfo) {
+    const message = isRequireInfo
       ? '환영합니다!👏\n원활한 서비스 이용을 위해 필요한 정보를 입력해 주세요.'
       : '환영합니다!💫\nNOGI의 멋진 기능들을 마음껏 즐겨보세요!';
 

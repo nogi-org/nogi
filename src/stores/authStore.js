@@ -9,25 +9,27 @@ export const useAuthStore = defineStore('useAuthStore', () => {
       : null
   );
 
-  function getAuth() {
-    if (auth.value !== null) {
-      auth.value.requireUserInfo = auth.value.requireUserInfo === 'true';
-    }
-    return auth;
-  }
-
   function deleteAuth() {
     auth.value = null;
     localStorage.removeItem(AuthManager.AUTH_KEY);
   }
 
-  function setAuth(payload) {
-    auth.value = payload;
-    localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(payload));
+  function getAuth() {
+    return auth;
   }
 
-  function updateRequireUserInfo(isRequire) {
-    auth.value.requireUserInfo = isRequire;
+  function setAuth(payload) {
+    const authInfo = {
+      userId: payload.userId,
+      role: payload.role,
+      isRequireInfo: payload.requireUserInfo === 'true'
+    };
+    auth.value = authInfo;
+    localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(authInfo));
+  }
+
+  function updateIsRequireInfo(isRequire) {
+    auth.value.isRequireInfo = isRequire;
     localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(auth.value));
   }
 
@@ -35,6 +37,6 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     getAuth,
     deleteAuth,
     setAuth,
-    updateRequireUserInfo
+    updateIsRequireInfo
   };
 });
