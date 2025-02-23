@@ -93,30 +93,30 @@ public class GithubClientImpl implements GithubClient {
 
 	@Override
 	public GithubBlobInfo createBlob(String owner, String repo, GithubCreateBlobRequest request, String token) {
-		return githubFeignClient.createBlob(owner, repo, request, token);
+		return githubFeignClient.createBlob(owner, repo, request, "Bearer " + token);
 	}
 
 	@Override
 	public GithubCreateTreeInfo createTree(String owner, String repo, GithubCreateTreeRequest request,
 		String token) {
-		return githubFeignClient.createTree(owner, repo, request, token);
+		return githubFeignClient.createTree(owner, repo, request, "Bearer " + token);
 	}
 
 	@Override
 	public GithubCreateCommitInfo createCommit(String owner, String repo, GithubCreateCommitRequest request,
 		String token) {
-		return githubFeignClient.createCommit(owner, repo, request, token);
+		return githubFeignClient.createCommit(owner, repo, request, "Bearer " + token);
 	}
 
 	@Override
 	public GithubUpdateReferenceInfo updateBranch(String owner, String repo, String branch,
 		GithubUpdateReferenceRequest request, String token) {
-		return githubFeignClient.updateBranch(owner, repo, branch, request, token);
+		return githubFeignClient.updateBranch(owner, repo, branch, request, "Bearer " + token);
 	}
 
 	@Override
 	public GithubIssueInfo createIssue(String owner, String repo, GithubCreateIssueRequest request, String token) {
-		return githubFeignClient.createIssue(owner, repo, request, token);
+		return githubFeignClient.createIssue(owner, repo, request, "Bearer " + token);
 	}
 
 	@Override

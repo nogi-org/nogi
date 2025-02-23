@@ -77,7 +77,7 @@ public record GithubCommitCommand(
 	}
 
 	private String getMarkdownFileName() {
-		return newTitle + ".md";
+		return content;
 	}
 
 	public Map<String, String> prepareFiles() {
