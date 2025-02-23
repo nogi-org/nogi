@@ -190,7 +190,7 @@ public class NotionService {
 						} else {
 							markDown
 								.append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(), true))
-								.append("<br>");
+								.append("\n");
 						}
 						break;
 
