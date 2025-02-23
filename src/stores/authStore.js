@@ -10,6 +10,9 @@ export const useAuthStore = defineStore('useAuthStore', () => {
   );
 
   function getAuth() {
+    if (auth.value !== null) {
+      auth.value.requireUserInfo = auth.value.requireUserInfo === 'true';
+    }
     return auth;
   }
 

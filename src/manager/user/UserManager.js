@@ -27,7 +27,7 @@ export class UserManager {
     if (this.#authStore.getAuth().value.requireUserInfo) {
       this.#apiResponseModalStore.onActive({
         isSuccess: false,
-        message: '아래 필수정보를 등록해주세요!'
+        message: '필수 정보를 입력하면 바로 서비스를 이용할 수 있어요! 🚀'
       });
       return;
     }

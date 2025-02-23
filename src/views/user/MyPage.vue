@@ -13,7 +13,7 @@ onMounted(async () => {
 
 watch(
   () => userInfo.value.githubRepository,
-  (newValue) => {
+  newValue => {
     user.watchRepositoryName(newValue);
   }
 );
@@ -132,17 +132,6 @@ const onManualNogi = async () => {
             확인
           </button>
         </div>
-      </li>
-
-      <li class="mb-5">
-        <label for="" class="relative text-neutral text-sm font-noto_sans_b">
-          Github Branch Name
-        </label>
-        <input
-          v-model="userInfo.githubDefaultBranch"
-          readonly
-          class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider text-neutral"
-        />
       </li>
 
       <li class="mb-5">

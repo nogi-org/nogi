@@ -34,7 +34,7 @@ export function setInterceptors(instance) {
 }
 
 // 공통 에러처리
-function handleInterceptorCommonError(response) {
+async function handleInterceptorCommonError(response) {
   const isCommonError = handleCommonError(response);
   if (!isCommonError) return;
 
@@ -42,12 +42,12 @@ function handleInterceptorCommonError(response) {
 
   switch (response.code) {
     case ApiResponse.USER_2: // 401
-      router.push({ name: 'home' });
+      await router.push({ name: 'home' });
       useAuthStore().deleteAuth();
       apiResponseModalStore.onActive(response);
       break;
     case ApiResponse.USER_3: // 403
-      router.push({ name: 'home' });
+      await router.push({ name: 'home' });
       apiResponseModalStore.onActive(response);
       break;
   }
