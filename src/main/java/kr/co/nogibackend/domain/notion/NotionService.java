@@ -39,9 +39,7 @@ public class NotionService {
 
 	private final NotionClient notionClient;
 
-	/*
-	Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
-	 */
+	// Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
 	public List<NotionStartTILResult> startTIL(List<NotionStartTILCommand> commands) {
 		return
 			commands
@@ -58,6 +56,9 @@ public class NotionService {
 
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
+			// page 에 커밋 일자, 시간 확인 및 주입
+			page.getProperties().createCommitDateWithCurrentTime();
+
 			// 블럭 조회
 			NotionInfo<NotionBlockInfo> blocks =
 				this.getBlocksOfPage(command.getNotionBotToken(), page, command.getUserId());
