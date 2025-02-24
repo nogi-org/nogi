@@ -1,10 +1,13 @@
 package kr.co.nogibackend.application.nogi;
 
+import static kr.co.nogibackend.response.code.UserResponseCode.*;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
@@ -44,6 +47,13 @@ public class NogiFacade {
 	// 수동 실행
 	public void onManual(Long userId) {
 		this.onNogi(userService.findUserByIdForFacade(userId));
+		List<ExecutionResultContext.ProcessingResult> errorResult = ExecutionResultContext.getResults();
+
+		if (!errorResult.isEmpty()) {
+			StringBuilder errorMessage = new StringBuilder();
+			ExecutionResultContext.getResults().forEach(item -> errorMessage.append(item.message()).append("\n"));
+			throw new GlobalException(F_MANUAL, errorMessage.toString());
+		}
 	}
 
 	private void onNogi(UserResult user) {
