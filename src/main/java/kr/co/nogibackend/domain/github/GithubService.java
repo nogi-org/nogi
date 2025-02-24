@@ -283,15 +283,12 @@ public class GithubService {
 		return githubClient.updateRepository(owner, originRepo, new GithubUpdateRepoRequest(newRepo), token);
 	}
 
-	public void validateRepositoryName(GithubGetRepositoryCommand command) {
-		boolean isUniqueName = githubClient.validateRepositoryName(
+	public boolean isUniqueRepositoryName(GithubGetRepositoryCommand command) {
+		return githubClient.isUniqueRepositoryName(
 			command.owner(),
 			command.repoName(),
 			command.token()
 		);
-		if (!isUniqueName) {
-			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
-		}
 	}
 
 	public void addCollaborator(GithubAddCollaboratorCommand command) {

@@ -19,6 +19,7 @@ import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 import kr.co.nogibackend.domain.user.dto.info.UserInfo;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
+import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
 
 /*
@@ -61,46 +62,65 @@ public class UserFacade {
 	}
 
 	public UserInfo updateUserAndCreateRepo(UserUpdateCommand command) {
-
 		// 1. user 정보 가져오기
 		UserResult userResult = userService.findUserByIdForFacade(command.getId());
 
-		if (
-			// 2-1. user 에 repository 가 없을 경우 -> 생성
-			userResult.githubRepository() == null
-		) {
-			GithubRepoInfo githubRepoInfo = githubService.createRepository(
-				command.getGithubRepository(),
-				userResult.githubAuthToken()
-			);
-			// default branch 수정
-			command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
-
-			// nogi-bot 을 collaborator 로 추가
-			UserResult nogiBot = userService.findNogiBot()
-				.orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
-			githubService.addCollaborator(
-				new GithubAddCollaboratorCommand(
-					userResult.githubOwner(),
-					command.getGithubRepository(),
-					nogiBot.githubOwner(),
-					userResult.githubAuthToken()
-				)
-			);
-		} else if (
-			// 2-2. user 에 repository 가 있으면서 repository 이름이 변경되었을 경우 -> 수정
-			!userResult.githubRepository().equals(command.getGithubRepository())
-		) {
-			githubService.updateRepository(
-				userResult.githubOwner(),
-				userResult.githubRepository(),
-				command.getGithubRepository(),
-				userResult.githubAuthToken()
-			);
-		}
+		// 2. Repository 생성 또는 업데이트
+		handleRepositoryCreationOrUpdate(command, userResult);
 
 		// 3. DB 에 user 정보 업데이트
 		return userService.updateUser(command);
+	}
+
+	private void handleRepositoryCreationOrUpdate(UserUpdateCommand command, UserResult userResult) {
+		String existingRepo = userResult.githubRepository();
+		String newRepo = command.getGithubRepository();
+
+		// 기존 repository가 없으면 새로 생성
+		if (existingRepo == null) {
+			createRepositoryAndAddCollaborator(command, userResult);
+			return;
+		}
+
+		boolean isDeletedOnGithub = isRepositoryDeletedOnGithub(userResult);
+
+		// GitHub에서 삭제된 상태일 때
+		if (isDeletedOnGithub) {
+			createRepositoryAndAddCollaborator(command, userResult);
+			return;
+		}
+
+		// repository 이름이 변경된 경우
+		if (!existingRepo.equals(newRepo)) {
+			githubService.updateRepository(
+				userResult.githubOwner(), existingRepo, newRepo, userResult.githubAuthToken()
+			);
+		}
+	}
+
+	private boolean isRepositoryDeletedOnGithub(UserResult userResult) {
+		return githubService.isUniqueRepositoryName(
+			new GithubGetRepositoryCommand(
+				userResult.githubOwner(), userResult.githubRepository(), userResult.githubAuthToken()
+			)
+		);
+	}
+
+	private void createRepositoryAndAddCollaborator(UserUpdateCommand command, UserResult userResult) {
+		GithubRepoInfo githubRepoInfo = githubService.createRepository(
+			command.getGithubRepository(), userResult.githubAuthToken()
+		);
+		command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
+
+		UserResult nogiBot = userService.findNogiBot()
+			.orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+
+		githubService.addCollaborator(
+			new GithubAddCollaboratorCommand(
+				userResult.githubOwner(), command.getGithubRepository(),
+				nogiBot.githubOwner(), userResult.githubAuthToken()
+			)
+		);
 	}
 
 	public void validateRepositoryName(
@@ -113,12 +133,15 @@ public class UserFacade {
 			throw new GlobalException(F_ALREADY_USING_REPOSITORY_NAME);
 		}
 
-		githubService.validateRepositoryName(
+		boolean isUniqueName = githubService.isUniqueRepositoryName(
 			new GithubGetRepositoryCommand(
 				userResult.githubOwner(),
 				command.repositoryName(),
 				userResult.githubAuthToken()
 			)
 		);
+		if (!isUniqueName) {
+			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+		}
 	}
 }

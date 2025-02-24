@@ -24,7 +24,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubUpdateRepoRequest;
 
 public interface GithubClient {
 
-	boolean validateRepositoryName(
+	boolean isUniqueRepositoryName(
 		String owner,
 		String repoName,
 		String token

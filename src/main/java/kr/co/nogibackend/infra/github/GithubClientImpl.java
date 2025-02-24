@@ -50,7 +50,7 @@ public class GithubClientImpl implements GithubClient {
 	}
 
 	@Override
-	public boolean validateRepositoryName(String owner, String repoName, String token) {
+	public boolean isUniqueRepositoryName(String owner, String repoName, String token) {
 		try {
 			githubFeignClient.getOwnerRepositoryInfo(owner, repoName, token);
 			return false;
@@ -58,7 +58,7 @@ public class GithubClientImpl implements GithubClient {
 			// TODO GithubException 처리 공통으로 처리하도록 수정
 			String detailMessage = GithubErrorParser.extractErrorMessage(e);
 			if (detailMessage.contains("Not Found")) {
-				return true;// 존재하지 않는 레포지토리
+				return true;// 존재하지 않는 레포지토리 -> 고유한 값
 			}
 			throw new GlobalException(GitResponseCode.F_GIT_UNKNOWN, e.getMessage());
 		} catch (Exception e) {
