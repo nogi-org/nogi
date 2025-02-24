@@ -34,6 +34,9 @@ export class UserManager {
     this.#spinnerStore.on();
     const response = await onManualNogiApi();
     this.#spinnerStore.off();
+    if (!response.isSuccess) {
+      response.message = response.result;
+    }
     this.#apiResponseModalStore.onActive(response);
   }
 
