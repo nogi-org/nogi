@@ -42,7 +42,8 @@ public class HttpLoggingInterceptor implements HandlerInterceptor {
 		long duration = System.currentTimeMillis() - startTime;
 
 		if (response instanceof CachedBodyHttpServletResponse cachedResponse) {
-			logResponse(cachedResponse, duration);
+			// todo: 수정 필요
+			// logResponse(cachedResponse, duration);
 		} else {
 			log.warn(
 				"⚠️ Response is not wrapped with CachedBodyHttpServletResponse. Ensure CacheBodyFilter is applied.");
