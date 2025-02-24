@@ -14,6 +14,7 @@ public enum GitResponseCode implements ResponseCode {
 	F_DUPLICATION_REPO_NAME_GIT(HttpStatus.BAD_REQUEST, "GIT-2", "이미 존재하는 저장소 이름이에요"),
 	F_PRIMARY_EMAIL_NOTFOUND(HttpStatus.NOT_FOUND, "GIT-3",
 		"Primary Email을 찾을 수 없어요. Github에 Primary Email이 등록되어 있는지 확인해주세요"),
+	F_ALREADY_USING_REPOSITORY_NAME(HttpStatus.BAD_REQUEST, "GIT-4", "현재 사용중인 리포지토리 이름이에요!"),
 	;
 
 	public final HttpStatus status;

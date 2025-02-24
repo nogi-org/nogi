@@ -1,4 +1,4 @@
-package kr.co.nogibackend.infra.user;
+package kr.co.nogibackend.domain.user;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -13,11 +13,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import kr.co.nogibackend.domain.user.NogiHistory;
-import kr.co.nogibackend.domain.user.NogiHistoryType;
-import kr.co.nogibackend.domain.user.User;
-import kr.co.nogibackend.domain.user.UserRepository;
-import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 
