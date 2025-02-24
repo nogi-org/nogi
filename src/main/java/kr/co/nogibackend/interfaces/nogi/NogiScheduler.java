@@ -1,4 +1,7 @@
-package kr.co.nogibackend.interfaces.notion;
+package kr.co.nogibackend.interfaces.nogi;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 import kr.co.nogibackend.application.nogi.NogiFacade;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +13,15 @@ import lombok.RequiredArgsConstructor;
   Created Date : 25. 2. 1.
   Description  :
  */
+@Component
 @RequiredArgsConstructor
-public class NotionScheduler {
+public class NogiScheduler {
 
 	private final NogiFacade nogiFacade;
 
-	// todo: 여기서 nogi 스케쥴 돌림
-	public void on() {
+	// 10분 = 600,000ms
+	@Scheduled(cron = "0 */10 * * * *")
+	public void onAuto() {
 		nogiFacade.onAuto();
 	}
 
