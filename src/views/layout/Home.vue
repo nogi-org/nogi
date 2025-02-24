@@ -184,6 +184,29 @@ onBeforeMount(async () => {});
         </router-link>
       </div>
     </section>
+
+    <!-- GitHub 저장소 소개 및 Star 유도 -->
+    <section class="w-full bg-gray-900">
+      <div class="max-w-[1280px] mx-auto px-4 md:px-8 py-20 text-center">
+        <h2 class="text-4xl font-bold text-white">
+          💡 이 프로젝트가 유용하다고 생각하신다면?
+        </h2>
+        <p class="mt-4 text-lg text-gray-300">
+          작은 응원이 큰 도움이 됩니다! ⭐️ Star를 눌러주세요.
+        </p>
+
+        <!-- GitHub 버튼 영역 -->
+        <div class="flex justify-center mt-6 space-x-4">
+          <a
+            href="https://github.com/nogi-org/nogi"
+            target="_blank"
+            class="bg-yellow-400 text-black font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-yellow-500 transition"
+          >
+            ⭐ GitHub에서 Star 주기
+          </a>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 

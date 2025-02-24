@@ -60,7 +60,7 @@ onUnmounted(() => {
     <!-- 플로팅 버튼 -->
     <button
       @click="toggleMenu"
-      class="flex items-center justify-center text-white rounded-full shadow-lg bg-gray-900 hover:bg-gray-800 transition-all w-[60px] h-[60px] md:w-[80px] md:h-[80px] text-2xl"
+      class="flex items-center justify-center text-white rounded-full shadow-lg bg-gray-700 hover:bg-gray-600 transition-all w-[60px] h-[60px] md:w-[80px] md:h-[80px] text-2xl"
     >
       {{ isOpen ? '✖' : '📝' }}
     </button>
