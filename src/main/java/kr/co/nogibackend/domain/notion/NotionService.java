@@ -151,7 +151,6 @@ public class NotionService {
 					.getPagesFromDatabase(AuthToken, databaseId, filter)
 					.getResults();
 		} catch (Exception error) {
-			ExecutionResultContext.addUserErrorResult("Notion Page를 불러오는 중 문제가 발생했어요.", userId);
 			return List.of();
 		}
 	}
