@@ -22,7 +22,7 @@ public class NogiScheduler {
 	// 10분 = 600,000ms
 	@Scheduled(cron = "0 */10 * * * *")
 	public void onAuto() {
-		// nogiFacade.onAuto();
+		nogiFacade.onAuto();
 	}
 
 }
