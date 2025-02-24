@@ -68,7 +68,10 @@ public class NotionNogiProperties {
 
 	// 커밋 메시지 속성을 문자열로 변환
 	public String convertCommitMessageToString() {
-		if (this.getNogiCommitMessage().getRich_text().isEmpty()) {
+		if (
+			this.getNogiCommitMessage() == null ||
+				this.getNogiCommitMessage().getRich_text().isEmpty()
+		) {
 			return null;
 		}
 		StringBuilder strb = new StringBuilder();

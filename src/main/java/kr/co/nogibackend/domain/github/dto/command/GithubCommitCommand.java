@@ -24,6 +24,7 @@ public record GithubCommitCommand(
 	String prevCategory,        // 이전 카테고리
 	String prevTitle,           // 이전 제목
 	String commitDate,          // 커밋 일자
+	String commitMessage,        // 커밋 메시지
 	String content,             // markdown 파일 내용
 	String githubToken,         // 깃허브 토큰
 	List<ImageOfGithub> images // 이미지 정보
@@ -58,6 +59,7 @@ public record GithubCommitCommand(
 					userCheckTILResult.prevCategory(),
 					userCheckTILResult.prevTitle(),
 					notion.commitDate(),
+					notion.commitMessage(),
 					notion.content(),
 					userCheckTILResult.githubToken(),
 					notion.images().stream()
@@ -85,9 +87,13 @@ public record GithubCommitCommand(
 	}
 
 	public String getCommitMessage() {
+		if (commitMessage != null && !commitMessage.isBlank()) {
+			return commitMessage;
+		}
+		// 커밋 Message 를 작성하지 않은 경우 기본 메시지 반환
 		return """
-			%s/%s.md %s 완료
-			""".formatted(newCategory, newTitle, type == NogiHistoryType.CREATE_OR_UPDATE_CONTENT ? "생성" : "수정");
+			%s/%s %s""".formatted(newCategory, newTitle,
+			type == NogiHistoryType.CREATE_OR_UPDATE_CONTENT ? "작성" : "수정");
 	}
 
 	private void addMarkdownFile(Map<String, String> fileMap) {
