@@ -47,7 +47,12 @@ public class NogiFacade {
 	// 수동 실행
 	public void onManual(Long userId) {
 		this.onNogi(userService.findUserByIdForFacade(userId));
-		List<ExecutionResultContext.ProcessingResult> errorResult = ExecutionResultContext.getResults();
+		List<ExecutionResultContext.ProcessingResult> errorResult =
+			ExecutionResultContext
+				.getResults()
+				.stream()
+				.filter(item -> !item.success())
+				.toList();
 
 		if (!errorResult.isEmpty()) {
 			StringBuilder errorMessage = new StringBuilder();
