@@ -36,7 +36,7 @@ public class ExecutionResultContext {
 		return threadLocal.get();
 	}
 
-	public void clear() {
+	public static void clear() {
 		threadLocal.remove();
 	}
 
