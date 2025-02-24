@@ -65,7 +65,7 @@ public class NogiFacade {
 		if (user.isUnProcessableToNogi()) {
 			return;
 		}
-		
+
 		// notion TIL 페이지 조회 후 markdown 변환
 		List<NotionStartTILResult> notionStartTILResults =
 			notionService.startTIL(NotionStartTILCommand.from(user));
