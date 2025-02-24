@@ -1,4 +1,4 @@
-package kr.co.nogibackend.domain.notion.dto.content;
+package kr.co.nogibackend.domain.notion.dto.property;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,4 +1,4 @@
-package kr.co.nogibackend.domain.notion.dto.content;
+package kr.co.nogibackend.domain.notion.dto.property;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NotionParentResponse {
+public class NotionParentProperty {
 
 	private String type;
 	private String database_id;

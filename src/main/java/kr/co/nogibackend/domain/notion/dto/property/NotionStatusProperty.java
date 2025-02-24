@@ -1,4 +1,4 @@
-package kr.co.nogibackend.domain.notion.dto.content;
+package kr.co.nogibackend.domain.notion.dto.property;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -7,10 +7,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NotionSelectResponse {
+public class NotionStatusProperty {
 
 	private String id;
 	private String name;
 	private String color;
-
 }

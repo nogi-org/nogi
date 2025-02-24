@@ -10,8 +10,8 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NotionNogiTitleProperty extends NotionNogiCommonProperty {
+public class NotionNogiCommitMessageProperty extends NotionNogiCommonProperty {
 
-	private List<NotionRichTextContent> title;
+	private List<NotionRichTextContent> rich_text;
 
 }

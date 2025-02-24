@@ -1,8 +1,10 @@
 # 📖 Notion Github 자동 커밋 서비스
 
+<div align="center">
+  <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https://github.com/nogi-org/nogi&count_bg=%2379C83D&title_bg=%23555555&icon=github.svg&icon_color=%23FFFFFF&title=hits&edge_flat=false" />
+</div>
+
 - 운영 URL : [https://nogi.co.kr](https://nogi.co.kr)
-- Backend 저장소 : https://github.com/nogi-org/nogi-backend
-- Frontend 저장소 : https://github.com/nogi-org/nogi-frontend
 
 ## 🚀 프로젝트 소개
 
@@ -22,8 +24,8 @@
 
 <div align="center">
 
-| **오원택** | **김경필** |
-| :------: |  :------: | 
+| **오원택** |                                                                            **superpil**                                                                             |
+| :------: |:-------------------------------------------------------------------------------------------------------------------------------------------------------------------:| 
 | [<img src="https://github.com/user-attachments/assets/c14b86d8-293a-4ecd-ac88-f17409232fbd" height=150 width=150> <br/> @onetaek](https://github.com/onetaek) | [<img src="https://github.com/user-attachments/assets/f72d14f8-0ee7-473d-b45d-751f8df50887" height=150 width=150> <br/> @superpil](https://github.com/superpil0220) |
 
 </div>
@@ -33,7 +35,8 @@
 
 > 🔽 최신 버전 및 변경 사항을 확인하세요.
 
-| 날짜 | 버전 | 변경 사항 |
-|---|---|---|
-| 2025-02-24 | v1.0.0 | 🎉 **첫 번째 릴리즈** <ul><li>Notion에서 GitHub로 자동 커밋 기능 추가</li> |
+| 날짜 | 버전  | 변경 사항 |
+|------|------|--------------------------------------|
+| 2025-02-25 | v1.1.0 | ✨ **커밋 메시지 처리 기능 추가** <ul><li>사용자가 커밋 메시지를 입력할 수 있도록 기능 추가</li><li>커밋 메시지가 없을 경우 기본 메시지 적용</li></ul> |
+| 2025-02-24 | v1.0.0 | 🎉 **첫 번째 릴리즈** <ul><li>Notion에서 GitHub로 자동 커밋 기능 추가</li></ul> |
 

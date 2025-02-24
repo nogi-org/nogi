@@ -24,6 +24,7 @@ public class NotionNogiProperties {
 	private NotionNogiCommitDateProperty nogiCommitDate;
 	private NotionNogiStatusProperty nogiStatus;
 	private NotionNogiTitleProperty nogiTitle;
+	private NotionNogiCommitMessageProperty nogiCommitMessage;
 	private final ZoneId koreaZone = ZoneId.of("Asia/Seoul");
 	private final ZoneId utcZone = ZoneId.of("UTC");
 
@@ -63,6 +64,21 @@ public class NotionNogiProperties {
 
 		String utc_iso = this.convertToUTC_ISO(commitDateTime);
 		this.nogiCommitDate.getDate().setStart(utc_iso);
+	}
+
+	// 커밋 메시지 속성을 문자열로 변환
+	public String convertCommitMessageToString() {
+		if (
+			this.getNogiCommitMessage() == null ||
+				this.getNogiCommitMessage().getRich_text().isEmpty()
+		) {
+			return null;
+		}
+		StringBuilder strb = new StringBuilder();
+		this.getNogiCommitMessage().getRich_text().forEach(text -> {
+			strb.append(text.getPlain_text()).append("\n");
+		});
+		return strb.toString();
 	}
 
 	private String convertToUTC_ISO(LocalDateTime koreaLocalDateTime) {

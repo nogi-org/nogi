@@ -31,4 +31,8 @@ public record UserResult(
 			user.getIsNotificationAllowed()
 		);
 	}
+
+	public boolean isUnProcessableToNogi() {
+		return githubRepository == null || notionDatabaseId == null || notionBotToken == null;
+	}
 }

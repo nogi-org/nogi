@@ -6,7 +6,7 @@
 - **domain** : `Entity`, `Service(비즈니스 로직)`, `EventService(이벤트 관련 로직)`, `Repository(I/F)`, `EventHandler(I/F)`,
 - **infra** : `RepositoryImpl`, `EventHandlerImpl`, `JpaRepository(I/F)`
 
-### DTO 는 계층별로 정해진 DTO 네이밍이 있고 Inner 클래스로 용도를 구분한다.
+### DTO 는 계층별로 정해진 DTO 네이밍이 있고 계층별로 dto 패키지를 두어 관리한다.
 
 - **~~Dto** : presentaion 계층에서 받을 때 사용하고 `Consumer, Controller 의 매개변수로 사용`한다..
 - **~~Command** : 비즈니스 로직을 동작할 때 사용하고 `Facade와 Service 의 매개변수로 사용`한다..

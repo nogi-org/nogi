@@ -4,16 +4,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/*
-reference:
-https://developers.notion.com/reference/property-object#date
- */
 @Getter
 @Setter
 @ToString
-public class NotionNogiProperty {
+public class NotionSelectProperty {
 
 	private String id;
-	private String type;
+	private String name;
+	private String color;
 
 }
