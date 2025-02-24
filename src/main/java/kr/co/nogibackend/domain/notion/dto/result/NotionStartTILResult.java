@@ -12,6 +12,7 @@ public record NotionStartTILResult(
 	String commitDate,// 커밋 일자
 	String title,// 제목(ex 파일명.md 에서 파일명으로 사용할 값)
 	String content,// markdown 파일(base64 인코딩된 파일 내용)
+	String commitMessage, // 유저가 등록한 커밋메시지, 없을 수 있음
 	List<ImageOfNotionBlock> images// 이미지 경로 정보
 ) {
 
@@ -21,6 +22,7 @@ public record NotionStartTILResult(
 		, NotionPageInfo page
 		, NotionBlockConversionInfo encoding
 	) {
+
 		this(
 			userId
 			, page.getId()
@@ -28,6 +30,7 @@ public record NotionStartTILResult(
 			, page.getProperties().getNogiCommitDate().getDate().getStart()
 			, page.getProperties().getNogiTitle().getTitle().get(0).getPlain_text()
 			, encoding.content()
+			, page.getProperties().convertCommitMessageToString()
 			, encoding.images()
 		);
 	}

@@ -52,7 +52,7 @@ public class NotionService {
 	public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
 		// 작성완료 상태 TIL 페이지 조회
 		List<NotionPageInfo> pages =
-			this.getCompletedPages(command.getNotionBotToken(), command.getNotionDatabaseId(), command.getUserId());
+			this.getCompletedPages(command.getNotionBotToken(), command.getNotionDatabaseId());
 
 		List<NotionStartTILResult> results = new ArrayList<>();
 		for (NotionPageInfo page : pages) {
@@ -142,7 +142,7 @@ public class NotionService {
 		}
 	}
 
-	private List<NotionPageInfo> getCompletedPages(String AuthToken, String databaseId, Long userId) {
+	private List<NotionPageInfo> getCompletedPages(String AuthToken, String databaseId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
 		try {
 			Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);

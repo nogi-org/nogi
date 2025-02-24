@@ -11,17 +11,17 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionEquationContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionFileContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionHeadingContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionImageContent;
-import kr.co.nogibackend.domain.notion.dto.content.NotionLastEditedByProperty;
 import kr.co.nogibackend.domain.notion.dto.content.NotionLinkPreviewContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionNumberedListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionPDFContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionParagraphContent;
-import kr.co.nogibackend.domain.notion.dto.content.NotionParentResponse;
 import kr.co.nogibackend.domain.notion.dto.content.NotionQuoteContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTodoContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionToggleBlocksContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionVideoContent;
 import kr.co.nogibackend.domain.notion.dto.property.NotionCreatedByProperty;
+import kr.co.nogibackend.domain.notion.dto.property.NotionLastEditedByProperty;
+import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -34,7 +34,7 @@ public class NotionBlockInfo {
 	// common
 	private String object;
 	private String id;
-	private NotionParentResponse parent;
+	private NotionParentProperty parent;
 	private String type;
 	private LocalDateTime created_time;
 	private NotionCreatedByProperty created_by;
