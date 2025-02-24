@@ -3,17 +3,22 @@ import TextEditorContent from '@/components/editor/TextEditorContent.vue';
 import { onBeforeMount, reactive, ref } from 'vue';
 import { UserGuideManager } from '@/manager/user/UserGuideManager.js';
 import FullSizeImageModal from '@/components/modal/FullSizeImageModal.vue';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 const userGuideManager = new UserGuideManager();
 const userGuides = ref([]);
+const spinnerStore = useSpinnerStore();
 
 onBeforeMount(async () => {
   await getUserGuides();
 });
 
+// todo: userGuideManager 에 넣기
 const getUserGuides = async () => {
+  spinnerStore.on();
   const response = await userGuideManager.getUserGuides();
   userGuides.value = response;
+  spinnerStore.off();
 };
 
 const confirmModalAction = reactive({
