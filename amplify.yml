@@ -1,0 +1,24 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - echo "🏗️ [preBuild] 현재 경로 확인"
+        - ls -la
+        - cd nogi-frontend
+        - echo "📂 [preBuild] nogi-frontend 이동 후 경로 확인"
+        - ls -la
+        - npm ci --prefer-offline
+    build:
+      commands:
+        - echo "🏗️ [build] 현재 경로 확인"
+        - ls -la  # 현재 위치 확인
+        - npm run build:prod
+  artifacts:
+    baseDirectory: nogi-frontend/dist  # 📌 경로 수정
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - nogi-frontend/.npm/**/*
+      - nogi-frontend/node_modules/**/*
