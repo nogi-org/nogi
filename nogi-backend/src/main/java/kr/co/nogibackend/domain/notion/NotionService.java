@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.domain.notion.dto.command.NotionConnectionTestCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
@@ -103,6 +104,16 @@ public class NotionService {
 				: Optional.empty();
 	}
 
+	// 노션 데이터베이스 연결 확인(단순 노션 데이터베이스에 페이지 조회 후 에러 없으면 성공처리)
+	public String onConnectionTest(NotionConnectionTestCommand command) {
+		Map<String, Object> filter = NotionRequestMaker.createPageFilterEqStatus(STATUS_COMPLETED);
+		return
+			notionClient
+				.getPagesFromDatabase(AuthToken, databaseId, filter)
+				.getResults();
+		return null;
+	}
+
 	private boolean updateTILResultStatus(boolean isSuccess, String AuthToken, String pageId, Long userId) {
 		try {
 			Map<String, Object> request = NotionRequestMaker.requestUpdateStatusOfPage(isSuccess);
@@ -145,7 +156,7 @@ public class NotionService {
 	private List<NotionPageInfo> getCompletedPages(String AuthToken, String databaseId) {
 		// todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
 		try {
-			Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
+			Map<String, Object> filter = NotionRequestMaker.createPageFilterEqStatus(STATUS_COMPLETED);
 			return
 				notionClient
 					.getPagesFromDatabase(AuthToken, databaseId, filter)

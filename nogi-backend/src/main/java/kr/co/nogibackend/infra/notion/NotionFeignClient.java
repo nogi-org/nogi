@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.co.nogibackend.config.openfeign.NotionFeignClientConfig;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 
@@ -47,6 +48,13 @@ public interface NotionFeignClient {
 		@RequestHeader("Authorization") String AuthToken,
 		@PathVariable(value = "pageId") String pageId,
 		@RequestBody Map<String, Object> request
+	);
+
+
+	@RequestMapping(method = RequestMethod.GET, value = "/databases/{databaseId}")
+	ResponseEntity<NotionDatabaseInfo> getDatabase(
+		@RequestHeader("Authorization") String AuthToken,
+		@PathVariable(value = "databaseId") String databaseId
 	);
 
 }
