@@ -1,3 +1,0 @@
-github:
-  token: ${TEST_GITHUB_TOKEN}
-  nogi-bot-token: ${NOGI_BOT_GITHUB_TOKEN}

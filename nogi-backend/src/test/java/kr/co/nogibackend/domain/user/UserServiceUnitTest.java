@@ -16,6 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 
+/*
+  Package Name : kr.co.nogibackend.domain.user
+  File Name    : UserServiceUnitTest
+  Author       : won taek oh
+  Created Date : 25. 2. 9.
+  Description  : UserService 단위 테스트
+ */
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUnitTest {
 
