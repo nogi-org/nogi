@@ -16,14 +16,17 @@ export const ApiResponse = Object.freeze({
   USER_4: 'USER-4',
   // github
   GIT_2: 'GIT-2',
+  GIT_4: 'GIT-4',
   // 외부
   EXTERNAL_0: 'EXTERNAL-0',
   EXTERNAL_1: 'EXTERNAL-1',
   EXTERNAL_2: 'EXTERNAL-2',
-  EXTERNAL_3: 'EXTERNAL-3'
+  EXTERNAL_3: 'EXTERNAL-3',
+  // notion
+  NOTION_4: 'NOTION-4'
 });
 
-export const handleLogout = response => {
+export const handleLogout = (response) => {
   switch (response.code) {
     case ApiResponse.S_0:
       response.message = '다음에도 NOGI와 함께하세요!😊';
@@ -32,7 +35,7 @@ export const handleLogout = response => {
   return response;
 };
 
-export const handleUserInfo = response => {
+export const handleUserInfo = (response) => {
   switch (response.code) {
     case ApiResponse.S_0:
       response.message = '정상적으로 등록완료했어요.';
@@ -44,7 +47,20 @@ export const handleUserInfo = response => {
   return response;
 };
 
-export const handleValidationGithubRepository = response => {
+export const handleNotionDatabaseConnectionTest = (response) => {
+  switch (response.code) {
+    case ApiResponse.S_0:
+      response.message = 'Notion Database 연결이 성공적으로 완료되었어요.';
+      break;
+    case ApiResponse.NOTION_4:
+      response.message =
+        'Notion Database 연결에 실패했어요.\n사용 가이드를 확인해주세요.';
+      break;
+  }
+  return response;
+};
+
+export const handleValidationGithubRepository = (response) => {
   switch (response.code) {
     case ApiResponse.S_0:
       response.message = '사용 가능한 이름입니다.';
@@ -52,11 +68,15 @@ export const handleValidationGithubRepository = response => {
     case ApiResponse.GIT_2:
       response.message = '이미 등록된 이름이에요.';
       break;
+    case ApiResponse.GIT_4:
+      response.isSuccess = true;
+      response.message = '지금 사용중인 이름이에요.';
+      break;
   }
   return response;
 };
 
-export const handleCommonError = response => {
+export const handleCommonError = (response) => {
   let isCommonError = true;
   switch (response.code) {
     case ApiResponse.USER_2:
@@ -88,7 +108,7 @@ export const handleCommonError = response => {
   return isCommonError;
 };
 
-export const convertResponseFormat = response => {
+export const convertResponseFormat = (response) => {
   return {
     isSuccess: response.success,
     code: response.code,

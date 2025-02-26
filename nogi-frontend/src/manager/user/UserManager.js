@@ -7,23 +7,38 @@ import {
 } from '@/api/user/user.js';
 import { ref } from 'vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
-import { useApiResponseModalStore } from '@/stores/apiResponseModalStore.js';
+import { useNotifyStore } from '@/stores/notifyStore.js';
 
 export class UserManager {
   #authStore = useAuthStore();
-  #apiResponseModalStore = useApiResponseModalStore();
+  #apiResponseModalStore = useNotifyStore();
   #spinnerStore = useSpinnerStore();
+
   #info = ref({});
-  #checkRepositoryName = ref({
-    isCheck: false,
-    prevName: null
-  });
   #infoUpdateValidation = ref({
-    isResult: false,
+    isSuccess: false,
     result: {}
   });
+  #isSuccessRepositoryNameCheck = ref(false);
+  #isSuccessNotionDatabaseConnectionTest = ref(false);
 
-  async onManualNogi() {
+  get isSuccessNotionDatabaseConnectionTest() {
+    return this.#isSuccessNotionDatabaseConnectionTest;
+  }
+
+  get info() {
+    return this.#info;
+  }
+
+  get infoUpdateValidation() {
+    return this.#infoUpdateValidation;
+  }
+
+  get isSuccessRepositoryNameCheck() {
+    return this.#isSuccessRepositoryNameCheck;
+  }
+
+  async onManual() {
     if (this.#authStore.getAuth().value.isRequireInfo) {
       this.#apiResponseModalStore.onActive({
         isSuccess: false,
@@ -41,37 +56,32 @@ export class UserManager {
   }
 
   async getInfo() {
+    this.#spinnerStore.on();
     const response = await getUserInfoApi();
+    this.#spinnerStore.off();
     this.#info.value = response.result;
-    if (this.#info.value.githubRepository) {
-      this.#checkRepositoryName.value.isCheck = true;
-      this.#checkRepositoryName.value.prevName =
-        this.#info.value.githubRepository;
-    }
-  }
-
-  watchRepositoryName(value) {
-    if (!value) return;
-    this.#checkRepositoryName.value.isCheck =
-      this.#checkRepositoryName.value.prevName === value;
+    this.#isSuccessNotionDatabaseConnectionTest.value =
+      this.#info.value.notionDatabaseId && this.#info.value.notionBotToken;
+    this.#isSuccessRepositoryNameCheck.value =
+      this.#info.value.githubRepository !== '';
   }
 
   async checkRepositoryName() {
-    if (
-      this.#checkRepositoryName.value.prevName ===
-      this.#info.value.githubRepository
-    ) {
+    // todo: 이름 최소 길이, 최대 길이 체크
+    if (this.#info.value.githubRepository.trim() === '') {
+      this.#infoUpdateValidation.value.result.githubRepository =
+        '이름을 입력해주세요.';
       return;
     }
-    // todo: 이름 최소 길이, 최대 길이 체크
-    const params = { repositoryName: this.#info.value.githubRepository };
+
+    this.#spinnerStore.on();
+    const params = { repositoryName: this.#info.value.githubRepository.trim() };
     const response = await checkValidationGithubRepositoryApi(params);
-    this.#infoUpdateValidation.value.result.githubRepository = '';
+    this.#spinnerStore.off();
 
     if (response.isSuccess) {
-      this.#checkRepositoryName.value.isCheck = true;
-      this.#checkRepositoryName.value.prevName =
-        this.#info.value.githubRepository;
+      this.#isSuccessRepositoryNameCheck.value = true;
+      this.initInfoUpdateValidation();
     }
     this.#apiResponseModalStore.onActive(response);
   }
@@ -85,47 +95,52 @@ export class UserManager {
     });
     this.#spinnerStore.off();
     this.#apiResponseModalStore.onActive(response);
-    this.#initInfoUpdateValidation();
+    this.initInfoUpdateValidation();
     if (response.isSuccess) {
       this.#authStore.updateIsRequireInfo(false);
     }
   }
 
-  checkInfoValidation() {
+  checkUpdateInfoValidation() {
     const info = this.#info.value;
-    const validation = this.#infoUpdateValidation.value;
-    validation.result = {};
 
     if (!info.notionBotToken || !info.notionBotToken.trim()) {
-      validation.result.notionBotToken = '꼭 필요한 정보에요!';
+      this.#infoUpdateValidation.value.result.notionBotToken =
+        '꼭 필요한 정보에요!';
     }
 
     if (!info.notionDatabaseId || !info.notionDatabaseId.trim()) {
-      validation.result.notionDatabaseId = '꼭 필요한 정보에요!';
+      this.#infoUpdateValidation.value.result.notionDatabaseId =
+        '꼭 필요한 정보에요!';
     }
 
     if (!info.githubRepository || !info.githubRepository.trim()) {
-      validation.result.githubRepository = '꼭 필요한 정보에요!';
+      this.#infoUpdateValidation.value.result.githubRepository =
+        '꼭 필요한 정보에요!';
     }
 
-    if (!this.#checkRepositoryName.value.isCheck) {
-      validation.result.githubRepository = 'Repository 이름을 확인해주세요!';
+    if (!this.#isSuccessRepositoryNameCheck.value) {
+      this.#infoUpdateValidation.value.result.githubRepository =
+        'Repository 이름을 확인해주세요!';
     }
 
-    if (Object.keys(validation.result).length <= 0) {
-      validation.isResult = true;
+    if (!this.#isSuccessNotionDatabaseConnectionTest.value) {
+      const message = 'Notion Database 연결 확인 해주세요!';
+      this.#infoUpdateValidation.value.result.notionBotToken = message;
+      this.#infoUpdateValidation.value.result.notionDatabaseId = message;
     }
-  }
 
-  #initInfoUpdateValidation() {
-    this.#infoUpdateValidation.value = {};
-  }
+    if (Object.keys(this.#infoUpdateValidation.value.result).length <= 0) {
+      this.#infoUpdateValidation.value.isSuccess = true;
+    }
 
-  get info() {
-    return this.#info;
-  }
-
-  get infoUpdateValidation() {
     return this.#infoUpdateValidation;
+  }
+
+  initInfoUpdateValidation() {
+    this.#infoUpdateValidation.value = {
+      isSuccess: false,
+      result: {}
+    };
   }
 }
