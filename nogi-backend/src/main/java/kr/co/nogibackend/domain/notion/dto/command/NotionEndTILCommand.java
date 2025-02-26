@@ -20,7 +20,7 @@ public record NotionEndTILCommand(
 			githubCommitResult.notionPageId(),
 			githubCommitResult.category(),
 			githubCommitResult.title(),
-			true // 실패 케이스는 따로 Context 에 저장
+			githubCommitResult.isSuccess() // 실패 케이스는 따로 Context 에 저장
 		);
 	}
 }

@@ -92,7 +92,8 @@ public class GithubService {
 					command.notionPageId(),
 					command.notionBotToken(),
 					command.newCategory(),
-					command.newTitle()
+					command.newTitle(),
+					true
 				)
 			);
 		} catch (Exception e) {
@@ -101,8 +102,17 @@ public class GithubService {
 				"Github에 Commit 중 문제가 발생했어요",
 				command.userId()
 			);
+			return Optional.of(
+				new GithubCommitResult(
+					command.userId(),
+					command.notionPageId(),
+					command.notionBotToken(),
+					command.newCategory(),
+					command.newTitle(),
+					false
+				)
+			);
 		}
-		return Optional.empty();
 	}
 
 	private List<GithubCreateTreeRequest.TreeEntry> createTreeEntries(

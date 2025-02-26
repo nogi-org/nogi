@@ -87,12 +87,17 @@ public class NotionService {
 	}
 
 	public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
-		boolean isUpdateResult =
-			this.updateTILResultStatus(command.isSuccess(), command.notionBotToken(), command.notionPageId(),
-				command.userId());
+		boolean isUpdateSuccess =
+			this.updateTILResultStatus(
+				command.isSuccess(),
+				command.notionBotToken(),
+				command.notionPageId(),
+				command.userId()
+			);
 
 		return
-			isUpdateResult
+			// notion 상태 변화 성공 & github commit 성공 시 결과 반환
+			isUpdateSuccess && command.isSuccess()
 				? Optional.of(
 				new NotionEndTILResult(
 					command.userId(),

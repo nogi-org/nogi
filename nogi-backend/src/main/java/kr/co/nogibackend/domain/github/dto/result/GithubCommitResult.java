@@ -5,6 +5,7 @@ public record GithubCommitResult(
 	String notionPageId,
 	String notionBotToken,
 	String category,
-	String title
+	String title,
+	boolean isSuccess
 ) {
 }
