@@ -71,5 +71,4 @@ class GithubFeignClientIntegrationTest extends GithubTestEnvironment {
 			.orElse(null);
 		Assertions.assertThat(githubUserEmailInfo).isNotNull();
 	}
-
 }
