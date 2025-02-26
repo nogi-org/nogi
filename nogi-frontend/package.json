@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "local": "vite",
+    "local": "vite --port 5173",
     "prod": "vite --mode prod",
     "build:prod": "vite build --mode prod",
     "preview": "vite preview",

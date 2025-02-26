@@ -19,7 +19,7 @@ public class NotionRequestMaker {
 	  }
 	}
    */
-	public static Map<String, Object> filterStatusEq(NotionPropertyValue status) {
+	public static Map<String, Object> createPageFilterEqStatus(NotionPropertyValue status) {
 		Map<String, Object> value =
 			Map.of(
 				"property", STATUS.getName()
