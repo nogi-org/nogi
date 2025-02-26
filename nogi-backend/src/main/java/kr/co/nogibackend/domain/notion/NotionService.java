@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import kr.co.nogibackend.config.context.ExecutionResultContext;
+import kr.co.nogibackend.domain.notion.dto.command.NotionConnectionTestCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
@@ -85,17 +86,13 @@ public class NotionService {
   }
 
   public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
-    boolean isUpdateSuccess =
-        this.updateTILResultStatus(
-            command.isSuccess(),
-            command.notionBotToken(),
+    boolean isUpdateResult =
+        this.updateTILResultStatus(command.isSuccess(), command.notionBotToken(),
             command.notionPageId(),
-            command.userId()
-        );
+            command.userId());
 
     return
-        // notion 상태 변화 성공 & github commit 성공 시 결과 반환
-        isUpdateSuccess && command.isSuccess()
+        isUpdateResult && command.isSuccess()
             ? Optional.of(
             new NotionEndTILResult(
                 command.userId(),
@@ -104,6 +101,11 @@ public class NotionService {
                 command.title()
             ))
             : Optional.empty();
+  }
+
+  // 노션 데이터베이스 연결 확인(단순 노션 데이터베이스에 페이지 조회 후 에러 없으면 성공처리)
+  public void onConnectionTest(NotionConnectionTestCommand command) {
+    notionClient.getDatabase(command.notionBotToken(), command.notionDatabaseId());
   }
 
   private boolean updateTILResultStatus(boolean isSuccess, String AuthToken, String pageId,
@@ -152,7 +154,7 @@ public class NotionService {
   private List<NotionPageInfo> getCompletedPages(String AuthToken, String databaseId) {
     // todo: 페이지 가져올떄 한번에 100개 만 가져옴. 100개 이상이면 더 가져오는 로직 추가 필요
     try {
-      Map<String, Object> filter = NotionRequestMaker.filterStatusEq(STATUS_COMPLETED);
+      Map<String, Object> filter = NotionRequestMaker.createPageFilterEqStatus(STATUS_COMPLETED);
       return
           notionClient
               .getPagesFromDatabase(AuthToken, databaseId, filter)

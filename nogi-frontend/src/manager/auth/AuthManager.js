@@ -2,12 +2,12 @@ import { apiLogout, getGithubLoginURL } from '@/api/auth/auth.js';
 import { useAuthStore } from '@/stores/authStore.js';
 import { useRouter } from 'vue-router';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
-import { useApiResponseModalStore } from '@/stores/apiResponseModalStore.js';
+import { useNotifyStore } from '@/stores/notifyStore.js';
 import { ApiResponse } from '@/api/apiResponse.js';
 
 export class AuthManager {
   #router = useRouter();
-  #apiResponseModalStore = useApiResponseModalStore();
+  #apiResponseModalStore = useNotifyStore();
   #authStore = useAuthStore();
   #spinnerStore = useSpinnerStore();
 

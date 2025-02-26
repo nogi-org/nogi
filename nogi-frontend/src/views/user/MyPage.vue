@@ -1,26 +1,19 @@
 <script setup>
-import { onMounted, watch } from 'vue';
+import { onMounted } from 'vue';
 import { UserManager } from '@/manager/user/UserManager.js';
 import Validation from '@/components/common/Validation.vue';
+import { NotionManager } from '@/manager/notion/NotionManager.js';
 
 const user = new UserManager();
-const userInfo = user.info;
-const validation = user.infoUpdateValidation;
+const notion = new NotionManager();
 
 onMounted(async () => {
   await user.getInfo();
 });
 
-watch(
-  () => userInfo.value.githubRepository,
-  newValue => {
-    user.watchRepositoryName(newValue);
-  }
-);
-
 const updateUserInfo = async () => {
-  user.checkInfoValidation();
-  if (!validation.value.isResult) {
+  const validationResult = user.checkUpdateInfoValidation();
+  if (!validationResult.value.isSuccess) {
     return;
   }
   await user.updateInfo();
@@ -30,8 +23,22 @@ const checkRepositoryName = async () => {
   await user.checkRepositoryName();
 };
 
-const onManualNogi = async () => {
-  await user.onManualNogi();
+const onManual = async () => {
+  await user.onManual();
+};
+
+const checkNotionDatabaseConnectionTest = async () => {
+  const response = await notion.onDatabaseConnectionTest(
+    user.info.value.notionBotToken,
+    user.info.value.notionDatabaseId
+  );
+  if (!response.isSuccess) {
+    return;
+  }
+  user.isSuccessNotionDatabaseConnectionTest.value = true;
+  user.info.value.notionBotToken = response.botToken;
+  user.info.value.notionDatabaseId = response.databaseId;
+  user.initInfoUpdateValidation();
 };
 </script>
 
@@ -40,14 +47,14 @@ const onManualNogi = async () => {
     <div class="border border-main rounded-md p-4 mb-10">
       <button
         class="mb-3 bg-action text-xs px-3 py-2 tracking-widest font-medium rounded-md sm:px-2.5"
-        @click="onManualNogi"
+        @click="onManual"
       >
         수동실행
       </button>
       <div class="text-xs sm:text-sm text-neutral">
         <font-awesome-icon
-          icon="fa-solid fa-circle-info"
           class="text-neutral mr-1 text-sm"
+          icon="fa-solid fa-circle-info"
         />
         <span>
           버튼을 클릭하면 NOGI의 자동 실행 주기를 기다릴 필요 없이, 즉시 실행할
@@ -61,94 +68,135 @@ const onManualNogi = async () => {
       <li class="mb-5">
         <!--        todo: label, input, validation component 로 분리-->
         <label
-          for=""
           class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger after:absolute after:-right-2.5 after:top-[65%] after:-translate-y-1/2"
+          for=""
         >
           Notion Bot Token
         </label>
         <input
-          v-model="userInfo.notionBotToken"
+          v-model="user.info.value.notionBotToken"
+          :class="[
+            {
+              'ring-danger ring-1':
+                user.infoUpdateValidation.value?.result?.notionBotToken
+            },
+            { 'text-neutral': user.isSuccessNotionDatabaseConnectionTest.value }
+          ]"
+          :readonly="user.isSuccessNotionDatabaseConnectionTest.value"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{ 'ring-danger ring-1': validation?.result?.notionBotToken }"
           placeholder="Notion Bot Token을 입력해주세요."
         />
-        {{ validation?.result?.notionBotToken }}
         <Validation
-          v-if="validation?.result?.notionBotToken"
-          :notice="validation?.result?.notionBotToken"
+          v-if="user.infoUpdateValidation.value?.result?.notionBotToken"
+          :notice="user.infoUpdateValidation.value?.result?.notionBotToken"
           class="mt-1"
         />
       </li>
 
       <!--      notion database key-->
-      <li class="mb-5">
+      <li>
         <!--        todo: label, input, validation component 로 분리-->
         <label
-          for=""
           class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger after:absolute after:-right-2.5 after:top-[65%] after:-translate-y-1/2"
+          for=""
         >
           Notion Database ID
         </label>
         <input
-          v-model="userInfo.notionDatabaseId"
+          v-model="user.info.value.notionDatabaseId"
+          :class="[
+            {
+              'ring-danger ring-1':
+                user.infoUpdateValidation.value?.result?.notionBotToken
+            },
+            { 'text-neutral': user.isSuccessNotionDatabaseConnectionTest.value }
+          ]"
+          :readonly="user.isSuccessNotionDatabaseConnectionTest.value"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{
-            'ring-danger ring-1': validation?.result?.notionDatabaseId
-          }"
           placeholder="Notion Database Id를 입력해주세요."
         />
         <Validation
-          v-if="validation?.result?.notionDatabaseId"
-          :notice="validation?.result?.notionDatabaseId"
+          v-if="user.infoUpdateValidation.value?.result?.notionDatabaseId"
+          :notice="user.infoUpdateValidation.value?.result?.notionDatabaseId"
           class="mt-1"
         />
       </li>
+      <div class="text-right mt-1">
+        <button
+          v-if="!user.isSuccessNotionDatabaseConnectionTest.value"
+          class="bg-action text-xs px-2.5 py-1 rounded-md sm:text-sm"
+          @click="checkNotionDatabaseConnectionTest"
+        >
+          연결 확인
+        </button>
+        <button
+          v-if="user.isSuccessNotionDatabaseConnectionTest.value"
+          class="bg-warning text-xs px-2.5 py-1 rounded-md sm:text-sm"
+          @click="user.isSuccessNotionDatabaseConnectionTest.value = false"
+        >
+          수정
+        </button>
+      </div>
 
+      <!-- Github Repository Name -->
       <li class="mb-5">
         <label
-          for=""
           class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger after:absolute after:-right-2.5 after:top-[65%] after:-translate-y-1/2"
+          for=""
         >
           Github Repository Name
         </label>
         <input
-          v-model="userInfo.githubRepository"
+          v-model="user.info.value.githubRepository"
+          :class="[
+            {
+              'ring-danger ring-1':
+                user.infoUpdateValidation.value?.result?.githubRepository
+            },
+            { 'text-neutral': user.isSuccessRepositoryNameCheck.value }
+          ]"
+          :readonly="user.isSuccessRepositoryNameCheck.value"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
-          :class="{
-            'ring-danger ring-1': validation?.result?.githubRepository
-          }"
           placeholder="TIL을 기록할 멋진 Repository 이름을 작성해주세요."
         />
         <Validation
-          v-if="validation?.result?.githubRepository"
-          :notice="validation?.result?.githubRepository"
+          v-if="user.infoUpdateValidation.value?.result?.githubRepository"
+          :notice="user.infoUpdateValidation.value?.result?.githubRepository"
           class="mt-1"
         />
         <div class="text-right mt-1">
           <button
+            v-if="!user.isSuccessRepositoryNameCheck.value"
             class="bg-action text-xs px-2.5 py-1 rounded-md sm:text-sm"
             @click="checkRepositoryName"
           >
             확인
           </button>
+          <button
+            v-if="user.isSuccessRepositoryNameCheck.value"
+            class="bg-warning text-xs px-2.5 py-1 rounded-md sm:text-sm"
+            @click="user.isSuccessRepositoryNameCheck.value = false"
+          >
+            수정
+          </button>
         </div>
       </li>
 
       <li class="mb-5">
-        <label for="" class="relative text-neutral text-sm font-noto_sans_b">
+        <label class="relative text-neutral text-sm font-noto_sans_b" for="">
           Github Email
         </label>
         <input
-          v-model="userInfo.githubEmail"
-          readonly
+          v-model="user.info.value.githubEmail"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider text-neutral"
+          readonly
         />
       </li>
 
       <li class="flex justify-end">
         <button
-          @click="updateUserInfo"
           class="mb-3 bg-action text-xs px-3 py-2 tracking-widest font-medium rounded-md sm:px-2.5"
+          @click="updateUserInfo"
         >
           저장
         </button>

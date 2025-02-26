@@ -2,6 +2,7 @@ package kr.co.nogibackend.infra.notion;
 
 import static kr.co.nogibackend.response.code.NotionResponseCode.F_GET_BLOCK_IMAGE;
 import static kr.co.nogibackend.response.code.NotionResponseCode.F_GET_NOTION_BLOCK;
+import static kr.co.nogibackend.response.code.NotionResponseCode.F_GET_NOTION_DATABASE;
 import static kr.co.nogibackend.response.code.NotionResponseCode.F_GET_NOTION_PAGE;
 import static kr.co.nogibackend.response.code.NotionResponseCode.F_UPDATE_TIL_STATUS;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import lombok.RequiredArgsConstructor;
@@ -26,14 +28,14 @@ public class NotionClientImpl implements NotionClient {
 
   @Override
   public NotionInfo<NotionPageInfo> getPagesFromDatabase(
-      String AuthToken,
+      String BotToken,
       String databaseId,
       Map<String, Object> request
   ) {
     try {
       return
           notionFeignClient
-              .getPagesFromDatabase(AuthToken, databaseId, request)
+              .getPagesFromDatabase(BotToken, databaseId, request)
               .getBody();
     } catch (Exception error) {
       throw new GlobalException(F_GET_NOTION_PAGE);
@@ -42,14 +44,14 @@ public class NotionClientImpl implements NotionClient {
 
   @Override
   public NotionInfo<NotionBlockInfo> getBlocksFromPage(
-      String AuthToken,
+      String BotToken,
       String pageId,
       String startCursor
   ) {
     try {
       return
           notionFeignClient
-              .getBlocksFromPage(AuthToken, pageId, startCursor)
+              .getBlocksFromPage(BotToken, pageId, startCursor)
               .getBody();
     } catch (Exception error) {
       throw new GlobalException(F_GET_NOTION_BLOCK);
@@ -67,19 +69,32 @@ public class NotionClientImpl implements NotionClient {
 
   @Override
   public NotionPageInfo updatePageStatus(
-      String AuthToken
+      String BotToken
       , String pageId
       , Map<String, Object> request
   ) {
     try {
       return
           notionFeignClient
-              .updatePageStatus(AuthToken, pageId, request)
+              .updatePageStatus(BotToken, pageId, request)
               .getBody();
     } catch (Exception error) {
       throw new GlobalException(F_UPDATE_TIL_STATUS);
     }
 
+  }
+
+  @Override
+  public NotionDatabaseInfo getDatabase(
+      String BotToken
+      , String databaseId
+  ) {
+    try {
+      return
+          notionFeignClient.getDatabase(BotToken, databaseId).getBody();
+    } catch (Exception error) {
+      throw new GlobalException(F_GET_NOTION_DATABASE);
+    }
   }
 
 }

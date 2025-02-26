@@ -3,6 +3,7 @@ package kr.co.nogibackend.infra.notion;
 import java.util.Map;
 import kr.co.nogibackend.config.openfeign.NotionFeignClientConfig;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -28,23 +29,30 @@ public interface NotionFeignClient {
 
   @PostMapping("/databases/{databaseId}/query")
   ResponseEntity<NotionInfo<NotionPageInfo>> getPagesFromDatabase(
-      @RequestHeader("Authorization") String AuthToken,
+      @RequestHeader("Authorization") String BotToken,
       @PathVariable(value = "databaseId") String databaseId,
       Map<String, Object> request
   );
 
   @GetMapping("/blocks/{pageId}/children?page_size=100")
   ResponseEntity<NotionInfo<NotionBlockInfo>> getBlocksFromPage(
-      @RequestHeader("Authorization") String AuthToken,
+      @RequestHeader("Authorization") String BotToken,
       @PathVariable(value = "pageId") String pageId,
       @RequestParam(value = "start_cursor", required = false) String startCursor
   );
 
   @RequestMapping(method = RequestMethod.PATCH, value = "/pages/{pageId}")
   ResponseEntity<NotionPageInfo> updatePageStatus(
-      @RequestHeader("Authorization") String AuthToken,
+      @RequestHeader("Authorization") String BotToken,
       @PathVariable(value = "pageId") String pageId,
       @RequestBody Map<String, Object> request
+  );
+
+
+  @RequestMapping(method = RequestMethod.GET, value = "/databases/{databaseId}")
+  ResponseEntity<NotionDatabaseInfo> getDatabase(
+      @RequestHeader("Authorization") String BotToken,
+      @PathVariable(value = "databaseId") String databaseId
   );
 
 }

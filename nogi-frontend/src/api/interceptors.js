@@ -5,15 +5,15 @@ import {
 } from '@/api/apiResponse.js';
 import router from '@/router/index.js';
 import { useAuthStore } from '@/stores/authStore.js';
-import { useApiResponseModalStore } from '@/stores/apiResponseModalStore.js';
+import { useNotifyStore } from '@/stores/notifyStore.js';
 
 export function setInterceptors(instance) {
   //요청 인터셉터
   instance.interceptors.request.use(
-    config => {
+    (config) => {
       return config;
     },
-    error => {
+    (error) => {
       //요청 에러 시 수행 로직
       return Promise.reject(error);
     }
@@ -21,10 +21,10 @@ export function setInterceptors(instance) {
 
   //응답 인터셉터
   instance.interceptors.response.use(
-    response => {
+    (response) => {
       return convertResponseFormat(response.data);
     },
-    error => {
+    (error) => {
       const response = convertResponseFormat(error.response.data);
       handleInterceptorCommonError(response);
       return Promise.reject(response);
@@ -36,19 +36,21 @@ export function setInterceptors(instance) {
 // 공통 에러처리
 async function handleInterceptorCommonError(response) {
   const isCommonError = handleCommonError(response);
-  if (!isCommonError) return;
+  if (!isCommonError) {
+    return;
+  }
 
-  const apiResponseModalStore = useApiResponseModalStore();
+  const notifyStore = useNotifyStore();
 
   switch (response.code) {
     case ApiResponse.USER_2: // 401
       await router.push({ name: 'home' });
       useAuthStore().deleteAuth();
-      apiResponseModalStore.onActive(response);
+      notifyStore.onActive(response);
       break;
     case ApiResponse.USER_3: // 403
       await router.push({ name: 'home' });
-      apiResponseModalStore.onActive(response);
+      notifyStore.onActive(response);
       break;
   }
 }
