@@ -47,3 +47,4 @@ src/test/resources/application-test.yml
 Dockerfile
 LOG_DIR_IS_UNDEFINED
 spy.log
+/src/main/generated/

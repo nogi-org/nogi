@@ -57,7 +57,6 @@ public class GithubService {
         .toList();
   }
 
-  // TODO 성공 실패여부 객체를 리턴하도록 수정
   public Optional<GithubCommitResult> commitToGithub(GithubCommitCommand command) {
     try {
       String owner = command.githubOwner();

@@ -56,7 +56,7 @@ public class GithubServiceIntegrationTest extends GithubTestEnvironment {
   }
 
   @Test
-  @DisplayName("새롭게 TIL을 작성하고나서 카테고리를 수정했을 경우 이전 카테고리 하위의 모든 파일은 삭제되고, 새로운 카테고리 하위에 파일이 생성된다.")
+  @DisplayName("새롭게 TIL을 작성하고나서 카테고리를 수정했을 경우 이전 MD 파일은 삭제되고 새로운 MD 파일이 생성된다.")
   void testUpdateCategoryCommitToGithub() throws IOException {
     githubService.commitToGithub(
         getGithubCommitCommand(
@@ -79,6 +79,41 @@ public class GithubServiceIntegrationTest extends GithubTestEnvironment {
     );
   }
 
+  @Test
+  @DisplayName("같은 카테고리의 TIL을 2개 작성하고, 그 중 하나의 카테고리를 수정했을 경우 이전 MD 파일은 삭제되고 새로운 MD 파일이 생성된다.")
+  void testUpdateCategoryCommitToGithub2() throws IOException {
+    githubService.commitToGithub(
+        getGithubCommitCommand(
+            NogiHistoryType.CREATE_OR_UPDATE_CONTENT,
+            "Java",
+            "Java 제목1",
+            "Java",
+            "Java 제목"
+        )
+    );
+
+    githubService.commitToGithub(
+        getGithubCommitCommand(
+            NogiHistoryType.CREATE_OR_UPDATE_CONTENT,
+            "Java",
+            "Java 제목2",
+            "Java",
+            "Java 제목"
+        )
+    );
+
+    githubService.commitToGithub(
+        getGithubCommitCommand(
+            NogiHistoryType.UPDATE_CATEGORY,
+            "New_Java",
+            "New Java 제목 Title",
+            "Java",
+            "Java 제목2"
+        )
+    );
+  }
+
+  // ============================== private 메서드 ==============================
   private GithubCommitCommand getGithubCommitCommand(
       NogiHistoryType type,
       String newCategory,

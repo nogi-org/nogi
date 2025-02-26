@@ -108,10 +108,12 @@ public record GithubCommitCommand(
   }
 
   private void addHistoryFile(Map<String, String> fileMap) {
-    if (type == NogiHistoryType.UPDATE_TITLE) {
+    if (
+      // 제목 or 카테고리가 수정되었을 경우 이전 md file 을 삭제하기 위해 null 값을 value 로 설정
+        type == NogiHistoryType.UPDATE_TITLE ||
+            type == NogiHistoryType.UPDATE_CATEGORY
+    ) {
       fileMap.put(getPrevMarkdownFilePath(), null);
-    } else if (type == NogiHistoryType.UPDATE_CATEGORY) {
-      fileMap.put(prevCategory, null);
     }
   }
 
