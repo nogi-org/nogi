@@ -16,6 +16,6 @@ import lombok.ToString;
 @ToString
 public class NotionEmbedContent {
 
-	private String url;
+  private String url;
 
 }

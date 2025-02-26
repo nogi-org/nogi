@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class NotionNogiCommitDateProperty extends NotionNogiCommonProperty {
 
-	private NotionDateProperty date;
+  private NotionDateProperty date;
 
 }

@@ -2,15 +2,13 @@ package kr.co.nogibackend.infra.guide;
 
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import kr.co.nogibackend.domain.guide.Guide;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface GuideJpaRepository extends JpaRepository<Guide, Long> {
 
-	Optional<Guide> findByStep(int step);
+  Optional<Guide> findByStep(int step);
 
-	List<Guide> findAllByOrderByStepAsc();
+  List<Guide> findAllByOrderByStepAsc();
 
 }

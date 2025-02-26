@@ -14,13 +14,13 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserLoginResponse {
 
-	private UserResponse user;
-	private String accessToken;
+  private UserResponse user;
+  private String accessToken;
 
-	public static UserLoginResponse from(UserLoginByGithubInfo userInfo) {
-		return new UserLoginResponse(
-			UserResponse.from(userInfo.getUserInfo()),
-			userInfo.getAccessToken()
-		);
-	}
+  public static UserLoginResponse from(UserLoginByGithubInfo userInfo) {
+    return new UserLoginResponse(
+        UserResponse.from(userInfo.getUserInfo()),
+        userInfo.getAccessToken()
+    );
+  }
 }

@@ -17,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Table(
-	name = "tb_nogi_history"
+    name = "tb_nogi_history"
 )
 @Getter
 @Entity
@@ -26,22 +26,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NogiHistory {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-	private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+  private User user;
 
-	private String notionPageId;
+  private String notionPageId;
 
-	private String category;
+  private String category;
 
-	private String title;
+  private String title;
 
-	public void updateMarkdownInfo(String category, String title) {
-		this.category = category;
-		this.title = title;
-	}
+  public void updateMarkdownInfo(String category, String title) {
+    this.category = category;
+    this.title = title;
+  }
 }

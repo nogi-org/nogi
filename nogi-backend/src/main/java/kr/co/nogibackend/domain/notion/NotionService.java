@@ -92,7 +92,7 @@ public class NotionService {
             command.userId());
 
     return
-        isUpdateResult
+        isUpdateResult && command.isSuccess()
             ? Optional.of(
             new NotionEndTILResult(
                 command.userId(),

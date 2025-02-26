@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
   Description  :
  */
 @Table(
-	name = "tb_guide"
+    name = "tb_guide"
 )
 @Getter
 @Entity
@@ -34,27 +34,27 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Guide {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	@Column(columnDefinition = "LONGTEXT")
-	private String image;
+  @Column(columnDefinition = "LONGTEXT")
+  private String image;
 
-	@Column(columnDefinition = "LONGTEXT")
-	private String content;
+  @Column(columnDefinition = "LONGTEXT")
+  private String content;
 
-	private int step;
+  private int step;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "USER_ID", foreignKey = @ForeignKey(name = "FK_TB_GUIDE__USER_ID"))
-	private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "USER_ID", foreignKey = @ForeignKey(name = "FK_TB_GUIDE__USER_ID"))
+  private User user;
 
-	// 모든 필드 수정
-	public void updateAll(String image, String content, Integer step) {
-		this.image = image;
-		this.content = content;
-		this.step = step;
-	}
+  // 모든 필드 수정
+  public void updateAll(String image, String content, Integer step) {
+    this.image = image;
+    this.content = content;
+    this.step = step;
+  }
 
 }

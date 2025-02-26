@@ -14,22 +14,22 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserUpdateCommand {
 
-	private Long id;
-	private String notionBotToken;
-	private String notionDatabaseId;
-	private String githubAuthToken;
-	private String githubRepository;
-	@Setter
-	private String githubDefaultBranch;
-	private String githubEmail;
-	private String githubOwner;
-	private Boolean isNotificationAllowed;
+  private Long id;
+  private String notionBotToken;
+  private String notionDatabaseId;
+  private String githubAuthToken;
+  private String githubRepository;
+  @Setter
+  private String githubDefaultBranch;
+  private String githubEmail;
+  private String githubOwner;
+  private Boolean isNotificationAllowed;
 
-	public static UserUpdateCommand from(GithubUserResult githubUserResult, String accessToken) {
-		return UserUpdateCommand.builder()
-			.githubAuthToken(accessToken)
-			.githubEmail(githubUserResult.email())
-			.githubOwner(githubUserResult.owner())
-			.build();
-	}
+  public static UserUpdateCommand from(GithubUserResult githubUserResult, String accessToken) {
+    return UserUpdateCommand.builder()
+        .githubAuthToken(accessToken)
+        .githubEmail(githubUserResult.email())
+        .githubOwner(githubUserResult.owner())
+        .build();
+  }
 }

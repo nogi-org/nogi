@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class NotionEmojiProperty {
 
-	private String type;
-	private String emoji;
+  private String type;
+  private String emoji;
 
 }

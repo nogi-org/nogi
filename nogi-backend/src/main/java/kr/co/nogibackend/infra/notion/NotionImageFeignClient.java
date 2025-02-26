@@ -1,7 +1,6 @@
 package kr.co.nogibackend.infra.notion;
 
 import java.net.URI;
-
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -13,7 +12,7 @@ URI baseUrl 에서 동적으로 base url 을 가져와서 처리함.
 @FeignClient(name = "NotionImageClient", url = "dynamic-baseUrl")
 public interface NotionImageFeignClient {
 
-	@GetMapping(path = "")
-	byte[] getBlockImage(URI baseUrl);
+  @GetMapping(path = "")
+  byte[] getBlockImage(URI baseUrl);
 
 }

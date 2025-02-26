@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class NotionLinkContent {
 
-	private String url;
+  private String url;
 
 }

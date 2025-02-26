@@ -1,10 +1,9 @@
 package kr.co.nogibackend.config.openfeign;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import feign.Client;
 import feign.httpclient.ApacheHttpClient;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /*
   Package Name : kr.co.nogibackend.config.openfeign
@@ -16,9 +15,9 @@ import feign.httpclient.ApacheHttpClient;
 @Configuration
 public class FeignApacheHttpConfiguration {
 
-	@Bean
-	public Client client() {
-		return new ApacheHttpClient();
-	}
+  @Bean
+  public Client client() {
+    return new ApacheHttpClient();
+  }
 
 }

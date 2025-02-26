@@ -9,11 +9,11 @@ import lombok.ToString;
 @ToString
 public class NotionAnnotationsContent {
 
-	private boolean bold;
-	private boolean italic;
-	private boolean strikethrough;
-	private boolean underline;
-	private boolean code;
-	private String color;
+  private boolean bold;
+  private boolean italic;
+  private boolean strikethrough;
+  private boolean underline;
+  private boolean code;
+  private String color;
 
 }

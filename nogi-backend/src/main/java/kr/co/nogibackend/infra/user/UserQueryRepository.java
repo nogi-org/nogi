@@ -1,67 +1,64 @@
 package kr.co.nogibackend.infra.user;
 
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
-
-import com.querydsl.jpa.impl.JPAQueryFactory;
-
 import kr.co.nogibackend.domain.user.NogiHistory;
 import kr.co.nogibackend.domain.user.QNogiHistory;
 import kr.co.nogibackend.domain.user.QUser;
 import kr.co.nogibackend.domain.user.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class UserQueryRepository {
 
-	private final JPAQueryFactory queryFactory;
+  private final JPAQueryFactory queryFactory;
 
-	public List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageId) {
-		var qNogiHistory = QNogiHistory.nogiHistory;
+  public List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageId) {
+    var qNogiHistory = QNogiHistory.nogiHistory;
 
-		return queryFactory.selectFrom(qNogiHistory)
-			.where(qNogiHistory.notionPageId.in(notionPageId))
-			.fetch();
-	}
+    return queryFactory.selectFrom(qNogiHistory)
+        .where(qNogiHistory.notionPageId.in(notionPageId))
+        .fetch();
+  }
 
-	public List<User> findAllUserByIds(Long... userIds) {
-		QUser qUser = QUser.user;
+  public List<User> findAllUserByIds(Long... userIds) {
+    QUser qUser = QUser.user;
 
-		return queryFactory.selectFrom(qUser)
-			.where(qUser.id.in(userIds))
-			.fetch();
-	}
+    return queryFactory.selectFrom(qUser)
+        .where(qUser.id.in(userIds))
+        .fetch();
+  }
 
-	public List<User> findAllUser() {
-		QUser qUser = QUser.user;
+  public List<User> findAllUser() {
+    QUser qUser = QUser.user;
 
-		return queryFactory.selectFrom(qUser)
-			.where(qUser.role.eq(User.Role.USER))
-			.fetch();
-	}
+    return queryFactory.selectFrom(qUser)
+        .where(qUser.role.eq(User.Role.USER))
+        .fetch();
+  }
 
-	public Optional<User> findNogiBot() {
-		QUser qUser = QUser.user;
+  public Optional<User> findNogiBot() {
+    QUser qUser = QUser.user;
 
-		return Optional.ofNullable(
-			queryFactory.selectFrom(qUser)
-				.where(qUser.role.eq(User.Role.NOGI_BOT))
-				.fetchOne()
-		);
-	}
+    return Optional.ofNullable(
+        queryFactory.selectFrom(qUser)
+            .where(qUser.role.eq(User.Role.NOGI_BOT))
+            .fetchOne()
+    );
+  }
 
-	public Optional<User> findByGithubOwner(String owner) {
-		QUser qUser = QUser.user;
+  public Optional<User> findByGithubOwner(String owner) {
+    QUser qUser = QUser.user;
 
-		return Optional.ofNullable(
-			queryFactory.selectFrom(qUser)
-				.where(
-					qUser.githubOwner.eq(owner)
-				)
-				.fetchOne()
-		);
-	}
+    return Optional.ofNullable(
+        queryFactory.selectFrom(qUser)
+            .where(
+                qUser.githubOwner.eq(owner)
+            )
+            .fetchOne()
+    );
+  }
 }

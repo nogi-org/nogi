@@ -17,7 +17,7 @@ import lombok.ToString;
 @ToString
 public class NotionPDFContent {
 
-	private String type;
-	private NotionFileProperty external;
+  private String type;
+  private NotionFileProperty external;
 
 }
