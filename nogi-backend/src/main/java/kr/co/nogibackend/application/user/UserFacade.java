@@ -1,9 +1,7 @@
 package kr.co.nogibackend.application.user;
 
-import static kr.co.nogibackend.response.code.GitResponseCode.*;
-import static kr.co.nogibackend.response.code.UserResponseCode.*;
-
-import org.springframework.stereotype.Service;
+import static kr.co.nogibackend.response.code.GitResponseCode.F_ALREADY_USING_REPOSITORY_NAME;
+import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.exception.GlobalException;
@@ -21,6 +19,7 @@ import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 /*
   Package Name : kr.co.nogibackend.application.user
@@ -33,115 +32,117 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserFacade {
 
-	private final GithubService githubService;
-	private final UserService userService;
-	private final JwtProvider jwtProvider;
+  private final GithubService githubService;
+  private final UserService userService;
+  private final JwtProvider jwtProvider;
 
-	public UserLoginByGithubInfo loginByGithub(UserFacadeCommand.GithubLogin command) {
-		// 1. access token 가져오기
-		String githubAccessToken = githubService.getAccessToken(
-			new GithubOAuthAccessTokenRequest(
-				command.clientId(),
-				command.clientSecret(),
-				command.code(),
-				"public_repo"
-			)
-		).accessToken();
+  public UserLoginByGithubInfo loginByGithub(UserFacadeCommand.GithubLogin command) {
+    // 1. access token 가져오기
+    String githubAccessToken = githubService.getAccessToken(
+        new GithubOAuthAccessTokenRequest(
+            command.clientId(),
+            command.clientSecret(),
+            command.code(),
+            "public_repo"
+        )
+    ).accessToken();
 
-		// 2. user 정보 가져오기
-		GithubUserResult githubUserResult = githubService.getUserInfo(githubAccessToken);
+    // 2. user 정보 가져오기
+    GithubUserResult githubUserResult = githubService.getUserInfo(githubAccessToken);
 
-		// 3. user 정보 저장하기
-		UserResult savedUserResult =
-			userService.createOrUpdateUser(UserUpdateCommand.from(githubUserResult, githubAccessToken));
+    // 3. user 정보 저장하기
+    UserResult savedUserResult =
+        userService.createOrUpdateUser(UserUpdateCommand.from(githubUserResult, githubAccessToken));
 
-		// 4. access toekn 발급하기(nogi token)
-		String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id(), savedUserResult.role());
+    // 4. access toekn 발급하기(nogi token)
+    String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id(),
+        savedUserResult.role());
 
-		return UserLoginByGithubInfo.from(savedUserResult, nogiAccessToken);
-	}
+    return UserLoginByGithubInfo.from(savedUserResult, nogiAccessToken);
+  }
 
-	public UserInfo updateUserAndCreateRepo(UserUpdateCommand command) {
-		// 1. user 정보 가져오기
-		UserResult userResult = userService.findUserByIdForFacade(command.getId());
+  public UserInfo updateUserAndCreateRepo(UserUpdateCommand command) {
+    // 1. user 정보 가져오기
+    UserResult userResult = userService.findUserByIdForFacade(command.getId());
 
-		// 2. Repository 생성 또는 업데이트
-		handleRepositoryCreationOrUpdate(command, userResult);
+    // 2. Repository 생성 또는 업데이트
+    handleRepositoryCreationOrUpdate(command, userResult);
 
-		// 3. DB 에 user 정보 업데이트
-		return userService.updateUser(command);
-	}
+    // 3. DB 에 user 정보 업데이트
+    return userService.updateUser(command);
+  }
 
-	private void handleRepositoryCreationOrUpdate(UserUpdateCommand command, UserResult userResult) {
-		String existingRepo = userResult.githubRepository();
-		String newRepo = command.getGithubRepository();
+  private void handleRepositoryCreationOrUpdate(UserUpdateCommand command, UserResult userResult) {
+    String existingRepo = userResult.githubRepository();
+    String newRepo = command.getGithubRepository();
 
-		// 기존 repository가 없으면 새로 생성
-		if (existingRepo == null) {
-			createRepositoryAndAddCollaborator(command, userResult);
-			return;
-		}
+    // 기존 repository가 없으면 새로 생성
+    if (existingRepo == null) {
+      createRepositoryAndAddCollaborator(command, userResult);
+      return;
+    }
 
-		boolean isDeletedOnGithub = isRepositoryDeletedOnGithub(userResult);
+    boolean isDeletedOnGithub = isRepositoryDeletedOnGithub(userResult);
 
-		// GitHub에서 삭제된 상태일 때
-		if (isDeletedOnGithub) {
-			createRepositoryAndAddCollaborator(command, userResult);
-			return;
-		}
+    // GitHub에서 삭제된 상태일 때
+    if (isDeletedOnGithub) {
+      createRepositoryAndAddCollaborator(command, userResult);
+      return;
+    }
 
-		// repository 이름이 변경된 경우
-		if (!existingRepo.equals(newRepo)) {
-			githubService.updateRepository(
-				userResult.githubOwner(), existingRepo, newRepo, userResult.githubAuthToken()
-			);
-		}
-	}
+    // repository 이름이 변경된 경우
+    if (!existingRepo.equals(newRepo)) {
+      githubService.updateRepository(
+          userResult.githubOwner(), existingRepo, newRepo, userResult.githubAuthToken()
+      );
+    }
+  }
 
-	private boolean isRepositoryDeletedOnGithub(UserResult userResult) {
-		return githubService.isUniqueRepositoryName(
-			new GithubGetRepositoryCommand(
-				userResult.githubOwner(), userResult.githubRepository(), userResult.githubAuthToken()
-			)
-		);
-	}
+  private boolean isRepositoryDeletedOnGithub(UserResult userResult) {
+    return githubService.isUniqueRepositoryName(
+        new GithubGetRepositoryCommand(
+            userResult.githubOwner(), userResult.githubRepository(), userResult.githubAuthToken()
+        )
+    );
+  }
 
-	private void createRepositoryAndAddCollaborator(UserUpdateCommand command, UserResult userResult) {
-		GithubRepoInfo githubRepoInfo = githubService.createRepository(
-			command.getGithubRepository(), userResult.githubAuthToken()
-		);
-		command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
+  private void createRepositoryAndAddCollaborator(UserUpdateCommand command,
+      UserResult userResult) {
+    GithubRepoInfo githubRepoInfo = githubService.createRepository(
+        command.getGithubRepository(), userResult.githubAuthToken()
+    );
+    command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
 
-		UserResult nogiBot = userService.findNogiBot()
-			.orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+    UserResult nogiBot = userService.findNogiBot()
+        .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
 
-		githubService.addCollaborator(
-			new GithubAddCollaboratorCommand(
-				userResult.githubOwner(), command.getGithubRepository(),
-				nogiBot.githubOwner(), userResult.githubAuthToken()
-			)
-		);
-	}
+    githubService.addCollaborator(
+        new GithubAddCollaboratorCommand(
+            userResult.githubOwner(), command.getGithubRepository(),
+            nogiBot.githubOwner(), userResult.githubAuthToken()
+        )
+    );
+  }
 
-	public void validateRepositoryName(
-		UserFacadeCommand.ValidateRepositoryName command
-	) {
-		UserResult userResult = userService.findUserByIdForFacade(command.userId());
+  public void validateRepositoryName(
+      UserFacadeCommand.ValidateRepositoryName command
+  ) {
+    UserResult userResult = userService.findUserByIdForFacade(command.userId());
 
-		// 현재 사용중인 repository 이름이랑 같은 값인 경우
-		if (command.repositoryName().equals(userResult.githubRepository())) {
-			throw new GlobalException(F_ALREADY_USING_REPOSITORY_NAME);
-		}
+    // 현재 사용중인 repository 이름이랑 같은 값인 경우
+    if (command.repositoryName().equals(userResult.githubRepository())) {
+      throw new GlobalException(F_ALREADY_USING_REPOSITORY_NAME);
+    }
 
-		boolean isUniqueName = githubService.isUniqueRepositoryName(
-			new GithubGetRepositoryCommand(
-				userResult.githubOwner(),
-				command.repositoryName(),
-				userResult.githubAuthToken()
-			)
-		);
-		if (!isUniqueName) {
-			throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
-		}
-	}
+    boolean isUniqueName = githubService.isUniqueRepositoryName(
+        new GithubGetRepositoryCommand(
+            userResult.githubOwner(),
+            command.repositoryName(),
+            userResult.githubAuthToken()
+        )
+    );
+    if (!isUniqueName) {
+      throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
+    }
+  }
 }

@@ -16,9 +16,9 @@ import lombok.ToString;
 @ToString
 public class NotionErrorInfo {
 
-	private String object;
-	private int status;
-	private String code;
-	private String message;
+  private String object;
+  private int status;
+  private String code;
+  private String message;
 
 }

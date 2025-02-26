@@ -13,7 +13,7 @@ https://developers.notion.com/reference/property-object#date
 @ToString
 public class NotionNogiCommonProperty {
 
-	private String id;
-	private String type;
+  private String id;
+  private String type;
 
 }

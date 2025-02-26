@@ -9,8 +9,8 @@ import lombok.ToString;
 @ToString
 public class NotionSelectProperty {
 
-	private String id;
-	private String name;
-	private String color;
+  private String id;
+  private String name;
+  private String color;
 
 }

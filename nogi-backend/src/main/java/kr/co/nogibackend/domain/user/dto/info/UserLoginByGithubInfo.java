@@ -14,37 +14,37 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserLoginByGithubInfo {
 
-	private UserInfo userInfo;
-	private String accessToken;
+  private UserInfo userInfo;
+  private String accessToken;
 
-	public static UserLoginByGithubInfo from(UserResult userresult, String accessToken) {
-		return
-			UserLoginByGithubInfo
-				.builder()
-				.userInfo(
-					new UserInfo(
-						userresult.id(),
-						userresult.role(),
-						userresult.notionBotToken(),
-						userresult.notionDatabaseId(),
-						userresult.githubAuthToken(),
-						userresult.githubRepository(),
-						userresult.githubDefaultBranch(),
-						userresult.githubEmail(),
-						userresult.githubOwner()
-					)
-				)
-				.accessToken(accessToken)
-				.build();
-	}
+  public static UserLoginByGithubInfo from(UserResult userresult, String accessToken) {
+    return
+        UserLoginByGithubInfo
+            .builder()
+            .userInfo(
+                new UserInfo(
+                    userresult.id(),
+                    userresult.role(),
+                    userresult.notionBotToken(),
+                    userresult.notionDatabaseId(),
+                    userresult.githubAuthToken(),
+                    userresult.githubRepository(),
+                    userresult.githubDefaultBranch(),
+                    userresult.githubEmail(),
+                    userresult.githubOwner()
+                )
+            )
+            .accessToken(accessToken)
+            .build();
+  }
 
-	/*
-	사용자가 입력해야할 정보가 있는지 확인하기 위한 메서드
-	 */
-	public boolean isRequireUserInfo() {
-		return userInfo.notionBotToken() == null ||
-			userInfo.notionDatabaseId() == null ||
-			userInfo.githubRepository() == null ||
-			userInfo.githubDefaultBranch() == null;
-	}
+  /*
+  사용자가 입력해야할 정보가 있는지 확인하기 위한 메서드
+   */
+  public boolean isRequireUserInfo() {
+    return userInfo.notionBotToken() == null ||
+        userInfo.notionDatabaseId() == null ||
+        userInfo.githubRepository() == null ||
+        userInfo.githubDefaultBranch() == null;
+  }
 }

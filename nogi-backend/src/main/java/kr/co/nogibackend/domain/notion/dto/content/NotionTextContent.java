@@ -11,7 +11,7 @@ https://developers.notion.com/reference/rich-text#text
 @ToString
 public class NotionTextContent {
 
-	private String content;
-	private NotionLinkContent link;
+  private String content;
+  private NotionLinkContent link;
 
 }

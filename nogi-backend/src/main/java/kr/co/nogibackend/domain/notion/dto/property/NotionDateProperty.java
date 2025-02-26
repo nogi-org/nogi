@@ -9,12 +9,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class NotionDateProperty {
 
-	private String start;
-	private String end;
-	private String time_zone;
+  private String start;
+  private String end;
+  private String time_zone;
 
-	public NotionDateProperty(String start) {
-		this.start = start;
-	}
+  public NotionDateProperty(String start) {
+    this.start = start;
+  }
 
 }

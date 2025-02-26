@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class NogiBackendApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NogiBackendApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(NogiBackendApplication.class, args);
+  }
 
 }

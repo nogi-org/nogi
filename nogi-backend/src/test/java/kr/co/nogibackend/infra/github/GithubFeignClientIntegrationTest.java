@@ -1,17 +1,15 @@
 package kr.co.nogibackend.infra.github;
 
 import java.util.List;
-
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /*
   Package Name : kr.co.nogibackend.infra.github
@@ -21,54 +19,53 @@ import kr.co.nogibackend.environment.GithubTestEnvironment;
   Description  : GithubFeignClient 통합 테스트
  */
 class GithubFeignClientIntegrationTest extends GithubTestEnvironment {
+  
+  @Autowired
+  private GithubFeignClient githubFeignClient;
 
-	@Autowired
-	private GithubFeignClient githubFeignClient;
+  @Test
+  @DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
+  void testCreateIssue() {
+    // when // then
+    githubFeignClient.addCollaborator(
+        testUserOwner,
+        testUserRepo,
+        "nogi-bot",
+        new GithubAddCollaboratorRequest(null),
+        testUserToken
+    );
+    githubFeignClient.createIssue(
+        testUserOwner,
+        testUserRepo,
+        new GithubCreateIssueRequest(
+            "Test Issue",
+            "Test Issue Body @" + testUserOwner,
+            List.of(testUserOwner)
+        ),
+        nogiBotToken
+    );
+  }
 
-	@Test
-	@DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
-	void testCreateIssue() {
-		// when // then
-		githubFeignClient.addCollaborator(
-			testUserOwner,
-			testUserRepo,
-			"nogi-bot",
-			new GithubAddCollaboratorRequest(null),
-			testUserToken
-		);
-		githubFeignClient.createIssue(
-			testUserOwner,
-			testUserRepo,
-			new GithubCreateIssueRequest(
-				"Test Issue",
-				"Test Issue Body @" + testUserOwner,
-				List.of(testUserOwner)
-			),
-			nogiBotToken
-		);
-	}
+  @Test
+  @DisplayName("토큰으로 유저의 정보를 조회하면 유저의 owner 를 조회할 수 있다.")
+  public void getUserInfo() {
+    GithubUserInfo userInfo = githubFeignClient.getUserInfo(testUserToken);
+    Assertions.assertThat(userInfo.login()).isEqualTo(testUserOwner);
+  }
 
-	@Test
-	@DisplayName("토큰으로 유저의 정보를 조회하면 유저의 owner 를 조회할 수 있다.")
-	public void getUserInfo() {
-		GithubUserInfo userInfo = githubFeignClient.getUserInfo(testUserToken);
-		Assertions.assertThat(userInfo.login()).isEqualTo(testUserOwner);
-	}
+  @Test
+  @DisplayName("토큰으로 유저의 이메일 정보를 조회하면 이메일 정보를 조회할 수 있고, primary 이메일이 존재한다.")
+  public void getUserEmailInfo() {
+    // when
+    List<GithubUserEmailInfo> userEmailInfos = githubFeignClient.getUserEmailInfo(testUserToken);
 
-	@Test
-	@DisplayName("토큰으로 유저의 이메일 정보를 조회하면 이메일 정보를 조회할 수 있고, primary 이메일이 존재한다.")
-	public void getUserEmailInfo() {
+    // then
+    Assertions.assertThat(userEmailInfos).isNotEmpty();
 
-		// when
-		List<GithubUserEmailInfo> userEmailInfos = githubFeignClient.getUserEmailInfo(testUserToken);
-
-		// then
-		Assertions.assertThat(userEmailInfos).isNotEmpty();
-
-		GithubUserEmailInfo githubUserEmailInfo = userEmailInfos.stream()
-			.filter(GithubUserEmailInfo::primary)
-			.findFirst()
-			.orElse(null);
-		Assertions.assertThat(githubUserEmailInfo).isNotNull();
-	}
+    GithubUserEmailInfo githubUserEmailInfo = userEmailInfos.stream()
+        .filter(GithubUserEmailInfo::primary)
+        .findFirst()
+        .orElse(null);
+    Assertions.assertThat(githubUserEmailInfo).isNotNull();
+  }
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class NotionCoverProperty {
 
-	private String type;
-	private NotionFileProperty external;
+  private String type;
+  private NotionFileProperty external;
 
 }

@@ -16,6 +16,6 @@ import lombok.ToString;
 @ToString
 public class NotionEquationContent {
 
-	private String expression;
+  private String expression;
 
 }

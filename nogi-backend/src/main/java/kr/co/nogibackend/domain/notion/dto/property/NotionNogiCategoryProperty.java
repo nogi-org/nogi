@@ -9,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
 
-	private NotionSelectProperty select;
+  private NotionSelectProperty select;
 
 }

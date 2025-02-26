@@ -5,14 +5,14 @@ import lombok.Getter;
 @Getter
 public class ValidationFailResultSet {
 
-	private final String code;
-	private final String msg;
-	private final String field;
+  private final String code;
+  private final String msg;
+  private final String field;
 
-	public ValidationFailResultSet(String code, String msg, String field) {
-		this.code = code;
-		this.msg = msg;
-		this.field = field;
-	}
+  public ValidationFailResultSet(String code, String msg, String field) {
+    this.code = code;
+    this.msg = msg;
+    this.field = field;
+  }
 
 }

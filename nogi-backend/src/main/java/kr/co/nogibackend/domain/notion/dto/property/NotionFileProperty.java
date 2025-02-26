@@ -1,7 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
 import java.time.LocalDateTime;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,7 +15,7 @@ https://developers.notion.com/reference/file-object
 @ToString
 public class NotionFileProperty {
 
-	private String url;
-	private LocalDateTime expiry_time;
+  private String url;
+  private LocalDateTime expiry_time;
 
 }

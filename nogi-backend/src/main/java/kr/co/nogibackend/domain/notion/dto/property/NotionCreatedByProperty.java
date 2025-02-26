@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class NotionCreatedByProperty {
 
-	private String id;
-	private String object;
+  private String id;
+  private String object;
 }
