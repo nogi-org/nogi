@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotionService {
 
   public static final String RESOURCES_PATH_NAME = "resources";
-  public static final String RESOURCES_IMAGE_NAME = "image";
+  public static final String RESOURCES_IMAGE_NAME = "images";
   private final NotionClient notionClient;
 
   // Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
