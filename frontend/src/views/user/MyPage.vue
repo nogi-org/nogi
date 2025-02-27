@@ -65,27 +65,28 @@ const checkNotionDatabaseConnectionTest = async () => {
 
     <ul>
       <!--      notion auth Key-->
+      <!-- Notion Bot Token -->
       <li class="mb-5">
-        <!--        todo: label, input, validation component 로 분리-->
-        <label
-          class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger after:absolute after:-right-2.5 after:top-[65%] after:-translate-y-1/2"
-          for=""
-        >
+        <label class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger">
           Notion Bot Token
         </label>
+
+        <!-- 마스킹된 값 (연결 확인 성공 후) -->
         <input
+          v-if="user.isSuccessNotionDatabaseConnectionTest.value"
+          value="*****************************************"
+          readonly
+          class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider text-neutral"
+        />
+
+        <!-- 원래 입력값 (연결 확인 전) -->
+        <input
+          v-else
           v-model="user.info.value.notionBotToken"
-          :class="[
-            {
-              'ring-danger ring-1':
-                user.infoUpdateValidation.value?.result?.notionBotToken
-            },
-            { 'text-neutral': user.isSuccessNotionDatabaseConnectionTest.value }
-          ]"
-          :readonly="user.isSuccessNotionDatabaseConnectionTest.value"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
           placeholder="Notion Bot Token을 입력해주세요."
         />
+
         <Validation
           v-if="user.infoUpdateValidation.value?.result?.notionBotToken"
           :notice="user.infoUpdateValidation.value?.result?.notionBotToken"
@@ -93,28 +94,28 @@ const checkNotionDatabaseConnectionTest = async () => {
         />
       </li>
 
-      <!--      notion database key-->
-      <li>
-        <!--        todo: label, input, validation component 로 분리-->
-        <label
-          class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger after:absolute after:-right-2.5 after:top-[65%] after:-translate-y-1/2"
-          for=""
-        >
+      <!-- Notion Database ID -->
+      <li class="mb-5">
+        <label class="relative text-neutral text-sm font-noto_sans_b after:content-['*'] after:text-danger">
           Notion Database ID
         </label>
+
+        <!-- 마스킹된 값 (연결 확인 성공 후) -->
         <input
+          v-if="user.isSuccessNotionDatabaseConnectionTest.value"
+          value="*****************************************"
+          readonly
+          class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider text-neutral"
+        />
+
+        <!-- 원래 입력값 (연결 확인 전) -->
+        <input
+          v-else
           v-model="user.info.value.notionDatabaseId"
-          :class="[
-            {
-              'ring-danger ring-1':
-                user.infoUpdateValidation.value?.result?.notionBotToken
-            },
-            { 'text-neutral': user.isSuccessNotionDatabaseConnectionTest.value }
-          ]"
-          :readonly="user.isSuccessNotionDatabaseConnectionTest.value"
           class="border-main border text-xs shadow-sm w-full rounded-md px-3 h-12 tracking-wider"
           placeholder="Notion Database Id를 입력해주세요."
         />
+
         <Validation
           v-if="user.infoUpdateValidation.value?.result?.notionDatabaseId"
           :notice="user.infoUpdateValidation.value?.result?.notionDatabaseId"
@@ -132,7 +133,11 @@ const checkNotionDatabaseConnectionTest = async () => {
         <button
           v-if="user.isSuccessNotionDatabaseConnectionTest.value"
           class="bg-warning text-xs px-2.5 py-1 rounded-md sm:text-sm"
-          @click="user.isSuccessNotionDatabaseConnectionTest.value = false"
+          @click="() => {
+            user.isSuccessNotionDatabaseConnectionTest.value = false
+            const originNotionDatabaseId = user.info.value.notionDatabaseId
+            user.info.value.notionDatabaseId = `https://www.notion.so/${originNotionDatabaseId}?v=xxx&pvs=x`;
+          }"
         >
           수정
         </button>
