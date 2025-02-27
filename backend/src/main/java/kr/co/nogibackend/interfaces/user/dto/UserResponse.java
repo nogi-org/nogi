@@ -22,6 +22,7 @@ public class UserResponse {
   private String githubDefaultBranch;
   private String githubEmail;
   private String githubOwner;
+  private Boolean isNotificationAllowed;
 
   public static UserResponse from(UserInfo userInfo) {
     return UserResponse.builder()
@@ -33,6 +34,7 @@ public class UserResponse {
         .githubDefaultBranch(userInfo.githubDefaultBranch())
         .githubEmail(userInfo.githubEmail())
         .githubOwner(userInfo.githubOwner())
+        .isNotificationAllowed(userInfo.isNotificationAllowed())
         .build();
   }
 

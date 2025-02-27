@@ -69,6 +69,9 @@ public class User {
     if (StringUtils.hasText(command.getGithubOwner())) {
       this.githubOwner = command.getGithubOwner();
     }
+    if (command.getIsNotificationAllowed() != null) {
+      this.isNotificationAllowed = command.getIsNotificationAllowed();
+    }
     return this;
   }
 

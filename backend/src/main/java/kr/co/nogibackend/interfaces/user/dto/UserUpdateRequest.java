@@ -9,7 +9,8 @@ public record UserUpdateRequest(
     String githubRepository,
     String githubDefaultBranch,
     String githubEmail,
-    String githubOwner
+    String githubOwner,
+    Boolean isNotificationAllowed
 ) {
 
   public UserUpdateCommand toCommand(Long id) {
@@ -22,6 +23,7 @@ public record UserUpdateRequest(
         .githubDefaultBranch(githubDefaultBranch())
         .githubEmail(githubEmail())
         .githubOwner(githubOwner())
+        .isNotificationAllowed(isNotificationAllowed())
         .build();
   }
 }
