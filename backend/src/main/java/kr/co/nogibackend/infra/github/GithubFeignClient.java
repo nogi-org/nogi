@@ -8,6 +8,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
@@ -114,6 +115,18 @@ public interface GithubFeignClient {
       @PathVariable("owner") String owner,
       @PathVariable("repo") String repo,
       @RequestBody GithubCreateBlobRequest request,
+      @RequestHeader("Authorization") String token
+  );
+
+  /*
+  ➡️ github tree 조회
+  docs: https://docs.github.com/ko/rest/git/trees?apiVersion=2022-11-28#get-a-tree
+   */
+  @GetMapping("/repos/{owner}/{repo}/git/trees/{treeSha}")
+  GithubTreeInfo getTree(
+      @PathVariable("owner") String owner,
+      @PathVariable("repo") String repo,
+      @PathVariable("treeSha") String treeSha,
       @RequestHeader("Authorization") String token
   );
 

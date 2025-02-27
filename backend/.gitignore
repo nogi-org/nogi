@@ -42,9 +42,11 @@ out/
 ### cutom ###
 .env
 src/main/resources/application-dev.yml
+src/main/resources/application-dev2.yml
 src/main/resources/application-prod.yml
 src/test/resources/application-test.yml
 Dockerfile
 LOG_DIR_IS_UNDEFINED
 spy.log
 /src/main/generated/
+/src/main/resources/sql/

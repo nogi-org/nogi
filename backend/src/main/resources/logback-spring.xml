@@ -94,6 +94,18 @@
     </root>
   </springProfile>
 
+  <springProfile name="dev2">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="test">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
   <!-- ====================================================== -->
   <!-- 8. Slack 알림 설정 (ERROR 발생 시 Slack으로 로그 전송) -->
   <springProperty name="LOG_DIR" source="logging.file.path"/>

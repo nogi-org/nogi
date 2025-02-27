@@ -4,6 +4,7 @@ import static kr.co.nogibackend.response.code.GitResponseCode.F_ALREADY_USING_RE
 import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
+import kr.co.nogibackend.config.audit.AuditContext;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.github.GithubService;
@@ -50,11 +51,14 @@ public class UserFacade {
     // 2. user 정보 가져오기
     GithubUserResult githubUserResult = githubService.getUserInfo(githubAccessToken);
 
-    // 3. user 정보 저장하기
+    // 3. AuditContext 에 저장(DB auditing 을 위함)
+    AuditContext.setUserId(0L);
+
+    // 4. user 정보 저장하기
     UserResult savedUserResult =
         userService.createOrUpdateUser(UserUpdateCommand.from(githubUserResult, githubAccessToken));
 
-    // 4. access toekn 발급하기(nogi token)
+    // 5. access toekn 발급하기(nogi token)
     String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id(),
         savedUserResult.role());
 

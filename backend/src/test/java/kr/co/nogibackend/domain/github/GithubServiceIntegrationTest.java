@@ -1,15 +1,24 @@
 package kr.co.nogibackend.domain.github;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo.GithubTreeNode;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
 import kr.co.nogibackend.util.TestUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Slf4j
 public class GithubServiceIntegrationTest extends GithubTestEnvironment {
 
   @Autowired

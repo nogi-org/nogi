@@ -27,11 +27,13 @@ public class GithubTestEnvironment {
 
   @BeforeEach
   public void createUsers() {
-    // Github Repository 에 유저의 저장소 생성
+
     try {
-      // 저장소 삭제
-      // 전체 권한을 가진 토근을 따로 발급받아서 삭제가 가능하다.
-      // 테스트 실행 후 눈으로 데이터를 보기위해 deleteRepository 를 AfterEach 에 두지 않음
+      /*
+      저장소 삭제
+      전체 권한을 가진 토큰을 따로 발급받아서 사용하고 있고, 유저들에게 받는 토큰은 read, write 권한만 가지고 있다.
+      테스트 실행 후 눈으로 데이터를 보기위해 deleteRepository 를 AfterEach 에 두지 않음
+       */
       githubFeignClient.deleteRepository(testUserOwner, testUserRepo, testUserToken);
     } catch (Exception ignored) {
     } finally {
