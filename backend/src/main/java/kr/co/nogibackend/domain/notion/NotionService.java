@@ -1,6 +1,6 @@
 package kr.co.nogibackend.domain.notion;
 
-import static kr.co.nogibackend.domain.notion.NotionPropertyValue.STATUS_COMPLETED;
+import static kr.co.nogibackend.domain.notion.constant.NotionPropertyValue.STATUS_COMPLETED;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -36,18 +36,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NotionService {
 
+  public static final String RESOURCES_PATH_NAME = "resources";
+  public static final String RESOURCES_IMAGE_NAME = "image";
   private final NotionClient notionClient;
 
   // Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
-  public List<NotionStartTILResult> startTIL(List<NotionStartTILCommand> commands) {
-    return
-        commands
-            .stream()
-            .map(this::startTIL)
-            .flatMap(List::stream)
-            .toList();
-  }
-
   public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
     // 작성완료 상태 TIL 페이지 조회
     List<NotionPageInfo> pages =
@@ -73,9 +66,7 @@ public class NotionService {
     return results;
   }
 
-  /*
-  Github 에 commit 된 결과를 notion 상태값 변경
-   */
+  // Github 에 commit 된 결과를 notion 상태값 변경
   public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
     return
         commands
@@ -121,8 +112,11 @@ public class NotionService {
   }
 
   // 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
-  private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionBotToken, NotionPageInfo page,
-      Long userId) {
+  private NotionInfo<NotionBlockInfo> getBlocksOfPage(
+      String notionBotToken
+      , NotionPageInfo page
+      , Long userId
+  ) {
     NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionBotToken, page.getId(), null, userId);
 
     // hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
@@ -165,8 +159,11 @@ public class NotionService {
   }
 
   // 블럭 조회 후 각각의 블럭을 markdown 으로 변환
-  private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page,
-      List<NotionBlockInfo> blocks, Long userId) {
+  private NotionBlockConversionInfo convertMarkdown(
+      NotionPageInfo page
+      , List<NotionBlockInfo> blocks
+      , Long userId
+  ) {
     StringBuilder markDown = new StringBuilder();
     List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
 
@@ -255,18 +252,15 @@ public class NotionService {
 
           case "image":
             // 이미지 요청
-            URI imageUri = block.getImage().createURI();
+            URI imageUri = block.getImage().createURL();
             String imageEnc64 = this.getImageOfBlock(imageUri);
 
-            // 이미지명 추출
-            String fileName = block.getImage().parseFileName(imageUri);
-
-            // 이미지 경로 생성
-            String imagePath =
-                block.getImage().createMarkdownPath(page.getProperties().getCategory(), fileName);
+            // 이미지명 생성
+            String fileName = block.getImage().createFileName();
 
             // 마크 다운에 들어갈 이미지 경로 생성
-            String markdownImagePath = "./image/" + fileName;
+            String markdownImagePath =
+                block.getImage().createMarkdownImagePath(page.getProperties().createRelativePath(), fileName);
 
             // 캡션 생성
             String caption = block.getImage().createCaption();
@@ -279,8 +273,12 @@ public class NotionService {
                 .append(")")
                 .append("\n");
 
-            images.add(
-                new NotionStartTILResult.ImageOfNotionBlock(imageEnc64, fileName, imagePath));
+            // 이미지 경로 생성
+            String imagePath =
+                block.getImage().createImagePath(fileName);
+
+            images
+                .add(new NotionStartTILResult.ImageOfNotionBlock(imageEnc64, fileName, imagePath));
 
             break;
 

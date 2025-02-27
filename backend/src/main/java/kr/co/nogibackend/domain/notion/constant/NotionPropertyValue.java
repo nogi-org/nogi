@@ -1,4 +1,4 @@
-package kr.co.nogibackend.domain.notion;
+package kr.co.nogibackend.domain.notion.constant;
 
 import lombok.Getter;
 

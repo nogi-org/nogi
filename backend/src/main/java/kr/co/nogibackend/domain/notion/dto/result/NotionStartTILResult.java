@@ -25,7 +25,7 @@ public record NotionStartTILResult(
     this(
         userId
         , page.getId()
-        , page.getProperties().getNogiCategory().getSelect().getName()
+        , page.getProperties().getCategoryPath()
         , page.getProperties().getNogiCommitDate().getDate().getStart()
         , page.getProperties().getNogiTitle().getTitle().get(0).getPlain_text()
         , encoding.content()
