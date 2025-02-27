@@ -196,15 +196,15 @@ public class NotionService {
           case "paragraph":
             if (block.getParagraph().getRich_text().isEmpty()) {
               markDown
+                  .append("\n")
                   .append("\n");
             } else {
               markDown
-                  .append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(),
-                      true))
+                  .append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(),true))
+                  .append("\n")
                   .append("\n");
             }
             break;
-
           case "bulleted_list_item":
             markDown
                 .append("* ")
@@ -212,6 +212,7 @@ public class NotionService {
                     NotionRichTextContent.mergePlainText(
                         block.getBulleted_list_item().getRich_text(),
                         true))
+                .append("\n")
                 .append("\n");
             break;
 
@@ -222,6 +223,7 @@ public class NotionService {
                     NotionRichTextContent.mergePlainText(
                         block.getNumbered_list_item().getRich_text(), true)
                 )
+                .append("\n")
                 .append("\n");
             break;
 
@@ -232,7 +234,8 @@ public class NotionService {
                 .append("\n")
                 .append(NotionRichTextContent.mergePlainText(block.getCode().getRich_text(), true))
                 .append("\n")
-                .append("```\n");
+                .append("```\n")
+                .append("\n");
             break;
 
           case "divider":
@@ -247,7 +250,8 @@ public class NotionService {
                 .append(checkBox)
                 .append(" ")
                 .append(NotionRichTextContent.mergePlainText(block.getTo_do().getRich_text(), true))
-                .append("   \n");
+                .append("\n")
+                .append("\n");
             break;
 
           case "image":
@@ -271,6 +275,7 @@ public class NotionService {
                 .append("](")
                 .append(markdownImagePath)
                 .append(")")
+                .append("\n")
                 .append("\n");
 
             // 이미지 경로 생성
@@ -283,7 +288,7 @@ public class NotionService {
             break;
 
           default:
-            markDown.append("\n");
+            markDown.append("\n").append("\n");
         }
       } catch (Exception error) {
         ExecutionResultContext.addNotionPageErrorResult("Markdown 변환 중 문제가 발생했어요.", userId);
