@@ -7,6 +7,7 @@ import jakarta.persistence.PreRemove;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.ToString;
+import org.hibernate.envers.Audited;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -15,6 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
+@Audited
 @ToString
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
