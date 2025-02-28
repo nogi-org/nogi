@@ -50,8 +50,21 @@ public class GithubService {
         .toList();
   }
 
+  /**
+   * <h2>🚀 GitHub에 파일을 커밋하는 메서드</h2>
+   *
+   * <ul>
+   *   <li>1️⃣ 현재 브랜치의 최신 HEAD 커밋 SHA 조회</li>
+   *   <li>2️⃣ 파일을 Blob으로 변환 후 TreeEntry 생성</li>
+   *   <li>3️⃣ 새로운 Git Tree 생성</li>
+   *   <li>4️⃣ 새로운 Commit 생성 (커밋 날짜 포함)</li>
+   *   <li>5️⃣ 브랜치를 최신 커밋으로 업데이트 (HEAD 이동)</li>
+   *   <li>6️⃣ 성공 여부에 따라 GithubCommitResult 반환</li>
+   * </ul>
+   */
   public Optional<GithubCommitResult> commitToGithub(GithubCommitCommand command) {
     try {
+      // ✅ 커밋에 필요한 정보 추출
       String owner = command.githubOwner();
       String repo = command.githubRepository();
       String branch = command.githubBranch();
@@ -61,23 +74,24 @@ public class GithubService {
       String date = command.commitDate();
       Map<String, String> files = command.prepareFiles();
 
-      // 1️⃣ 현재 브랜치의 HEAD 커밋 가져오기
+      // 1️⃣ 현재 브랜치의 HEAD 커밋 SHA 조회 🔄
       String latestSha = getLatestCommitSha(owner, repo, branch, token);
 
-      // 2️⃣ 파일들을 Blob 으로 변환하여 TreeEntry 목록 생성
+      // 2️⃣ 파일들을 Blob으로 변환하여 TreeEntry 목록 생성 📂
       List<GithubCreateTreeRequest.TreeEntry> treeEntries = createTreeEntries(files, owner, repo,
           token);
 
-      // 3️⃣ 새로운 Git Tree 생성
+      // 3️⃣ 새로운 Git Tree 생성 🌳
       GithubCreateTreeInfo tree = createNewTree(owner, repo, latestSha, treeEntries, token);
 
-      // 4️⃣ 새로운 Commit 생성 (커밋 날짜 지정)
+      // 4️⃣ 새로운 Commit 생성 (커밋 날짜 포함) 📝
       String newCommitSha = createNewCommit(owner, repo, email, message, date, latestSha,
           tree.sha(), token);
 
-      // 5️⃣ 브랜치 업데이트 (HEAD 이동)
+      // 5️⃣ 브랜치 업데이트 (HEAD 이동) 🔄
       updateBranch(owner, repo, branch, newCommitSha, token);
 
+      // 6️⃣ 성공 결과 반환 ✅
       return Optional.of(
           new GithubCommitResult(
               command.userId(),
@@ -85,15 +99,20 @@ public class GithubService {
               command.notionBotToken(),
               command.newCategory(),
               command.newTitle(),
-              true
+              true // 커밋 성공
           )
       );
     } catch (Exception e) {
+      // ❌ 예외 발생 시 로그 기록 및 에러 처리
       log.error("Github commit error", e);
+
+      // ExecutionResultContext에 오류 기록 📌
       ExecutionResultContext.addNotionPageErrorResult(
           "Github에 Commit 중 문제가 발생했어요",
           command.userId()
       );
+
+      // 6️⃣ 실패 결과 반환 ❌
       return Optional.of(
           new GithubCommitResult(
               command.userId(),
@@ -101,11 +120,12 @@ public class GithubService {
               command.notionBotToken(),
               command.newCategory(),
               command.newTitle(),
-              false
+              false // 커밋 실패
           )
       );
     }
   }
+
 
   private List<GithubCreateTreeRequest.TreeEntry> createTreeEntries(
       Map<String, String> files,

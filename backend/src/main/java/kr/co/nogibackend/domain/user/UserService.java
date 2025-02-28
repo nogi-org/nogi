@@ -28,12 +28,6 @@ public class UserService {
 
   private final UserRepository userRepository;
 
-  /*
-  ➡️ Notion 에서 가져온 페이지 정보가 아래 3가지 중 어떤 케이스인지 체크
-  1. 생성 또는 파일내용 : nogiHistory 에 notionPageId 가 없는 경우 or 있으나 category 와 title 은 그대로인 경우
-  2. 파일제목 수정 : nogiHsitory 에 notionPageId 가 있고 category 는 그대로이면서 title이 변경된 경우
-  3. 카테고리 수정 : nogiHistory 에 notionPageId 가 있고 category 가 변경된 경우
-   */
   public List<UserCheckTILResult> checkTIL(List<UserCheckTILCommand> commands) {
 
     Long[] userIds = commands.stream().map(UserCheckTILCommand::userId).toArray(Long[]::new);

@@ -40,31 +40,44 @@ public class NotionService {
   public static final String RESOURCES_IMAGE_NAME = "images";
   private final NotionClient notionClient;
 
-  // Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
+  /**
+   * <h2>📝 Notion에서 작성완료된 TIL 조회 및 Markdown 변환</h2>
+   *
+   * <ul>
+   *   <li>1️⃣ 작성완료 상태의 TIL 페이지 조회</li>
+   *   <li>2️⃣ 각 페이지에 커밋 일자 및 시간 추가</li>
+   *   <li>3️⃣ Notion 블록 정보 조회</li>
+   *   <li>4️⃣ 블록 데이터를 Markdown 형식으로 변환</li>
+   *   <li>5️⃣ 변환된 결과를 NotionStartTILResult 객체로 생성</li>
+   *   <li>6️⃣ 모든 결과를 리스트에 담아 반환</li>
+   * </ul>
+   */
   public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
-    // 작성완료 상태 TIL 페이지 조회
+    // 1️⃣ 작성완료 상태의 TIL 페이지 조회
     List<NotionPageInfo> pages =
         this.getCompletedPages(command.getNotionBotToken(), command.getNotionDatabaseId());
 
     List<NotionStartTILResult> results = new ArrayList<>();
     for (NotionPageInfo page : pages) {
-      // page 에 커밋 일자, 시간 확인 및 주입
+      // 2️⃣ 페이지에 커밋 일자 및 시간 추가
       page.getProperties().createCommitDateWithCurrentTime();
 
-      // 블럭 조회
+      // 3️⃣ Notion 블록 정보 조회
       NotionInfo<NotionBlockInfo> blocks =
           this.getBlocksOfPage(command.getNotionBotToken(), page, command.getUserId());
 
-      // 블럭 markdown 으로 변환
+      // 4️⃣ 블록 데이터를 Markdown 형식으로 변환
       NotionBlockConversionInfo encodingOfBlock =
           this.convertMarkdown(page, blocks.getResults(), command.getUserId());
 
-      // result 로 빌드
+      // 5️⃣ 변환된 결과를 NotionStartTILResult 객체로 생성
       results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
     }
 
+    // 6️⃣ 변환된 결과 리스트 반환
     return results;
   }
+
 
   // Github 에 commit 된 결과를 notion 상태값 변경
   public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
@@ -76,23 +89,38 @@ public class NotionService {
             .toList();
   }
 
+  /**
+   * <h2>✅ Notion TIL 상태 업데이트</h2>
+   *
+   * <ul>
+   *   <li>1️⃣ TIL 커밋 성공/실패 여부를 기반으로 상태 업데이트</li>
+   *   <li>2️⃣ Notion 페이지 ID, 사용자 ID를 이용해 상태 변경</li>
+   *   <li>3️⃣ 성공한 경우 NotionEndTILResult 객체 생성</li>
+   *   <li>4️⃣ 실패한 경우 Optional.empty() 반환</li>
+   * </ul>
+   */
   public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
+    // 1️⃣ TIL 커밋 성공/실패 여부를 기반으로 상태 업데이트
     boolean isUpdateResult =
         this.updateTILResultStatus(command.isSuccess(), command.notionBotToken(),
             command.notionPageId(),
             command.userId());
 
+    // 2️⃣ Notion 페이지 ID, 사용자 ID를 이용해 상태 변경
     return
         isUpdateResult && command.isSuccess()
             ? Optional.of(
+            // 3️⃣ 성공한 경우 NotionEndTILResult 객체 생성
             new NotionEndTILResult(
                 command.userId(),
                 command.notionPageId(),
                 command.category(),
                 command.title()
             ))
+            // 4️⃣ 실패한 경우 Optional.empty() 반환
             : Optional.empty();
   }
+
 
   // 노션 데이터베이스 연결 확인(단순 노션 데이터베이스에 페이지 조회 후 에러 없으면 성공처리)
   public void onConnectionTest(NotionConnectionTestCommand command) {
