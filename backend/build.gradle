@@ -67,6 +67,8 @@ dependencies {
 
     // springdoc-openapi
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    // revision
+    implementation 'org.springframework.data:spring-data-envers'
 }
 
 tasks.named('test') {

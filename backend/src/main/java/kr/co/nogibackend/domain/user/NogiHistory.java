@@ -8,7 +8,6 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -19,6 +18,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Table(
@@ -27,6 +27,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Getter
 @Entity
 @Builder
+@Audited
 @EnableJpaAuditing
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

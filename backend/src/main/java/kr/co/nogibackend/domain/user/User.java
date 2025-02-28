@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.util.StringUtils;
 
@@ -31,6 +32,7 @@ import org.springframework.util.StringUtils;
 )
 @Getter
 @Entity
+@Audited
 @Builder
 @EnableJpaAuditing
 @AllArgsConstructor
