@@ -20,13 +20,6 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.util.StringUtils;
 
-/*
-  Package Name : kr.co.nogibackend.domain
-  File Name    : User
-  Author       : superpil
-  Created Date : 25. 2. 1.
-  Description  :
- */
 @Table(
     name = "tb_user"
 )

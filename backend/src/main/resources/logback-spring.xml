@@ -1,19 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!--
-    [LOGGING CONFIGURATION]
-    - 이 설정 파일은 Spring Boot의 Logback 설정을 정의합니다.
-    - 콘솔, 파일, Slack 등으로 로그를 출력하며, 환경(local/dev/prod)별로 다르게 설정됩니다.
-  -->
+  <!-- ====================================================== -->
+  <!-- [LOGGING CONFIGURATION] -->
+  <!-- Spring Boot의 Logback 설정을 정의합니다. -->
+  <!-- 환경(local/dev/prod)에 따라 콘솔, 파일, Slack 등에 로그를 출력합니다. -->
+  <!-- ====================================================== -->
 
-  <!-- 1. 로그 파일 디렉토리 설정 (Spring Boot 프로퍼티를 이용해 외부에서 주입 가능) -->
+  <!-- 1. 로그 파일 디렉토리 설정 (외부 프로퍼티 참조 가능) -->
   <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
     <encoder>
       <pattern>${LOG_PATTERN_CONSOLE}</pattern>
     </encoder>
   </appender>
-
-  <!-- 2. Slack 알림 전송을 위한 설정 (외부 설정을 참조하여 슬랙 채널로 ERROR 로그를 전송) -->
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="INFO_FILE">
     <encoder>
       <pattern>${LOG_PATTERN_FILE}</pattern>
@@ -23,6 +21,8 @@
       <maxHistory>${MAX_HISTORY}</maxHistory>
     </rollingPolicy>
   </appender>
+
+  <!-- 2. 로그 출력 패턴 설정 -->
   <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR_FILE">
     <encoder>
       <pattern>${LOG_PATTERN_FILE}</pattern>
@@ -53,30 +53,42 @@
       <level>ERROR</level>
     </filter>
   </appender>
-
-  <!-- 3. 로그 파일 저장 경로 설정 -->
-  <property name="INFO_LOG_DIR" value="${LOG_DIR}/data/"/>
-  <property name="ERROR_LOG_DIR" value="${LOG_DIR}/error/"/>
-
-  <!-- 4. 로그 출력 패턴 설정 -->
-  <property name="LOG_PATTERN_CONSOLE"
-    value="%yellow(%d{yyyy-MM-dd HH:mm:ss}) %magenta([%thread]) %highlight(%-5level) %cyan(%logger{35}) - %msg%n"/>
-  <property name="LOG_PATTERN_FILE"
-    value="[%d{yyyy-MM-dd HH:mm:ss}][%thread] %-5level %logger{35} - %msg%n"/>
-  <property name="SQL_LOG_PATTERN"
-    value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{35} - %msg%n"/>
-  <property name="MAX_HISTORY" value="60"/>  <!-- 로그 보관 기간: 60일 -->
+  <property name="INFO_LOG_DIR" value="${LOG_DIR}/data/"/>  <!-- 로그 보관 기간: 60일 -->
 
   <!-- ====================================================== -->
-  <!-- 5. 콘솔 로그 설정 -->
+  <!-- 3. 로그 Appender 설정 -->
+  <!-- ====================================================== -->
+
+  <!-- (1) 콘솔 로그 출력 -->
+  <property name="ERROR_LOG_DIR" value="${LOG_DIR}/error/"/>
+
+  <!-- (2) INFO 로그 파일 저장 -->
+  <property name="LOG_PATTERN_CONSOLE"
+    value="%yellow(%d{yyyy-MM-dd HH:mm:ss}) %magenta([%thread]) %highlight(%-5level) %cyan(%logger{35}) - %msg%n"/>
+
+  <!-- (3) ERROR 로그 파일 저장 -->
+  <property name="LOG_PATTERN_FILE"
+    value="[%d{yyyy-MM-dd HH:mm:ss}][%thread] %-5level %logger{35} - %msg%n"/>
+
+  <!-- (4) Slack 알림 설정 (ERROR 로그 전송) -->
+  <property name="SQL_LOG_PATTERN"
+    value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{35} - %msg%n"/>
+
+  <!-- (5) Slack 알림을 비동기로 처리 -->
+  <property name="MAX_HISTORY" value="60"/>
+
+  <!-- ====================================================== -->
+  <!-- 4. 환경별 로그 설정 -->
+  <!-- ====================================================== -->
+
+  <!-- ✅ Local 환경: 콘솔에만 로그 출력 -->
   <springProfile name="local">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
     </root>
   </springProfile>
 
-  <!-- ====================================================== -->
-  <!-- 6. INFO 레벨 로그 파일 저장 -->
+  <!-- ✅ Production 환경: 콘솔, 파일 저장, Slack 알림 활성화 -->
   <springProfile name="prod">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
@@ -86,20 +98,14 @@
     </root>
   </springProfile>
 
-  <!-- ====================================================== -->
-  <!-- 7. ERROR 레벨 로그 파일 저장 -->
+  <!-- ✅ Dev 환경: 콘솔에만 로그 출력 -->
   <springProfile name="dev">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
     </root>
   </springProfile>
 
-  <springProfile name="dev2">
-    <root level="INFO">
-      <appender-ref ref="CONSOLE"/>
-    </root>
-  </springProfile>
-
+  <!-- ✅ Test 환경: 콘솔에만 로그 출력 -->
   <springProfile name="test">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
@@ -107,22 +113,11 @@
   </springProfile>
 
   <!-- ====================================================== -->
-  <!-- 8. Slack 알림 설정 (ERROR 발생 시 Slack으로 로그 전송) -->
-  <springProperty name="LOG_DIR" source="logging.file.path"/>
-
-  <!-- ✅ Slack 알림을 비동기로 처리 -->
-  <springProperty name="SLACK_WEBHOOK" source="slack.webhook-uri"/>
-
+  <!-- 5. Slack 관련 프로퍼티 설정 -->
   <!-- ====================================================== -->
-  <!-- 9. 프로파일별 로깅 설정 -->
-
-  <!-- ✅ Local 환경: 콘솔에만 로그 출력 -->
+  <springProperty name="LOG_DIR" source="logging.file.path"/>
+  <springProperty name="SLACK_WEBHOOK" source="slack.webhook-uri"/>
   <springProperty name="SLACK_CHANNEL" source="slack.channel"/>
-
-  <!-- ✅ Production 환경: 콘솔, 파일 저장, Slack 알림 활성화 -->
   <springProperty name="SLACK_USERNAME" source="slack.username"/>
-
-  <!-- ✅ Dev 환경: 콘솔에만 로그 출력 -->
   <springProperty name="SLACK_EMOJI" source="slack.emoji"/>
-
 </configuration>

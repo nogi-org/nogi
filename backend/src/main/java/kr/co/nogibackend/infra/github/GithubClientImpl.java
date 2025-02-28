@@ -28,13 +28,6 @@ import kr.co.nogibackend.util.GithubErrorParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/*
-  Package Name : kr.co.nogibackend.infra.github
-  File Name    : GithubClientImpl
-  Author       : won taek oh
-  Created Date : 25. 2. 9.
-  Description  :
- */
 @Component
 @RequiredArgsConstructor
 public class GithubClientImpl implements GithubClient {

@@ -25,10 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
-노션 용어정리
-1. 데이터베이스: TIL 페이지를 담고있는 데이터베이스, 속성도 포함
-2. 페이지: 데이터베이스가 담고 있는 여러개의 페이지, 페이지는 각각 TIL 로 구분됨
-3. 블럭: 페이지에 작성된 내용, 한줄이 블럭 한개
+  노션 용어정리
+  1. 데이터베이스: TIL 페이지를 담고있는 데이터베이스, 속성도 포함
+  2. 페이지: 데이터베이스가 담고 있는 여러개의 페이지, 페이지는 각각 TIL 로 구분됨
+  3. 블럭: 페이지에 작성된 내용, 한줄이 블럭 한개
  */
 @Slf4j
 @Service
@@ -176,20 +176,23 @@ public class NotionService {
           case "heading_1":
             markDown
                 .append("# ")
-                .append(NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
+                .append(
+                    NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
                 .append("  \n");
             break;
           case "heading_2":
             markDown
                 .append("## ")
-                .append(NotionRichTextContent.mergePlainText(block.getHeading_2().getRich_text(), true))
+                .append(
+                    NotionRichTextContent.mergePlainText(block.getHeading_2().getRich_text(), true))
                 .append("  \n");
             break;
 
           case "heading_3":
             markDown
                 .append("### ")
-                .append(NotionRichTextContent.mergePlainText(block.getHeading_3().getRich_text(), true))
+                .append(
+                    NotionRichTextContent.mergePlainText(block.getHeading_3().getRich_text(), true))
                 .append("  \n");
             break;
 
@@ -199,7 +202,8 @@ public class NotionService {
                   .append("  \n");
             } else {
               markDown
-                  .append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(),true))
+                  .append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(),
+                      true))
                   .append("  \n");
             }
             break;
@@ -229,7 +233,7 @@ public class NotionService {
                 .append(block.getCode().getLanguage())
                 .append("  \n");
 
-            for(NotionRichTextContent richTest : block.getCode().getRich_text()) {
+            for (NotionRichTextContent richTest : block.getCode().getRich_text()) {
               markDown.append(richTest.getPlain_text()).append("  \n");
             }
 
@@ -260,7 +264,8 @@ public class NotionService {
 
             // 마크 다운에 들어갈 이미지 경로 생성
             String markdownImagePath =
-                block.getImage().createMarkdownImagePath(page.getProperties().createRelativePath(), fileName);
+                block.getImage()
+                    .createMarkdownImagePath(page.getProperties().createRelativePath(), fileName);
 
             // 캡션 생성
             String caption = block.getImage().createCaption();

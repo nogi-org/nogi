@@ -22,13 +22,6 @@ import kr.co.nogibackend.domain.user.dto.result.UserResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/*
-  Package Name : kr.co.nogibackend.application.notion
-  File Name    : NotionFacade
-  Author       : superpil
-  Created Date : 25. 2. 1.
-  Description  :
- */
 @Service
 @RequiredArgsConstructor
 public class NogiFacade {

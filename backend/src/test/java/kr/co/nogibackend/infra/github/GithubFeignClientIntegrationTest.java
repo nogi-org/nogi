@@ -3,8 +3,6 @@ package kr.co.nogibackend.infra.github;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;

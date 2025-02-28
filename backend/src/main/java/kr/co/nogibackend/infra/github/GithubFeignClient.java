@@ -30,13 +30,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-/*
-  Package Name : kr.co.nogibackend.infra.github
-  File Name    : GithubFeignClient
-  Author       : won taek oh
-  Created Date : 25. 2. 9.
-  Description  : GIT API를 호출하기 위한 Feign Client
- */
 @FeignClient(name = "GithubClient", url = "https://api.github.com", configuration = GitHubFeignClientConfig.class)
 public interface GithubFeignClient {
 

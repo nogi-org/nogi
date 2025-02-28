@@ -1,15 +1,8 @@
 package kr.co.nogibackend.domain.github;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
-import kr.co.nogibackend.domain.github.dto.info.GithubBranchInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo.GithubTreeNode;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
 import kr.co.nogibackend.util.TestUtil;

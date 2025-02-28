@@ -22,13 +22,6 @@ import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/*
-  Package Name : kr.co.nogibackend.application.user
-  File Name    : UserFacade
-  Author       : won taek oh
-  Created Date : 25. 2. 13.
-  Description  :
- */
 @Service
 @RequiredArgsConstructor
 public class UserFacade {

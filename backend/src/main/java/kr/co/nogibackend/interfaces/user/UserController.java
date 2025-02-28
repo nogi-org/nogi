@@ -18,13 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-/*
-  Package Name : kr.co.nogibackend.interfaces.user
-  File Name    : UserController
-  Author       : won taek oh
-  Created Date : 25. 2. 14.
-  Description  :
- */
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor

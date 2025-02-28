@@ -9,13 +9,6 @@ import java.util.Arrays;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
-/*
-  Package Name : kr.co.nogibackend.util
-  File Name    : CookieUtil
-  Author       : won taek oh
-  Created Date : 25. 2. 13.
-  Description  :
- */
 @Component
 public class CookieUtil {
 

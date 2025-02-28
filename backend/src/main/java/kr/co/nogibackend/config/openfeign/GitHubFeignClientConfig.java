@@ -8,13 +8,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 
-/*
-  Package Name : kr.co.nogibackend.config.openfeign
-  File Name    : GitHubFeignClientConfig
-  Author       : superpil
-  Created Date : 2023/08/19
-  Description  : GitHub API 기본 헤더 설정 (Authorization, Accept)
- */
 @Slf4j
 @Configuration
 public class GitHubFeignClientConfig implements RequestInterceptor {
