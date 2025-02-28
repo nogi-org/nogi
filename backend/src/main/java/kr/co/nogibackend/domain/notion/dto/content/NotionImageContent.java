@@ -6,6 +6,8 @@ import static kr.co.nogibackend.response.code.NotionResponseCode.F_FILE_URL_PARS
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import kr.co.nogibackend.config.exception.GlobalException;
@@ -55,7 +57,8 @@ public class NotionImageContent {
   // url 에서 파일 이름 파싱해서 가져오기
   private String parseFileName() {
     String path = this.file.getUrl().substring(this.file.getUrl().lastIndexOf('/') + 1);
-    return path.split("\\?")[0];
+    String decodedPath = URLDecoder.decode(path, StandardCharsets.UTF_8); // URL 디코딩
+    return decodedPath.split("\\?")[0];
   }
 
 }

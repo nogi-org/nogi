@@ -158,7 +158,10 @@ public class NotionService {
     }
   }
 
-  // 블럭 조회 후 각각의 블럭을 markdown 으로 변환
+  /*
+  블럭 조회 후 각각의 블럭을 markdown 으로 변환
+  줄바꿈 경우: 띄어쓰기 두번 + \n 으로 처리
+   */
   private NotionBlockConversionInfo convertMarkdown(
       NotionPageInfo page
       , List<NotionBlockInfo> blocks
@@ -173,36 +176,31 @@ public class NotionService {
           case "heading_1":
             markDown
                 .append("# ")
-                .append(
-                    NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
-                .append("\n");
+                .append(NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
+                .append("  \n");
             break;
           case "heading_2":
             markDown
                 .append("## ")
-                .append(
-                    NotionRichTextContent.mergePlainText(block.getHeading_2().getRich_text(), true))
-                .append("\n");
+                .append(NotionRichTextContent.mergePlainText(block.getHeading_2().getRich_text(), true))
+                .append("  \n");
             break;
 
           case "heading_3":
             markDown
                 .append("### ")
-                .append(
-                    NotionRichTextContent.mergePlainText(block.getHeading_3().getRich_text(), true))
-                .append("\n");
+                .append(NotionRichTextContent.mergePlainText(block.getHeading_3().getRich_text(), true))
+                .append("  \n");
             break;
 
           case "paragraph":
             if (block.getParagraph().getRich_text().isEmpty()) {
               markDown
-                  .append("\n")
-                  .append("\n");
+                  .append("  \n");
             } else {
               markDown
                   .append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(),true))
-                  .append("\n")
-                  .append("\n");
+                  .append("  \n");
             }
             break;
           case "bulleted_list_item":
@@ -212,8 +210,7 @@ public class NotionService {
                     NotionRichTextContent.mergePlainText(
                         block.getBulleted_list_item().getRich_text(),
                         true))
-                .append("\n")
-                .append("\n");
+                .append("  \n");
             break;
 
           case "numbered_list_item":
@@ -223,35 +220,34 @@ public class NotionService {
                     NotionRichTextContent.mergePlainText(
                         block.getNumbered_list_item().getRich_text(), true)
                 )
-                .append("\n")
-                .append("\n");
+                .append("  \n");
             break;
 
           case "code":
             markDown
                 .append("```")
                 .append(block.getCode().getLanguage())
-                .append("\n")
-                .append(NotionRichTextContent.mergePlainText(block.getCode().getRich_text(), true))
-                .append("\n")
-                .append("```\n")
-                .append("\n");
+                .append("  \n");
+
+            for(NotionRichTextContent richTest : block.getCode().getRich_text()) {
+              markDown.append(richTest.getPlain_text()).append("  \n");
+            }
+
+            markDown
+                .append("```")
+                .append("  \n");
             break;
 
           case "divider":
-            markDown
-                .append("---")
-                .append("\n");
+            markDown.append("---").append("  \n");
             break;
 
           case "to_do":
-            String checkBox = block.getTo_do().isChecked() ? "- [x]" : "- [ ]";
+            String checkBox = block.getTo_do().isChecked() ? "- [x] " : "- [ ] ";
             markDown
                 .append(checkBox)
-                .append(" ")
                 .append(NotionRichTextContent.mergePlainText(block.getTo_do().getRich_text(), true))
-                .append("\n")
-                .append("\n");
+                .append("  \n");
             break;
 
           case "image":
@@ -275,8 +271,7 @@ public class NotionService {
                 .append("](")
                 .append(markdownImagePath)
                 .append(")")
-                .append("\n")
-                .append("\n");
+                .append("  \n");
 
             // 이미지 경로 생성
             String imagePath =
@@ -288,7 +283,7 @@ public class NotionService {
             break;
 
           default:
-            markDown.append("\n").append("\n");
+            markDown.append("  \n");
         }
       } catch (Exception error) {
         ExecutionResultContext.addNotionPageErrorResult("Markdown 변환 중 문제가 발생했어요.", userId);
