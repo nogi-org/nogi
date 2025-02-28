@@ -126,6 +126,7 @@ public class UserService {
     );
   }
 
+  @Transactional
   public List<UserStoreNogiHistoryResult> storeNogiHistory(
       List<UserStoreNogiHistoryCommand> commands) {
     // key : notionPageId, value : NogiHistory
@@ -176,7 +177,6 @@ public class UserService {
     }
   }
 
-  @Transactional
   public void updateNogiHistory(NogiHistory nogiHistory, UserStoreNogiHistoryCommand command) {
     nogiHistory.updateMarkdownInfo(
         command.category(),
