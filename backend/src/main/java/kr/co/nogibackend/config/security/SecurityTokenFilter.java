@@ -19,13 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-/*
-  Package Name : com.exitkrapi.config.security
-  File Name    : SecurityTokenFilter
-  Author       : superpil
-  Created Date : 2/9/24
-  Description  :
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor

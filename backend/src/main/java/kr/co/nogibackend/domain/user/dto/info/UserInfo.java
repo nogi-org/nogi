@@ -11,7 +11,8 @@ public record UserInfo(
     String githubRepository,
     String githubDefaultBranch,
     String githubEmail,
-    String githubOwner
+    String githubOwner,
+    Boolean isNotificationAllowed
 ) {
 
   public static UserInfo from(
@@ -26,7 +27,8 @@ public record UserInfo(
         user.getGithubRepository(),
         user.getGithubDefaultBranch(),
         user.getGithubEmail(),
-        user.getGithubOwner()
+        user.getGithubOwner(),
+        user.getIsNotificationAllowed()
     );
   }
 }

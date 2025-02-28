@@ -6,10 +6,12 @@ import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
 import kr.co.nogibackend.util.TestUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Slf4j
 public class GithubServiceIntegrationTest extends GithubTestEnvironment {
 
   @Autowired

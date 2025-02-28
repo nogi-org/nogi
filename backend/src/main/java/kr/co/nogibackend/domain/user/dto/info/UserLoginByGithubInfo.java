@@ -31,7 +31,8 @@ public class UserLoginByGithubInfo {
                     userresult.githubRepository(),
                     userresult.githubDefaultBranch(),
                     userresult.githubEmail(),
-                    userresult.githubOwner()
+                    userresult.githubOwner(),
+                    userresult.isNotificationAllowed()
                 )
             )
             .accessToken(accessToken)

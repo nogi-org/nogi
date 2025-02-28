@@ -26,12 +26,12 @@ const confirmModalAction = reactive({
   hasActive: false
 });
 
-const showFullProfileImage = (image) => {
+const showFullProfileImage = image => {
   confirmModalAction.hasActive = true;
   confirmModalAction.message = image;
 };
 
-const toggleFullImage = (hasAction) => {
+const toggleFullImage = hasAction => {
   confirmModalAction.hasActive = hasAction;
 };
 </script>

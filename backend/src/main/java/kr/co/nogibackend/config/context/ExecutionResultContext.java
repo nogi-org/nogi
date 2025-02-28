@@ -4,13 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
-/*
-  Package Name : kr.co.nogibackend.config.context
-  File Name    : ExecutionResultContext
-  Author       : won taek oh
-  Created Date : 25. 2. 9.
-  Description  :
- */
 @Component
 public class ExecutionResultContext {
 
