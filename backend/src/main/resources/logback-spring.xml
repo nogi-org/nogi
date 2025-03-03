@@ -1,42 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <!-- ====================================================== -->
-  <!-- [LOGGING CONFIGURATION] -->
-  <!-- Spring Boot의 Logback 설정을 정의합니다. -->
-  <!-- 환경(local/dev/prod)에 따라 콘솔, 파일, Slack 등에 로그를 출력합니다. -->
-  <!-- ====================================================== -->
 
-  <!-- 1. 로그 파일 디렉토리 설정 (외부 프로퍼티 참조 가능) -->
+  <!-- 프로퍼티 설정 -->
+  <springProperty name="LOG_DIR" source="logging.file.path"/>
+  <springProperty name="SLACK_WEBHOOK" source="slack.webhook-uri"/>
+  <springProperty name="SLACK_CHANNEL" source="slack.channel"/>
+  <springProperty name="SLACK_USERNAME" source="slack.username"/>
+  <springProperty name="SLACK_EMOJI" source="slack.emoji"/>
+  <property name="LOG_PATTERN_CONSOLE" value="%yellow(%d{yyyy-MM-dd HH:mm:ss}) %magenta([%thread]) %highlight(%-5level) %cyan(%logger{35}) - %msg%n"/>
+  <property name="LOG_PATTERN_FILE" value="[%d{yyyy-MM-dd HH:mm:ss}][%thread] %-5level %logger{35} - %msg%n"/>
+  <property name="MAX_HISTORY" value="60"/>
+
+  <!-- CONSOLE -->
   <appender class="ch.qos.logback.core.ConsoleAppender" name="CONSOLE">
     <encoder>
       <pattern>${LOG_PATTERN_CONSOLE}</pattern>
     </encoder>
   </appender>
-  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="INFO_FILE">
-    <encoder>
-      <pattern>${LOG_PATTERN_FILE}</pattern>
-    </encoder>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${INFO_LOG_DIR}info_%d{yyyyMMdd}.log</fileNamePattern>
-      <maxHistory>${MAX_HISTORY}</maxHistory>
-    </rollingPolicy>
-  </appender>
 
-  <!-- 2. 로그 출력 패턴 설정 -->
-  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR_FILE">
-    <encoder>
-      <pattern>${LOG_PATTERN_FILE}</pattern>
-    </encoder>
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-      <level>ERROR</level>
-      <onMatch>ACCEPT</onMatch>
-      <onMismatch>DENY</onMismatch>
-    </filter>
-    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <fileNamePattern>${ERROR_LOG_DIR}error_%d{yyyyMMdd}.log</fileNamePattern>
-      <maxHistory>${MAX_HISTORY}</maxHistory>
-    </rollingPolicy>
-  </appender>
+  <!-- SLACK -->
   <appender class="com.github.maricn.logback.SlackAppender" name="SLACK_ERROR">
     <channel>${SLACK_CHANNEL}</channel>
     <colorCoding>true</colorCoding>
@@ -53,71 +35,37 @@
       <level>ERROR</level>
     </filter>
   </appender>
-  <property name="INFO_LOG_DIR" value="${LOG_DIR}/data/"/>  <!-- 로그 보관 기간: 60일 -->
 
-  <!-- ====================================================== -->
-  <!-- 3. 로그 Appender 설정 -->
-  <!-- ====================================================== -->
+  <!-- FILE -->
+  <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${LOG_DIR}/general.log</file>
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_DIR}/general-%d{yyyy-MM-dd}.loghistory</fileNamePattern>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>1GB</totalSizeCap>
+    </rollingPolicy>
+  </appender>
 
-  <!-- (1) 콘솔 로그 출력 -->
-  <property name="ERROR_LOG_DIR" value="${LOG_DIR}/error/"/>
-
-  <!-- (2) INFO 로그 파일 저장 -->
-  <property name="LOG_PATTERN_CONSOLE"
-    value="%yellow(%d{yyyy-MM-dd HH:mm:ss}) %magenta([%thread]) %highlight(%-5level) %cyan(%logger{35}) - %msg%n"/>
-
-  <!-- (3) ERROR 로그 파일 저장 -->
-  <property name="LOG_PATTERN_FILE"
-    value="[%d{yyyy-MM-dd HH:mm:ss}][%thread] %-5level %logger{35} - %msg%n"/>
-
-  <!-- (4) Slack 알림 설정 (ERROR 로그 전송) -->
-  <property name="SQL_LOG_PATTERN"
-    value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{35} - %msg%n"/>
-
-  <!-- (5) Slack 알림을 비동기로 처리 -->
-  <property name="MAX_HISTORY" value="60"/>
-
-  <!-- ====================================================== -->
-  <!-- 4. 환경별 로그 설정 -->
-  <!-- ====================================================== -->
-
-  <!-- ✅ Local 환경: 콘솔에만 로그 출력 -->
-  <springProfile name="local">
-    <root level="INFO">
-      <appender-ref ref="CONSOLE"/>
-    </root>
-  </springProfile>
-
-  <!-- ✅ Production 환경: 콘솔, 파일 저장, Slack 알림 활성화 -->
   <springProfile name="prod">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
-      <appender-ref ref="INFO_FILE"/>
-      <appender-ref ref="ERROR_FILE"/>
       <appender-ref ref="ASYNC_SLACK_ERROR"/>
     </root>
   </springProfile>
 
-  <!-- ✅ Dev 환경: 콘솔에만 로그 출력 -->
   <springProfile name="dev">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
+<!--      <appender-ref ref="FILE"/>-->
     </root>
   </springProfile>
 
-  <!-- ✅ Test 환경: 콘솔에만 로그 출력 -->
   <springProfile name="test">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
     </root>
   </springProfile>
-
-  <!-- ====================================================== -->
-  <!-- 5. Slack 관련 프로퍼티 설정 -->
-  <!-- ====================================================== -->
-  <springProperty name="LOG_DIR" source="logging.file.path"/>
-  <springProperty name="SLACK_WEBHOOK" source="slack.webhook-uri"/>
-  <springProperty name="SLACK_CHANNEL" source="slack.channel"/>
-  <springProperty name="SLACK_USERNAME" source="slack.username"/>
-  <springProperty name="SLACK_EMOJI" source="slack.emoji"/>
 </configuration>

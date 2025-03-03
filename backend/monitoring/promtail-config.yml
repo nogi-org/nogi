@@ -1,0 +1,19 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /positions.yml  # 어디까지 읽었는지 기록하는 파일
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push  # Loki의 API 주소
+
+scrape_configs:
+  - job_name: "spring-boot-logs"
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: "spring-boot"
+          environment: "dev"
+          __path__: "/app/logs/general.log"
