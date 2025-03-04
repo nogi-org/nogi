@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import kr.co.nogibackend.domain.BaseEntity;
@@ -51,8 +52,13 @@ public class NogiHistory extends BaseEntity {
   @Column(nullable = false, length = 255) // Not Null 설정
   private String title;
 
-  public void updateMarkdownInfo(String category, String title) {
+  @Lob
+  @Column(nullable = false, columnDefinition = "TEXT") // Not Null 설정
+  private String content;
+
+  public void updateMarkdownInfo(String category, String title, String content) {
     this.category = category;
     this.title = title;
+    this.content = content;
   }
 }

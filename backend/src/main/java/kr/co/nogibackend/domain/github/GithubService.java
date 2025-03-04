@@ -71,7 +71,7 @@ public class GithubService {
    */
   public Optional<GithubCommitResult> commitToGithub(GithubCommitCommand command) {
     try {
-      // ✅ 커밋에 필요한 정보 추출
+      // ✅ markdown 파일 업로드할 때 필요한 정보
       String owner = command.githubOwner();
       String repo = command.githubRepository();
       String branch = command.githubBranch();
@@ -81,25 +81,9 @@ public class GithubService {
       String date = command.commitDate();
       Map<String, String> markdownFiles = command.prepareFiles();
 
+      // ✅ 이미지 업로드할 때 필요한 정보
       NogiBot nogiBot = command.nogiBot();
       Map<String, String> imageFiles = command.prepareImageFiles(resourcesBasePath);
-
-      for (Map.Entry<String, String> imageFile : imageFiles.entrySet()) {
-        githubClient.uploadFile(
-            nogiBot.githubOwner(),
-            nogiBot.githubRepository(),
-            imageFile.getKey(),
-            new GithubCreateOrUpdateContentRequest(
-                "이미지 파일 업로드",
-                imageFile.getValue(),
-                new GithubCommitter(
-                    nogiBot.githubOwner(),
-                    nogiBot.githubEmail()
-                )
-            ),
-            nogiBot.githubToken()
-        );
-      }
 
       // 1️⃣ 현재 브랜치의 HEAD 커밋 SHA 조회 🔄
       String latestSha = getLatestCommitSha(owner, repo, branch, token);
@@ -118,7 +102,10 @@ public class GithubService {
       // 5️⃣ 브랜치 업데이트 (HEAD 이동) 🔄
       updateBranch(owner, repo, branch, newCommitSha, token);
 
-      // 6️⃣ 성공 결과 반환 ✅
+      // 6️⃣ 이미지 저장
+      uploadImageFiles(imageFiles, nogiBot);
+
+      // 7️⃣ 성공 결과 반환 ✅
       return Optional.of(
           new GithubCommitResult(
               command.userId(),
@@ -126,6 +113,7 @@ public class GithubService {
               command.notionBotToken(),
               command.newCategory(),
               command.newTitle(),
+              command.content(),
               true // 커밋 성공
           )
       );
@@ -139,7 +127,7 @@ public class GithubService {
           command.userId()
       );
 
-      // 6️⃣ 실패 결과 반환 ❌
+      // 7️⃣ 실패 결과 반환 ❌
       return Optional.of(
           new GithubCommitResult(
               command.userId(),
@@ -147,8 +135,28 @@ public class GithubService {
               command.notionBotToken(),
               command.newCategory(),
               command.newTitle(),
+              command.content(),
               false // 커밋 실패
           )
+      );
+    }
+  }
+
+  private void uploadImageFiles(Map<String, String> imageFiles, NogiBot nogiBot) {
+    for (Map.Entry<String, String> imageFile : imageFiles.entrySet()) {
+      githubClient.uploadFile(
+          nogiBot.githubOwner(),
+          nogiBot.githubRepository(),
+          imageFile.getKey(),
+          new GithubCreateOrUpdateContentRequest(
+              "이미지 파일 업로드",
+              imageFile.getValue(),
+              new GithubCommitter(
+                  nogiBot.githubOwner(),
+                  nogiBot.githubEmail()
+              )
+          ),
+          nogiBot.githubToken()
       );
     }
   }

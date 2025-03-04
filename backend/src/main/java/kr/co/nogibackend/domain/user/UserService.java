@@ -158,6 +158,7 @@ public class UserService {
                 .notionPageId(command.notionPageId())
                 .category(command.category())
                 .title(command.title())
+                .content(command.content())
                 .build()
         );
         return true;
@@ -174,7 +175,8 @@ public class UserService {
   public void updateNogiHistory(NogiHistory nogiHistory, UserStoreNogiHistoryCommand command) {
     nogiHistory.updateMarkdownInfo(
         command.category(),
-        command.title()
+        command.title(),
+        command.content()
     );
   }
 

@@ -6,6 +6,7 @@ public record GithubCommitResult(
     String notionBotToken,
     String category,
     String title,
+    String content,
     boolean isSuccess
 ) {
 
