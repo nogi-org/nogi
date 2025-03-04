@@ -50,3 +50,4 @@ LOG_DIR_IS_UNDEFINED
 spy.log
 /src/main/generated/
 /src/main/resources/sql/
+monitoring/logs/*.*

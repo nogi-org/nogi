@@ -167,7 +167,14 @@ public class GithubServiceIntegrationTest extends GithubTestEnvironment {
         null,
         mdContent,
         testUserToken,
-        images
+        images,
+        new GithubCommitCommand.NogiBot(
+            nogiBotToken,
+            nogiBotOwner,
+            nogiBotRepo,
+            "main",
+            nogiBotEmail
+        )
     );
   }
 }

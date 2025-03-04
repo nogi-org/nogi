@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import kr.co.nogibackend.config.logging.cachebody.CachedBodyHttpServletRequest;
 import kr.co.nogibackend.config.logging.cachebody.CachedBodyHttpServletResponse;
@@ -21,9 +22,21 @@ public class HttpLoggingInterceptor implements HandlerInterceptor {
 
   private final Map<String, Long> requestTimestamps = new ConcurrentHashMap<>();
 
+  // ✅ 로그 제외할 URI 목록
+  private final Set<String> excludedUris = Set.of(
+      "/health-check",
+      "/actuator/health"
+  );
+
   @Override
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
       Object handler) {
+
+    // ✅ 제외할 URI라면 로깅 안함
+    if (excludedUris.contains(request.getRequestURI())) {
+      return true;
+    }
+
     requestTimestamps.put(getRequestKey(request), System.currentTimeMillis());
 
     if (request instanceof CachedBodyHttpServletRequest cachedRequest) {
@@ -39,6 +52,11 @@ public class HttpLoggingInterceptor implements HandlerInterceptor {
   public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
       Object handler,
       Exception ex) {
+    // ✅ 제외할 URI라면 로깅 안함
+    if (excludedUris.contains(request.getRequestURI())) {
+      return;
+    }
+
     long startTime = requestTimestamps.getOrDefault(getRequestKey(request),
         System.currentTimeMillis());
     long duration = System.currentTimeMillis() - startTime;

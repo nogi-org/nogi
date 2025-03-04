@@ -38,11 +38,14 @@ public class NotionNogiProperties {
             .collect(Collectors.joining("/"));
   }
 
-  // 마크다운 파일의 상대 경로를 생성
-  public String createRelativePath() {
-    int count = nogiCategory.getMulti_select().size();
-    return "../".repeat(count);
-  }
+  /*
+  todo: 필요없는 경우 삭제
+  마크다운 파일의 상대 경로를 생성
+   */
+  // public String createRelativePath() {
+  //   int count = nogiCategory.getMulti_select().size();
+  //   return "../".repeat(count);
+  // }
 
   /*
   github 에 UTC_ISO 날짜 포맷으로 커밋할 수 있다.
