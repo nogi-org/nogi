@@ -16,6 +16,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
@@ -183,6 +184,19 @@ public interface GithubFeignClient {
       @PathVariable("repo") String repo,
       @PathVariable("username") String username,
       @RequestBody GithubAddCollaboratorRequest request,
+      @RequestHeader("Authorization") String token
+  );
+
+  /*
+  ➡️ 파일 업로드 (base64)
+  https://docs.github.com/ko/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
+   */
+  @PutMapping("/repos/{owner}/{repo}/contents/{path}")
+  void uploadFile(
+      @PathVariable("owner") String owner,
+      @PathVariable("repo") String repo,
+      @PathVariable("path") String path,
+      @RequestBody GithubCreateOrUpdateContentRequest request,
       @RequestHeader("Authorization") String token
   );
 

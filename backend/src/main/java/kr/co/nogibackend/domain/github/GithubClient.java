@@ -15,6 +15,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
@@ -97,6 +98,14 @@ public interface GithubClient {
       String repo,
       String username,
       GithubAddCollaboratorRequest request,
+      String token
+  );
+
+  void uploadFile(
+      String owner,
+      String repo,
+      String path,
+      GithubCreateOrUpdateContentRequest request,
       String token
   );
 }

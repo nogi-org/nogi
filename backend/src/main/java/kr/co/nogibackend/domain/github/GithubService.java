@@ -10,6 +10,7 @@ import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand.NogiBot;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
@@ -23,6 +24,8 @@ import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest.GithubCommitter;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
@@ -33,12 +36,16 @@ import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GithubService {
+
+  @Value("${github.resources-base-path}")
+  private String resourcesBasePath;
 
   private static final Set<String> BINARY_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".gif");
   private final GithubClient githubClient;
@@ -72,14 +79,34 @@ public class GithubService {
       String token = command.githubToken();
       String message = command.getCommitMessage();
       String date = command.commitDate();
-      Map<String, String> files = command.prepareFiles();
+      Map<String, String> markdownFiles = command.prepareFiles();
+
+      NogiBot nogiBot = command.nogiBot();
+      Map<String, String> imageFiles = command.prepareImageFiles(resourcesBasePath);
+
+      for (Map.Entry<String, String> imageFile : imageFiles.entrySet()) {
+        githubClient.uploadFile(
+            nogiBot.githubOwner(),
+            nogiBot.githubRepository(),
+            imageFile.getKey(),
+            new GithubCreateOrUpdateContentRequest(
+                "이미지 파일 업로드",
+                imageFile.getValue(),
+                new GithubCommitter(
+                    nogiBot.githubOwner(),
+                    nogiBot.githubEmail()
+                )
+            ),
+            nogiBot.githubToken()
+        );
+      }
 
       // 1️⃣ 현재 브랜치의 HEAD 커밋 SHA 조회 🔄
       String latestSha = getLatestCommitSha(owner, repo, branch, token);
 
       // 2️⃣ 파일들을 Blob으로 변환하여 TreeEntry 목록 생성 📂
-      List<GithubCreateTreeRequest.TreeEntry> treeEntries = createTreeEntries(files, owner, repo,
-          token);
+      List<GithubCreateTreeRequest.TreeEntry> treeEntries = createTreeEntries(markdownFiles, owner,
+          repo, token);
 
       // 3️⃣ 새로운 Git Tree 생성 🌳
       GithubCreateTreeInfo tree = createNewTree(owner, repo, latestSha, treeEntries, token);

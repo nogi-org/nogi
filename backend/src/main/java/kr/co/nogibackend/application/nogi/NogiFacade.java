@@ -1,6 +1,7 @@
 package kr.co.nogibackend.application.nogi;
 
 import static kr.co.nogibackend.response.code.UserResponseCode.F_MANUAL;
+import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_NOGI_BOT;
 
 import java.util.Collections;
 import java.util.List;
@@ -83,12 +84,7 @@ public class NogiFacade {
       // 2️⃣ Notion TIL 페이지 조회 후 Markdown 변환 📝
       List<NotionStartTILResult> notionStartTILResults =
           notionService.startTIL(NotionStartTILCommand.from(user));
-      log.info("After Notion StartTIL:\n{}",
-          notionStartTILResults.stream()
-              .map(result -> String.format(
-                  " - userId: %d, category: %s, title: %s, notionPageId: %s",
-                  result.userId(), result.category(), result.title(), result.notionPageId()))
-              .collect(Collectors.joining("\n")));
+      logStartTilResults(notionStartTILResults);
 
       // 3️⃣ TIL 생성 또는 수정 체크 🔍
       List<UserCheckTILCommand> userCheckTILCommands =
@@ -96,8 +92,10 @@ public class NogiFacade {
       List<UserCheckTILResult> userCheckTILResults = userService.checkTIL(userCheckTILCommands);
 
       // 4️⃣ Markdown을 GitHub에 커밋 🚀
+      UserResult nogiBotResult = userService.findNogiBot()
+          .orElseThrow(() -> new GlobalException(F_NOT_FOUND_NOGI_BOT));
       List<GithubCommitCommand> githubCommitCommands =
-          GithubCommitCommand.of(notionStartTILResults, userCheckTILResults);
+          GithubCommitCommand.of(notionStartTILResults, userCheckTILResults, nogiBotResult);
       List<GithubCommitResult> githubCommitResults = githubService.commitToGithub(
           githubCommitCommands);
 
@@ -120,9 +118,7 @@ public class NogiFacade {
                 .distinct()
                 .toArray(Long[]::new)
         );
-        userService.findNogiBot().ifPresent((masterUser) -> {
-          githubService.notify(GithubNotifyCommand.from(userResult, masterUser));
-        });
+        githubService.notify(GithubNotifyCommand.from(userResult, nogiBotResult));
       }
     } finally {
       logFailureResults();
@@ -130,6 +126,15 @@ public class NogiFacade {
       // 8️⃣ ExecutionResultContext 정리 🧹
       ExecutionResultContext.clear();
     }
+  }
+
+  private void logStartTilResults(List<NotionStartTILResult> notionStartTILResults) {
+    log.info("After Notion StartTIL:\n{}",
+        notionStartTILResults.stream()
+            .map(result -> String.format(
+                " - userId: %d, category: %s, title: %s, notionPageId: %s",
+                result.userId(), result.category(), result.title(), result.notionPageId()))
+            .collect(Collectors.joining("\n")));
   }
 
   private void logFailureResults() {

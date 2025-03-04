@@ -16,6 +16,10 @@ public class GithubTestEnvironment {
   protected String nogiBotOwner;
   @Value("${github.nogi-bot.token}")
   protected String nogiBotToken;
+  @Value("${github.nogi-bot.email}")
+  protected String nogiBotEmail;
+  @Value("${github.nogi-bot.repo}")
+  protected String nogiBotRepo;
   @Value("${github.test-user.owner}")
   protected String testUserOwner;
   @Value("${github.test-user.token}")
