@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.user;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -7,30 +8,30 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import kr.co.nogibackend.domain.BaseEntity;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.envers.Audited;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.util.StringUtils;
 
-/*
-  Package Name : kr.co.nogibackend.domain
-  File Name    : User
-  Author       : superpil
-  Created Date : 25. 2. 1.
-  Description  :
- */
 @Table(
     name = "tb_user"
 )
 @Getter
 @Entity
+@Audited
 @Builder
+@EnableJpaAuditing
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User {
+@SQLDelete(sql = "UPDATE tb_user SET deleted = true, deleted_on = CURRENT_TIMESTAMP WHERE id = ?")
+public class User extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,6 +39,7 @@ public class User {
   @Enumerated(EnumType.STRING)
   private Role role;
   private String notionBotToken;
+  @Column(nullable = true, length = 255, unique = true)
   private String notionDatabaseId;
   private String githubAuthToken;
   private String githubRepository;
@@ -68,6 +70,9 @@ public class User {
     }
     if (StringUtils.hasText(command.getGithubOwner())) {
       this.githubOwner = command.getGithubOwner();
+    }
+    if (command.getIsNotificationAllowed() != null) {
+      this.isNotificationAllowed = command.getIsNotificationAllowed();
     }
     return this;
   }

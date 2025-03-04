@@ -18,13 +18,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/*
-  Package Name : kr.co.nogibackend.interfaces.user
-  File Name    : LoginController
-  Author       : won taek oh
-  Created Date : 25. 2. 14.
-  Description  :
- */
 @Slf4j
 @RestController
 @RequiredArgsConstructor

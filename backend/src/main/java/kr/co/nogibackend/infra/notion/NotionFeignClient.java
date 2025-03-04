@@ -17,13 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/*
-  Package Name : kr.co.nogibackend.infra.notion
-  File Name    : NotionFeignClient
-  Author       : superpil
-  Created Date : 25. 1. 26.
-  Description  :
- */
 @FeignClient(name = "NotionClient", url = "https://api.notion.com/v1", configuration = NotionFeignClientConfig.class)
 public interface NotionFeignClient {
 
