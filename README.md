@@ -89,6 +89,32 @@
   <img src="https://img.shields.io/badge/axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white">
 </div>
 
+## 🛠 시스템 아키텍처
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/0f79cdb6-e7b1-47bc-a9c0-b1e5b76f7c03" alt="Nogi 프로젝트 아키텍처" width="80%">
+</p>
+
+- 아래 다이어그램은 **Nogi 프로젝트의 전체 인프라 및 서비스 구성**을 나타냅니다.
+- AWS와 Oracle Cloud를 기반으로 **프론트엔드, 백엔드, 데이터베이스, 모니터링 시스템**이 어떻게 연동되는지 확인할 수 있습니다.
+
+### 🔹 **클라우드 및 역할 분리 이유**
+- **모니터링 및 운영 서비스**를 애플리케이션 서비스와 분리하여 **확장성과 가용성을 높이기 위해** AWS와 Oracle Cloud를 함께 사용하였습니다.
+- **프리 티어(무료 계정) 인스턴스 제한**으로 인해 AWS와 Oracle Cloud를 조합하여 효율적으로 리소스를 활용하였습니다.
+    - **AWS** → 웹 애플리케이션 및 API 서비스 운영
+    - **Oracle Cloud** → **모니터링(Grafana, Prometheus, Loki) 및 인증 서비스(Nginx, Certbot) 관리**
+- 이와 같은 구성은 **비용을 절감하면서도 클라우드 리소스를 최대한 활용**할 수 있도록 설계되었습니다.
+
+
+## 📌 개발 규약
+
+개발 규칙에 대한 자세한 내용은 **`docs/rule` 폴더**에 정리되어 있습니다.
+
+🔹 **개발 규칙 문서 경로**
+- 📄 **코드 스타일 가이드** → [`docs/rule/code_rule.md`](docs/rule/code_rule.md)
+- 📄 **Git 규칙** → [`docs/rule/git_rule.md`](docs/rule/git_rule.md)
+- 📄 **버전 관리 규칙** → [`docs/rule/versioning.md`](docs/rule/versioning.md)
+- ⚙️ **IntelliJ 코드 스타일 설정 파일** → [`docs/rule/intellij-java-google-style.xml`](docs/rule/intellij-java-google-style.xml)
 
 ## 🧑‍💻 팀원 구성
 
