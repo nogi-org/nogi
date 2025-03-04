@@ -15,7 +15,6 @@ public class NogiScheduler {
 
   @Scheduled(cron = "0 */10 * * * *")
   public void onAuto() {
-    log.info("onAuto Scheduler Start 10Min");
     nogiFacade.onAuto();
   }
 
