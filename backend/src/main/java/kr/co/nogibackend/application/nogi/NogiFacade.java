@@ -128,6 +128,7 @@ public class NogiFacade {
     }
   }
 
+
   private void logStartTilResults(List<NotionStartTILResult> notionStartTILResults) {
     log.info("After Notion StartTIL:\n{}",
         notionStartTILResults.stream()

@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CookieUtil {
+public class CookieUtils {
 
   public static final String ACCESS_COOKIE_NAME = "ac_token";
 

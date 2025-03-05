@@ -1,6 +1,6 @@
 package kr.co.nogibackend.config.security;
 
-import static kr.co.nogibackend.util.CookieUtil.ACCESS_COOKIE_NAME;
+import static kr.co.nogibackend.util.CookieUtils.ACCESS_COOKIE_NAME;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import kr.co.nogibackend.util.CookieUtil;
+import kr.co.nogibackend.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +25,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class SecurityTokenFilter extends OncePerRequestFilter {
 
   private final JwtProvider jwtProvider;
-  private final CookieUtil cookieUtil;
+  private final CookieUtils cookieUtil;
 
   // spring security 필터
   @Override

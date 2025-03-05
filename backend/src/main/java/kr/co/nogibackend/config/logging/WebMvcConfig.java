@@ -20,7 +20,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
   public void addInterceptors(InterceptorRegistry registry) {
     registry.addInterceptor(httpLoggingInterceptor)
         .addPathPatterns("/**")
-        .excludePathPatterns("/vendor/**", "/css/*", "/img/*");
+        .excludePathPatterns("/vendor/**", "/css/*", "/img/*", "/js/*", "/fonts/*", "/favicon.ico",
+            "", "/", "/health-check", "/actuator/health", "/");
 
     if (enableSQLLogging) {
       registry.addInterceptor(sqlLoggingInterceptor)

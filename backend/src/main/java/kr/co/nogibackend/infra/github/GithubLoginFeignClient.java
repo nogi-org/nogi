@@ -1,12 +1,13 @@
 package kr.co.nogibackend.infra.github;
 
+import kr.co.nogibackend.config.openfeign.GitHubFeignClientConfig;
 import kr.co.nogibackend.domain.github.dto.info.GithubOauthAccessTokenInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@FeignClient(name = "GithubLoginFeignClient", url = "https://github.com")
+@FeignClient(name = "GithubLoginFeignClient", url = "https://github.com", configuration = GitHubFeignClientConfig.class)
 public interface GithubLoginFeignClient {
 
   /*

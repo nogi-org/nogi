@@ -4,8 +4,10 @@ import java.util.Map;
 import kr.co.nogibackend.config.openfeign.NotionFeignClientConfig;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessTokenResponse;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +48,12 @@ public interface NotionFeignClient {
   ResponseEntity<NotionDatabaseInfo> getDatabase(
       @RequestHeader("Authorization") String BotToken,
       @PathVariable(value = "databaseId") String databaseId
+  );
+
+  @RequestMapping(method = RequestMethod.POST, value = "/oauth/token")
+  ResponseEntity<NotionGetAccessTokenResponse> getAccessToken(
+      @RequestHeader("Authorization") String token,
+      @RequestBody NotionGetAccessTokenRequest request
   );
 
 }

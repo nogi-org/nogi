@@ -1,7 +1,7 @@
 package kr.co.nogibackend.interfaces.user;
 
-import static kr.co.nogibackend.util.CookieUtil.ACCESS_COOKIE_NAME;
-import static kr.co.nogibackend.util.CookieUtil.createAccessTokenCookieExpTime;
+import static kr.co.nogibackend.util.CookieUtils.ACCESS_COOKIE_NAME;
+import static kr.co.nogibackend.util.CookieUtils.createAccessTokenCookieExpTime;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import kr.co.nogibackend.application.user.UserFacade;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
 import kr.co.nogibackend.response.service.Response;
-import kr.co.nogibackend.util.CookieUtil;
+import kr.co.nogibackend.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class AuthController {
+public class GithubAuthController {
 
   private final UserFacade userFacade;
-  private final CookieUtil cookieUtil;
+  private final CookieUtils cookieUtil;
 
   @Value("${github.client.id}")
   private String githubClientId;

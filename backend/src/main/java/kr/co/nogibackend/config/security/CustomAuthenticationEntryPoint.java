@@ -1,7 +1,7 @@
 package kr.co.nogibackend.config.security;
 
 import static kr.co.nogibackend.response.code.UserResponseCode.F_401;
-import static kr.co.nogibackend.util.CookieUtil.ACCESS_COOKIE_NAME;
+import static kr.co.nogibackend.util.CookieUtils.ACCESS_COOKIE_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import kr.co.nogibackend.response.service.Response;
-import kr.co.nogibackend.util.CookieUtil;
+import kr.co.nogibackend.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-  private final CookieUtil cookieUtil;
+  private final CookieUtils cookieUtil;
 
   // 401 에러처리
   @Override
