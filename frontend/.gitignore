@@ -28,3 +28,5 @@ coverage
 
 *.tsbuildinfo
 /.vite/
+/localhost.pem
+/localhost-key.pem

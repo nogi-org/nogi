@@ -51,3 +51,4 @@ spy.log
 /src/main/generated/
 /src/main/resources/sql/
 monitoring/logs/*.*
+/src/main/resources/keystore.p12
