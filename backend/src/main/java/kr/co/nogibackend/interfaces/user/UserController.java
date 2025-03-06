@@ -45,7 +45,7 @@ public class UserController {
   }
 
   @GetMapping("validate-repository-name")
-  public ResponseEntity<?> updateUser(
+  public ResponseEntity<?> validateRepositoryName(
       @RequestParam String repositoryName,
       Auth auth
   ) {

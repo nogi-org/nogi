@@ -13,11 +13,15 @@ import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
+import kr.co.nogibackend.domain.notion.NotionService;
+import kr.co.nogibackend.domain.notion.dto.result.NotionGetAccessResult;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 import kr.co.nogibackend.domain.user.dto.info.UserInfo;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
+import kr.co.nogibackend.domain.user.dto.info.UserLoginByNotionInfo;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
+import kr.co.nogibackend.domain.user.dto.result.UserSinUpOrUpdateResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +31,7 @@ import org.springframework.stereotype.Service;
 public class UserFacade {
 
   private final GithubService githubService;
+  private final NotionService notionService;
   private final UserService userService;
   private final JwtProvider jwtProvider;
 
@@ -48,15 +53,73 @@ public class UserFacade {
     AuditContext.setUserId(0L);
 
     // 4. user 정보 저장하기
-    UserResult savedUserResult =
-        userService.createOrUpdateUser(UserUpdateCommand.from(githubUserResult, githubAccessToken));
+    UserSinUpOrUpdateResult sinUpOrUpdateResult =
+        userService.signUpOrUpdateUser(
+            UserUpdateCommand.fromGithubLogin(githubUserResult, githubAccessToken)
+        );
 
     // 5. access toekn 발급하기(nogi token)
-    String nogiAccessToken = jwtProvider.generateToken(savedUserResult.id(),
-        savedUserResult.role());
+    String nogiAccessToken = jwtProvider.generateToken(
+        sinUpOrUpdateResult.id(),
+        sinUpOrUpdateResult.role()
+    );
 
-    return UserLoginByGithubInfo.from(savedUserResult, nogiAccessToken);
+    // 6. 신규유저일 경우 알림보내개(경축!)
+    if (sinUpOrUpdateResult.isSinUp()) {
+      userService.sendSinUpNotification(
+          sinUpOrUpdateResult.id(),
+          sinUpOrUpdateResult.githubOwner()
+      );
+    }
+
+    return UserLoginByGithubInfo.from(sinUpOrUpdateResult, nogiAccessToken);
   }
+
+  public UserLoginByNotionInfo loginByNotion(UserFacadeCommand.NotionLogin command) {
+    try {
+      // 1. access token 가져오기
+      NotionGetAccessResult notionResult = notionService.getAccessToken(
+          command.getBasicToken(),
+          command.code(),
+          command.notionRedirectUri()
+      );
+
+      // 2. database 정보 가져오기 (비동기)
+      // TODO : 비동기로 처리하기, event driven 방식으로 리팩터링하기
+      try {
+        Thread.sleep(5000);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+      String notionDatabaseId = notionService.getNotionDatabaseInfo(
+          notionResult.notionAccessToken(),
+          notionResult.notionPageId()
+      );
+      userService.updateUser(
+          UserUpdateCommand.builder()
+              .id(command.userId())
+              .notionDatabaseId(notionDatabaseId)
+              .build()
+      );
+
+      // 3. AuditContext 에 저장(DB auditing 을 위함) -> callUrl 로 동작하는 메서드라 따로 처리
+      AuditContext.setUserId(command.userId());
+
+      // 4. user 정보 저장하기
+      userService.updateUser(
+          UserUpdateCommand.builder()
+              .id(command.userId())
+              .notionAccessToken(notionResult.notionAccessToken())
+              .notionPageId(notionResult.notionPageId())
+              .build()
+      );
+
+      return new UserLoginByNotionInfo(true, "노션과 연동하는데 성공하였습니다.");
+    } catch (Exception e) {
+      return new UserLoginByNotionInfo(false, "노션과 연동하는데 실패하였습니다.");
+    }
+  }
+
 
   public UserInfo updateUserAndCreateRepo(UserUpdateCommand command) {
     // 1. user 정보 가져오기

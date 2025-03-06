@@ -1,6 +1,7 @@
 package kr.co.nogibackend.domain.user.dto.info;
 
-import kr.co.nogibackend.domain.user.dto.result.UserResult;
+import kr.co.nogibackend.domain.user.User;
+import kr.co.nogibackend.domain.user.dto.result.UserSinUpOrUpdateResult;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,27 +15,18 @@ import lombok.Setter;
 @AllArgsConstructor
 public class UserLoginByGithubInfo {
 
-  private UserInfo userInfo;
+  private Long userId;
+  private User.Role role;
+  private String notionPageId;
   private String accessToken;
 
-  public static UserLoginByGithubInfo from(UserResult userresult, String accessToken) {
+  public static UserLoginByGithubInfo from(UserSinUpOrUpdateResult userResult, String accessToken) {
     return
         UserLoginByGithubInfo
             .builder()
-            .userInfo(
-                new UserInfo(
-                    userresult.id(),
-                    userresult.role(),
-                    userresult.notionBotToken(),
-                    userresult.notionDatabaseId(),
-                    userresult.githubAuthToken(),
-                    userresult.githubRepository(),
-                    userresult.githubDefaultBranch(),
-                    userresult.githubEmail(),
-                    userresult.githubOwner(),
-                    userresult.isNotificationAllowed()
-                )
-            )
+            .userId(userResult.id())
+            .role(userResult.role())
+            .notionPageId(userResult.notionPageId())
             .accessToken(accessToken)
             .build();
   }
@@ -42,10 +34,7 @@ public class UserLoginByGithubInfo {
   /*
   사용자가 입력해야할 정보가 있는지 확인하기 위한 메서드
    */
-  public boolean isRequireUserInfo() {
-    return userInfo.notionBotToken() == null ||
-        userInfo.notionDatabaseId() == null ||
-        userInfo.githubRepository() == null ||
-        userInfo.githubDefaultBranch() == null;
+  public boolean isRequireNotionInfo() {
+    return notionPageId == null;
   }
 }

@@ -1,15 +1,15 @@
 package kr.co.nogibackend.interfaces.user;
 
+import static kr.co.nogibackend.util.CookieUtils.ACCESS_COOKIE_NAME;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.List;
 import kr.co.nogibackend.application.user.UserFacade;
-import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
-import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessTokenResponse;
-import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
-import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
+import kr.co.nogibackend.application.user.dto.UserFacadeCommand.NotionLogin;
+import kr.co.nogibackend.config.security.JwtProvider;
+import kr.co.nogibackend.domain.user.dto.info.UserLoginByNotionInfo;
 import kr.co.nogibackend.infra.notion.NotionFeignClient;
 import kr.co.nogibackend.response.service.Response;
 import kr.co.nogibackend.util.CookieUtils;
@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotionAuthController {
 
   private final UserFacade userFacade;
-  private final CookieUtils cookieUtil;
-  // TODO infra 단 추상화하기
+  private final JwtProvider jwtProvider;
+
   private final NotionFeignClient notionFeignClient;
   @Value("${notion.client.id}")
   private String notionClientId;
@@ -43,11 +43,15 @@ public class NotionAuthController {
    * Notion 로그인 URL 반환 (사용자가 클릭하여 Notion 로그인 페이지로 이동)
    */
   @GetMapping("/notion/auth-url")
-  public ResponseEntity<?> getNotionAuthUrl() {
-    // TODO state 파라미터 설정하기(userId 담기)
+  public ResponseEntity<?> getNotionAuthUrl(HttpServletRequest request) {
+    // TODO Security 로 빼야하나?
+    Cookie cookie = CookieUtils.getCookie(request, ACCESS_COOKIE_NAME)
+        .orElseThrow(() -> new RuntimeException("쿠키가 존재하지 않습니다."));
+    String accessToken = cookie.getValue();
+
     String authUrl = String.format(
-        "https://api.notion.com/v1/oauth/authorize?owner=user&client_id=%s&redirect_uri=%s&response_type=code",
-        notionClientId, notionRedirectUri
+        "https://api.notion.com/v1/oauth/authorize?owner=user&client_id=%s&redirect_uri=%s&response_type=code&state=%s",
+        notionClientId, notionRedirectUri, accessToken
     );
 
     return Response.success(authUrl);
@@ -62,45 +66,21 @@ public class NotionAuthController {
       @RequestParam("state") String state,
       HttpServletResponse response
   ) throws IOException {
-    try {
-      String credentials = notionClientId + ":" + notionClientSecret;
-      String encodedCredentials = Base64.getEncoder()
-          .encodeToString(credentials.getBytes(StandardCharsets.UTF_8));
 
-      NotionGetAccessTokenRequest request = NotionGetAccessTokenRequest.of(code, notionRedirectUri);
+    Long userId = jwtProvider.getUserInfoFromToken(state).getUserId();
 
-      ResponseEntity<NotionGetAccessTokenResponse> accessToken = notionFeignClient.getAccessToken(
-          "Basic " + encodedCredentials,
-          request
-      );
-      log.info("accessToken: {}", accessToken);
+    UserLoginByNotionInfo userLoginByNotionInfo = userFacade.loginByNotion(
+        new NotionLogin(userId, notionClientId, notionClientSecret, notionRedirectUri, code)
+    );
 
-      // TODO retry 5번 비동기로 처리
-      Thread.sleep(5000);
-      NotionGetAccessTokenResponse body = accessToken.getBody();
-      ResponseEntity<NotionInfo<NotionBlockInfo>> blocksFromPage = notionFeignClient.getBlocksFromPage(
-          body.accessToken(),
-          body.duplicatedTemplateId(),
-          null
-      );
+    String redirectUrl = String.format(
+        "%s?isSuccess=%s&message=%s",
+        afterLoginRedirectUrl,
+        userLoginByNotionInfo.isSuccess(),
+        userLoginByNotionInfo.message()
+    );
 
-      NotionInfo<NotionBlockInfo> notionPageResponse = blocksFromPage.getBody();
-      List<NotionBlockInfo> results = notionPageResponse.getResults();
-      NotionBlockInfo childDatabase = results.stream()
-          .filter(v -> v.getType().equals("child_database")).findFirst()
-          .orElseThrow(() -> new RuntimeException("Notion Page 에서 Database 를 찾을 수 없습니다."));
-      String databaseId = childDatabase.getId();
-      System.out.println("databaseId = " + databaseId);
-
-      // TODO user 수정 및 Response 반환
-      // TODO Response 에 token 값 없도록 작업
-
-    } catch (Exception e) {
-      log.error("Notion OAuth 인증 처리 중 오류 발생", e);
-    }
-
-    // TODO redirectUrl 설정하기
-    response.sendRedirect("리다이렉터 경로 설정 필요");
+    response.sendRedirect(redirectUrl);
     return Response.success();
   }
 }

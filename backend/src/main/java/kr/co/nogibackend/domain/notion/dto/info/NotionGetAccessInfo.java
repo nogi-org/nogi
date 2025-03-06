@@ -3,7 +3,7 @@ package kr.co.nogibackend.domain.notion.dto.info;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public record NotionGetAccessTokenResponse(
+public record NotionGetAccessInfo(
     @JsonProperty("access_token")
     String accessToken,
 

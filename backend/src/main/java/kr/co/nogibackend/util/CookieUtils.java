@@ -19,18 +19,43 @@ public class CookieUtils {
     return (int) (ACCESS_TOKEN_VALIDITY / 1000);
   }
 
-  // 쿠키 생성
-  public void createCookie(HttpServletResponse response, String name, String value, int maxAge) {
+  /**
+   * <h2>✅ 쿠키 생성 (보안 강화)</h2>
+   * <ul>
+   *   <li>SameSite=Strict: CSRF 방어가 강력하지만, 리디렉션 등에서 쿠키 전송이 안 될 수 있음.</li>
+   *   <li>SameSite=Lax: CSRF 방어가 어느 정도 가능하면서도, GET 요청은 허용됨.</li>
+   *   <li>SameSite=None; Secure: 보안이 필요하지만 HTTPS에서만 동작함.</li>
+   * </ul>
+   */
+  public static void createCookie(
+      HttpServletResponse response,
+      String name,
+      String value,
+      int maxAge,
+      boolean isSecure
+  ) {
     Cookie cookie = new Cookie(name, value);
-    cookie.setHttpOnly(true);
-    cookie.setSecure(true);
-    cookie.setPath("/");
-    cookie.setMaxAge(maxAge);
+    cookie.setHttpOnly(true);  // JavaScript 접근 차단 (XSS 방어)
+    cookie.setSecure(isSecure);  // HTTPS에서만 전송 (네트워크 스니핑 방어)
+    cookie.setPath("/");  // 모든 경로에서 유효
+    cookie.setMaxAge(maxAge);  // 쿠키 만료 시간 설정
+
+    // ✅ SameSite 속성 추가 (CSRF 방어)
+    if (isSecure) {
+      response.addHeader("Set-Cookie",
+          String.format("%s=%s; Max-Age=%d; Path=/; HttpOnly; Secure; SameSite=None",
+              name, value, maxAge));
+    } else {
+      response.addHeader("Set-Cookie",
+          String.format("%s=%s; Max-Age=%d; Path=/; HttpOnly; SameSite=Lax",
+              name, value, maxAge));
+    }
+
     response.addCookie(cookie);
   }
 
   // 쿠키 가져오기
-  public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
+  public static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
     if (request.getCookies() == null) {
       return Optional.empty();
     }
@@ -41,12 +66,15 @@ public class CookieUtils {
             .findFirst();
   }
 
-  // 쿠기 삭제
-  public void deleteCookie(HttpServletResponse response, String name) {
+  // 쿠키 삭제 (보안 강화)
+  public static void deleteCookie(HttpServletResponse response, String name) {
     Cookie cookie = new Cookie(name, null);
     cookie.setPath("/");
     cookie.setMaxAge(0);
+    response.addHeader("Set-Cookie",
+        name + "=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=None");
     response.addCookie(cookie);
   }
+
 
 }

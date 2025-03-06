@@ -15,9 +15,12 @@ import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
 import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
+import kr.co.nogibackend.domain.notion.dto.result.NotionGetAccessResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -328,4 +331,32 @@ public class NotionService {
     return Base64.getEncoder().encodeToString(imageByte);
   }
 
+  public NotionGetAccessResult getAccessToken(String basicToken, String code,
+      String notionRedirectUrl) {
+    NotionGetAccessInfo notionInfo = notionClient.getAccessToken(
+        basicToken,
+        NotionGetAccessTokenRequest.of(code, notionRedirectUrl
+        )
+    );
+
+    return new NotionGetAccessResult(
+        notionInfo.accessToken(),
+        notionInfo.duplicatedTemplateId()
+    );
+  }
+
+  // TODO 코드 리팩터링
+  public String getNotionDatabaseInfo(
+      String notionAccessToken,
+      String notionPageId
+  ) {
+    NotionInfo<NotionBlockInfo> notionPageInfo = notionClient.getBlocksFromPage(notionAccessToken,
+        notionPageId, null
+    );
+    List<NotionBlockInfo> results = notionPageInfo.getResults();
+    NotionBlockInfo childDatabase = results.stream()
+        .filter(v -> v.getType().equals("child_database")).findFirst()
+        .orElseThrow(() -> new RuntimeException("Notion Page 에서 Database 를 찾을 수 없습니다."));
+    return childDatabase.getId();
+  }
 }

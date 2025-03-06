@@ -21,7 +21,7 @@ public record UserResult(
     return new UserResult(
         user.getId(),
         user.getRole(),
-        user.getNotionBotToken(),
+        user.getNotionAccessToken(),
         user.getNotionDatabaseId(),
         user.getGithubAuthToken(),
         user.getGithubRepository(),

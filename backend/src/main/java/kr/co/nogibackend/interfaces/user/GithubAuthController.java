@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class GithubAuthController {
 
   private final UserFacade userFacade;
-  private final CookieUtils cookieUtil;
 
   @Value("${github.client.id}")
   private String githubClientId;
@@ -59,17 +58,21 @@ public class GithubAuthController {
     UserLoginByGithubInfo userLoginByGithubInfo = userFacade.loginByGithub(userFacadeCommand);
 
     String redirectUrl = String.format(
-        "%s?requireUserInfo=%s&userId=%s&role=%s",
+        "%s?isRequireNotionInfo=%s&userId=%s&role=%s",
         afterLoginRedirectUrl,
-        userLoginByGithubInfo.isRequireUserInfo(),
-        userLoginByGithubInfo.getUserInfo().id(),
-        userLoginByGithubInfo.getUserInfo().role()
+        userLoginByGithubInfo.isRequireNotionInfo(),
+        userLoginByGithubInfo.getUserId(),
+        userLoginByGithubInfo.getRole()
     );
 
     // access token 쿠키 설정
-    cookieUtil.createCookie
-        (response, ACCESS_COOKIE_NAME, userLoginByGithubInfo.getAccessToken(),
-            createAccessTokenCookieExpTime());
+    CookieUtils.createCookie(
+        response,
+        ACCESS_COOKIE_NAME,
+        userLoginByGithubInfo.getAccessToken(),
+        createAccessTokenCookieExpTime(),
+        true
+    );
 
     // 프론트엔드 리다이렉트 주소로 이동
     response.sendRedirect(redirectUrl);
@@ -78,7 +81,7 @@ public class GithubAuthController {
 
   @PutMapping("logout")
   public ResponseEntity<?> logout(HttpServletResponse response) {
-    cookieUtil.deleteCookie(response, ACCESS_COOKIE_NAME);
+    CookieUtils.deleteCookie(response, ACCESS_COOKIE_NAME);
     return Response.success();
   }
 

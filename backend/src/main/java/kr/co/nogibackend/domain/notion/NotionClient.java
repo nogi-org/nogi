@@ -4,8 +4,10 @@ import java.net.URI;
 import java.util.Map;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
 
 public interface NotionClient {
 
@@ -21,4 +23,5 @@ public interface NotionClient {
 
   NotionDatabaseInfo getDatabase(String BotToken, String databaseId);
 
+  NotionGetAccessInfo getAccessToken(String basicToken, NotionGetAccessTokenRequest request);
 }

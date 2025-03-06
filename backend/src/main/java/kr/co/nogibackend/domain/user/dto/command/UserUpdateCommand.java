@@ -15,7 +15,8 @@ import lombok.Setter;
 public class UserUpdateCommand {
 
   private Long id;
-  private String notionBotToken;
+  private String notionAccessToken;
+  private String notionPageId;
   private String notionDatabaseId;
   private String githubAuthToken;
   private String githubRepository;
@@ -25,7 +26,10 @@ public class UserUpdateCommand {
   private String githubOwner;
   private Boolean isNotificationAllowed;
 
-  public static UserUpdateCommand from(GithubUserResult githubUserResult, String accessToken) {
+  public static UserUpdateCommand fromGithubLogin(
+      GithubUserResult githubUserResult,
+      String accessToken
+  ) {
     return UserUpdateCommand.builder()
         .githubAuthToken(accessToken)
         .githubEmail(githubUserResult.email())
