@@ -245,4 +245,9 @@ public class UserService {
             .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
     return UserResult.from(user);
   }
+
+  @Async
+  public void sendSinUpNotification(Long userId, String ownerName) {
+    userSender.sendSignUpNotification(userId, ownerName);
+  }
 }
