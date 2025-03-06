@@ -15,11 +15,11 @@ import lombok.Setter;
 public class UserResponse {
 
   private Long id;
-  private String notionBotToken;
-  private String notionDatabaseId;
-  private String githubAuthToken;
+  private String notionBotToken;//제거
+  private String notionDatabaseId;//제거
+  private String githubAuthToken;//제거
   private String githubRepository;
-  private String githubDefaultBranch;
+  private String githubDefaultBranch;//제거
   private String githubEmail;
   private String githubOwner;
   private Boolean isNotificationAllowed;

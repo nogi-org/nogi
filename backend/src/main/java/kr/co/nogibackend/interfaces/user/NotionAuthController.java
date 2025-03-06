@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import kr.co.nogibackend.application.user.UserFacade;
-import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessTokenResponse;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
@@ -29,16 +28,14 @@ public class NotionAuthController {
 
   private final UserFacade userFacade;
   private final CookieUtils cookieUtil;
-
+  // TODO infra 단 추상화하기
+  private final NotionFeignClient notionFeignClient;
   @Value("${notion.client.id}")
   private String notionClientId;
-
   @Value("${notion.redirect-uri}")
   private String notionRedirectUri;
-
   @Value("${notion.client.secret}")
   private String notionClientSecret;
-
   @Value("${notion.after-login-redirect-uri}")
   private String afterLoginRedirectUrl;
 
@@ -47,6 +44,7 @@ public class NotionAuthController {
    */
   @GetMapping("/notion/auth-url")
   public ResponseEntity<?> getNotionAuthUrl() {
+    // TODO state 파라미터 설정하기(userId 담기)
     String authUrl = String.format(
         "https://api.notion.com/v1/oauth/authorize?owner=user&client_id=%s&redirect_uri=%s&response_type=code",
         notionClientId, notionRedirectUri
@@ -55,19 +53,15 @@ public class NotionAuthController {
     return Response.success(authUrl);
   }
 
-  // TODO infra 단 추상화하기
-  private final NotionFeignClient notionFeignClient;
-
   /**
    * Notion OAuth 인증 후, 액세스 토큰 요청 및 처리
    */
   @GetMapping("/login/code/notion")
   public ResponseEntity<?> loginByNotion(
       @RequestParam("code") String code,
-      HttpServletResponse response,
-      Auth auth
+      @RequestParam("state") String state,
+      HttpServletResponse response
   ) throws IOException {
-    System.out.println("auth = " + auth);
     try {
       String credentials = notionClientId + ":" + notionClientSecret;
       String encodedCredentials = Base64.getEncoder()
@@ -81,15 +75,15 @@ public class NotionAuthController {
       );
       log.info("accessToken: {}", accessToken);
 
+      // TODO retry 5번 비동기로 처리
+      Thread.sleep(5000);
       NotionGetAccessTokenResponse body = accessToken.getBody();
-      // TODO Block type copy_indicator is not supported via the API. 에러가 자꾸 발생하뮤ㅠㅠㅠㅠㅠㅠㅠ
-      // TODO POSTMAN 으로 직접요청하면 type 이 copy_indicator 인게 없는데 이런 에러가남ㅠㅠㅠㅠㅠㅠㅠ
       ResponseEntity<NotionInfo<NotionBlockInfo>> blocksFromPage = notionFeignClient.getBlocksFromPage(
           body.accessToken(),
           body.duplicatedTemplateId(),
           null
-      );//1ad7e38f-6917-81b1-991e-f67f269d9587
-      //1ad7e38f-6917-81b0-ba08-cf5145ee5e71
+      );
+
       NotionInfo<NotionBlockInfo> notionPageResponse = blocksFromPage.getBody();
       List<NotionBlockInfo> results = notionPageResponse.getResults();
       NotionBlockInfo childDatabase = results.stream()
@@ -98,11 +92,14 @@ public class NotionAuthController {
       String databaseId = childDatabase.getId();
       System.out.println("databaseId = " + databaseId);
 
+      // TODO user 수정 및 Response 반환
+      // TODO Response 에 token 값 없도록 작업
 
     } catch (Exception e) {
       log.error("Notion OAuth 인증 처리 중 오류 발생", e);
     }
 
+    // TODO redirectUrl 설정하기
     response.sendRedirect("리다이렉터 경로 설정 필요");
     return Response.success();
   }

@@ -75,6 +75,8 @@ public class NogiFacade {
    * </ul>
    */
   private void onNogi(UserResult user) {
+    // TODO notion_page_id 값이 있으면서 notion_database_id 가 없는 경우 notion api 요청하여 user 정보 업데이트
+
     // 1️⃣ 처리 불가능한 경우 바로 종료
     if (user.isUnProcessableToNogi()) {
       return;
