@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import kr.co.nogibackend.domain.notion.dto.content.NotionBookmarkContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionBulletedListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionCalloutContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionChildDatabaseContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionCodeContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionEmbedContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionEquationContent;
@@ -63,5 +64,6 @@ public class NotionBlockInfo {
   private NotionTodoContent to_do;
   private NotionToggleBlocksContent toggle;
   private NotionVideoContent video;
+  private NotionChildDatabaseContent child_database;
 
 }
