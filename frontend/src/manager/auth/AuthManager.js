@@ -1,4 +1,8 @@
-import { apiLogout, getGithubLoginURL } from '@/api/auth/auth.js';
+import {
+  apiLogout,
+  getGithubLoginURL,
+  getNotionLoginURL
+} from '@/api/auth/auth.js';
 import { useAuthStore } from '@/stores/authStore.js';
 import { useRouter } from 'vue-router';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
@@ -34,6 +38,16 @@ export class AuthManager {
     this.#spinnerStore.off();
   }
 
+  async toNotionLoginPage(isRequireNotionInfo) {
+    if (!isRequireNotionInfo) {
+      return;
+    }
+    this.#spinnerStore.on();
+    const response = await getNotionLoginURL();
+    window.location.href = response.result;
+    this.#spinnerStore.off();
+  }
+
   // 서버의 리다이렉트로 받은 URL 정보로 셋팅
   getLoginInfoFromRedirectURL() {
     const searchParams = new URLSearchParams(window.location.search);
@@ -43,7 +57,6 @@ export class AuthManager {
   // 접속 정보 저장
   setAuthInfo(requireUserInfo, userId, role) {
     if (!requireUserInfo || !userId || !role) {
-      console.error('접속 정보가 없습니다.');
       return;
     }
     this.#authStore.setAuth({ requireUserInfo, userId, role });

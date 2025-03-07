@@ -92,7 +92,7 @@ export class UserManager {
       notionBotToken: this.#info.value.notionBotToken,
       notionDatabaseId: this.#info.value.notionDatabaseId,
       githubRepository: this.#info.value.githubRepository,
-      isNotificationAllowed: this.#info.value.isNotificationAllowed,
+      isNotificationAllowed: this.#info.value.isNotificationAllowed
     });
     this.#spinnerStore.off();
     this.#apiResponseModalStore.onActive(response);

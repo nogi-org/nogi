@@ -1,12 +1,20 @@
 <script setup>
 import { onMounted } from 'vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
+import { useRouter } from 'vue-router';
 
 const auth = new AuthManager();
+const router = useRouter();
 
 onMounted(async () => {
-  const { requireUserInfo, userId, role } = auth.getLoginInfoFromRedirectURL();
+  const { isSuccess, isRequireNotionInfo, requireUserInfo, userId, role } =
+    auth.getLoginInfoFromRedirectURL();
+  if (!isSuccess) {
+    router.push({ name: 'home' });
+    return;
+  }
   auth.setAuthInfo(requireUserInfo, userId, role);
+  await auth.toNotionLoginPage(isRequireNotionInfo);
   await auth.goPageAfterSuccessLogin();
 });
 </script>
