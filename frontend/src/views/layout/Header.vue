@@ -20,7 +20,7 @@ onMounted(() => {
 
 watch(
   () => authInfo.value,
-  newValue => {
+  (newValue) => {
     navigationStore.setIsVisibleByAuth();
   },
   { deep: true }
@@ -44,7 +44,7 @@ watchEffect(() => {
           />
         </RouterLink>
       </h1>
-      <LoginButton v-if="!authInfo" @onLogin="auth.toGithubLoginPage()" />
+      <LoginButton v-if="!authInfo" />
       <LogoutButton v-if="authInfo" @onLogout="auth.onLogout()" />
     </div>
 

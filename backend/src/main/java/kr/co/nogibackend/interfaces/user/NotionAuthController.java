@@ -65,14 +65,20 @@ public class NotionAuthController {
    */
   @GetMapping("/login/code/notion")
   public ResponseEntity<?> loginByNotion(
-      @RequestParam("code") String code,
-      @RequestParam("state") String state,
+      @RequestParam(value = "code", required = false) String code,
+      @RequestParam(value = "error", required = false) String error,
+      @RequestParam(value ="state", required = false) String state,
       HttpServletResponse response
   ) throws IOException {
+    if (error != null) {
+      response.sendRedirect(afterLoginRedirectUrl + "?isSuccess=false&type=NOTION&message=notion login cancel");
+      return Response.success();
+    }
+
     // 토큰이 유효한지 체크
     boolean isValidToken = jwtProvider.validateToken(state);
     if (!isValidToken) {
-      response.sendRedirect(afterLoginRedirectUrl + "?isSuccess=false&message=Invalid token");
+      response.sendRedirect(afterLoginRedirectUrl + "?isSuccess=false&type=NOTION&message=Invalid token");
       return Response.success();
     }
 
@@ -92,4 +98,5 @@ public class NotionAuthController {
     response.sendRedirect(redirectUrl);
     return Response.success();
   }
+
 }

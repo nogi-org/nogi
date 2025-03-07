@@ -1,22 +1,37 @@
 <script setup>
 import { onMounted } from 'vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const auth = new AuthManager();
 const router = useRouter();
+const route = useRoute();
 
 onMounted(async () => {
-  const { isSuccess, isRequireNotionInfo, requireUserInfo, userId, role } =
-    auth.getLoginInfoFromRedirectURL();
+  route.query.startLogin
+    ? await auth.toGithubLoginPage()
+    : await processRedirect();
+});
+
+const processRedirect = async () => {
+  const {
+    isSuccess,
+    isRequireNotionInfo,
+    isRequireGithubInfo,
+    userId,
+    role,
+    type
+  } = auth.getLoginInfoFromRedirectURL();
+
   if (!isSuccess) {
-    router.push({ name: 'home' });
+    await auth.processLoginFail(type);
     return;
   }
-  auth.setAuthInfo(requireUserInfo, userId, role);
+
+  auth.setAuthInfo(isRequireGithubInfo, userId, role);
   await auth.toNotionLoginPage(isRequireNotionInfo);
-  await auth.goPageAfterSuccessLogin();
-});
+  await auth.goPageAfterSuccessLogin(isRequireNotionInfo);
+};
 </script>
 
 <template>

@@ -1,8 +1,10 @@
 <script setup>
-const emit = defineEmits(['onLogin']);
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const onLogin = () => {
-  emit('onLogin');
+  router.push({ name: 'authorizeRedirect', query: { startLogin: true } });
 };
 </script>
 

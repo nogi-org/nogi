@@ -58,7 +58,7 @@ public class GithubAuthController {
     UserLoginByGithubInfo userLoginByGithubInfo = userFacade.loginByGithub(userFacadeCommand);
 
     String redirectUrl = String.format(
-        "%s?isRequireNotionInfo=%s&isRequireGithubInfo=%s&userId=%s&role=%s&isSuccess=%s&message=%s",
+        "%s?isRequireNotionInfo=%s&isRequireGithubInfo=%s&userId=%s&role=%s&isSuccess=%s&message=%s&type=GITHUB",
         afterLoginRedirectUrl,
         userLoginByGithubInfo.isRequireNotionInfo(),
         userLoginByGithubInfo.isRequireGithubInfo(),
