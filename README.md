@@ -98,7 +98,7 @@
 ## 🛠 시스템 아키텍처
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/624d7f8d-23b8-494b-8794-2fb5aaa1abda" alt="Nogi 프로젝트 아키텍처" width="80%">
+  <img src="https://raw.githubusercontent.com/nogi-bot/resources/main/images/readme/nogi-cloud-architecture.png" alt="Nogi 프로젝트 아키텍처" width="80%">
 </p>
 
 - 아래 다이어그램은 **Nogi 프로젝트의 전체 인프라 및 서비스 구성**을 나타냅니다.
