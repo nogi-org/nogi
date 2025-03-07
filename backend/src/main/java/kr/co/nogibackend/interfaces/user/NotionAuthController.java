@@ -1,18 +1,16 @@
 package kr.co.nogibackend.interfaces.user;
 
-import static kr.co.nogibackend.util.CookieUtils.ACCESS_COOKIE_NAME;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import kr.co.nogibackend.application.user.UserFacade;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand.NotionLogin;
+import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByNotionInfo;
 import kr.co.nogibackend.infra.notion.NotionFeignClient;
 import kr.co.nogibackend.response.service.Response;
-import kr.co.nogibackend.util.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,15 +41,20 @@ public class NotionAuthController {
    * Notion 로그인 URL 반환 (사용자가 클릭하여 Notion 로그인 페이지로 이동)
    */
   @GetMapping("/notion/auth-url")
-  public ResponseEntity<?> getNotionAuthUrl(HttpServletRequest request) {
-    // TODO Security 로 빼야하나?
-    Cookie cookie = CookieUtils.getCookie(request, ACCESS_COOKIE_NAME)
-        .orElseThrow(() -> new RuntimeException("쿠키가 존재하지 않습니다."));
-    String accessToken = cookie.getValue();
+  public ResponseEntity<?> getNotionAuthUrl(Auth auth) {
+
+    // TODO 추가 코드 리팩터링
+    Date date = new Date();
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(date);
+    calendar.add(Calendar.MINUTE, 10);
+    Date expirationDate = calendar.getTime();
+
+    String token = jwtProvider.generateToken(auth.getUserId(), auth.getRole(), expirationDate);
 
     String authUrl = String.format(
         "https://api.notion.com/v1/oauth/authorize?owner=user&client_id=%s&redirect_uri=%s&response_type=code&state=%s",
-        notionClientId, notionRedirectUri, accessToken
+        notionClientId, notionRedirectUri, token
     );
 
     return Response.success(authUrl);
@@ -66,6 +69,12 @@ public class NotionAuthController {
       @RequestParam("state") String state,
       HttpServletResponse response
   ) throws IOException {
+    // 토큰이 유효한지 체크
+    boolean isValidToken = jwtProvider.validateToken(state);
+    if (!isValidToken) {
+      response.sendRedirect(afterLoginRedirectUrl + "?isSuccess=false&message=Invalid token");
+      return Response.success();
+    }
 
     Long userId = jwtProvider.getUserInfoFromToken(state).getUserId();
 

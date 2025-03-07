@@ -41,6 +41,18 @@ public class JwtProvider {
             .compact();
   }
 
+  public String generateToken(Long userId, User.Role role, Date date) {
+    return
+        Jwts
+            .builder()
+            .subject(String.valueOf(userId))
+            .claim("role", role.name())
+            .issuedAt(new Date())
+            .expiration(date)
+            .signWith(secretKey)
+            .compact();
+  }
+
   // JWT 리프레시 토큰 생성
   public String generateRefreshToken(Long userId) {
     return
