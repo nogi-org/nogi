@@ -36,43 +36,52 @@ public class UserFacade {
   private final JwtProvider jwtProvider;
 
   public UserLoginByGithubInfo loginByGithub(UserFacadeCommand.GithubLogin command) {
-    // 1. access token 가져오기
-    String githubAccessToken = githubService.getAccessToken(
-        new GithubOAuthAccessTokenRequest(
-            command.clientId(),
-            command.clientSecret(),
-            command.code(),
-            "public_repo"
-        )
-    ).accessToken();
+    try {
+      // 1. access token 가져오기
+      String githubAccessToken = githubService.getAccessToken(
+          new GithubOAuthAccessTokenRequest(
+              command.clientId(),
+              command.clientSecret(),
+              command.code(),
+              "public_repo"
+          )
+      ).accessToken();
 
-    // 2. user 정보 가져오기
-    GithubUserResult githubUserResult = githubService.getUserInfo(githubAccessToken);
+      // 2. user 정보 가져오기
+      GithubUserResult githubUserResult = githubService.getUserInfo(githubAccessToken);
 
-    // 3. AuditContext 에 저장(DB auditing 을 위함)
-    AuditContext.setUserId(0L);
+      // 3. AuditContext 에 저장(DB auditing 을 위함)
+      AuditContext.setUserId(0L);
 
-    // 4. user 정보 저장하기
-    UserSinUpOrUpdateResult sinUpOrUpdateResult =
-        userService.signUpOrUpdateUser(
-            UserUpdateCommand.fromGithubLogin(githubUserResult, githubAccessToken)
-        );
+      // 4. user 정보 저장하기
+      UserSinUpOrUpdateResult sinUpOrUpdateResult =
+          userService.signUpOrUpdateUser(
+              UserUpdateCommand.fromGithubLogin(githubUserResult, githubAccessToken)
+          );
 
-    // 5. access toekn 발급하기(nogi token)
-    String nogiAccessToken = jwtProvider.generateToken(
-        sinUpOrUpdateResult.id(),
-        sinUpOrUpdateResult.role()
-    );
-
-    // 6. 신규유저일 경우 알림보내개(경축!)
-    if (sinUpOrUpdateResult.isSinUp()) {
-      userService.sendSinUpNotification(
+      // 5. access toekn 발급하기(nogi token)
+      String nogiAccessToken = jwtProvider.generateToken(
           sinUpOrUpdateResult.id(),
-          sinUpOrUpdateResult.githubOwner()
+          sinUpOrUpdateResult.role()
       );
-    }
 
-    return UserLoginByGithubInfo.from(sinUpOrUpdateResult, nogiAccessToken);
+      // 6. 신규유저일 경우 알림보내개(경축!)
+      if (sinUpOrUpdateResult.isSinUp()) {
+        userService.sendSinUpNotification(
+            sinUpOrUpdateResult.id(),
+            sinUpOrUpdateResult.githubOwner()
+        );
+      }
+
+      return UserLoginByGithubInfo.from(
+          sinUpOrUpdateResult,
+          nogiAccessToken,
+          true,
+          "로그인에 성공하였습니다."
+      );
+    } catch (Exception e) {
+      return UserLoginByGithubInfo.from(true, "로그인에 실패하였습니다.");
+    }
   }
 
   public UserLoginByNotionInfo loginByNotion(UserFacadeCommand.NotionLogin command) {

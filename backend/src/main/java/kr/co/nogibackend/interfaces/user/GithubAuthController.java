@@ -58,11 +58,14 @@ public class GithubAuthController {
     UserLoginByGithubInfo userLoginByGithubInfo = userFacade.loginByGithub(userFacadeCommand);
 
     String redirectUrl = String.format(
-        "%s?isRequireNotionInfo=%s&userId=%s&role=%s",
+        "%s?isRequireNotionInfo=%s&isRequireGithubInfo=%s&userId=%s&role=%s&isSuccess=%s&message=%s",
         afterLoginRedirectUrl,
         userLoginByGithubInfo.isRequireNotionInfo(),
+        userLoginByGithubInfo.isRequireGithubInfo(),
         userLoginByGithubInfo.getUserId(),
-        userLoginByGithubInfo.getRole()
+        userLoginByGithubInfo.getRole(),
+        userLoginByGithubInfo.isSuccess(),
+        userLoginByGithubInfo.getMessage()
     );
 
     // access token 쿠키 설정

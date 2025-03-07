@@ -6,6 +6,7 @@ public record UserSinUpOrUpdateResult(
     Long id,
     User.Role role,
     String notionPageId,
+    String githubRepository,
     String githubOwner,
     boolean isSinUp
 ) {
@@ -15,6 +16,7 @@ public record UserSinUpOrUpdateResult(
         user.getId(),
         user.getRole(),
         user.getNotionPageId(),
+        user.getGithubRepository(),
         user.getGithubOwner(),
         isSinUp
     );
