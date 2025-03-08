@@ -75,6 +75,11 @@ dependencies {
     implementation 'io.micrometer:micrometer-registry-prometheus'
     // loki
     implementation 'com.github.loki4j:loki-logback-appender:1.4.2'
+
+    // retryable
+    implementation 'org.springframework.retry:spring-retry:2.0.3'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
 }
 
 tasks.named('test') {

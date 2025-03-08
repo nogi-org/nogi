@@ -41,7 +41,10 @@ public class NotionAuthController {
    * Notion 로그인 URL 반환 (사용자가 클릭하여 Notion 로그인 페이지로 이동)
    */
   @GetMapping("/notion/auth-url")
-  public ResponseEntity<?> getNotionAuthUrl(Auth auth) {
+  public ResponseEntity<?> getNotionAuthUrl(
+      Auth auth,
+      @RequestParam(value = "event") String event // notion 로그인 or notion new 생성
+  ) {
 
     // TODO 추가 코드 리팩터링
     Date date = new Date();
@@ -54,7 +57,7 @@ public class NotionAuthController {
 
     String authUrl = String.format(
         "https://api.notion.com/v1/oauth/authorize?owner=user&client_id=%s&redirect_uri=%s&response_type=code&state=%s",
-        notionClientId, notionRedirectUri, token
+        notionClientId, notionRedirectUri, token + ":" + event
     );
 
     return Response.success(authUrl);
@@ -67,36 +70,52 @@ public class NotionAuthController {
   public ResponseEntity<?> loginByNotion(
       @RequestParam(value = "code", required = false) String code,
       @RequestParam(value = "error", required = false) String error,
-      @RequestParam(value ="state", required = false) String state,
+      @RequestParam(value = "state", required = false) String state,
       HttpServletResponse response
   ) throws IOException {
+    // 유저가 로그인을 취소한 경우
     if (error != null) {
-      response.sendRedirect(afterLoginRedirectUrl + "?isSuccess=false&type=NOTION&message=notion login cancel");
+      String redirectUrl = new StringBuilder(afterLoginRedirectUrl)
+          .append("?isSuccess=false")
+          .append("&type=NOTION")
+          .append("&message=notion login cancel")
+          .toString();
+
+      response.sendRedirect(redirectUrl);
       return Response.success();
     }
+
+    String[] split = state.split(":");
+    String token = split[0];
+    String event = split[1];
 
     // 토큰이 유효한지 체크
-    boolean isValidToken = jwtProvider.validateToken(state);
-    if (!isValidToken) {
-      response.sendRedirect(afterLoginRedirectUrl + "?isSuccess=false&type=NOTION&message=Invalid token");
+    if (!jwtProvider.validateToken(token)) {
+      String redirectUrl = new StringBuilder(afterLoginRedirectUrl)
+          .append("?isSuccess=false")
+          .append("&type=NOTION")
+          .append("&message=Invalid token")
+          .toString();
+
+      response.sendRedirect(redirectUrl);
       return Response.success();
     }
 
-    Long userId = jwtProvider.getUserInfoFromToken(state).getUserId();
+    Long userId = jwtProvider.getUserInfoFromToken(token).getUserId();
 
     UserLoginByNotionInfo userLoginByNotionInfo = userFacade.loginByNotion(
         new NotionLogin(userId, notionClientId, notionClientSecret, notionRedirectUri, code)
     );
 
-    String redirectUrl = String.format(
-        "%s?isSuccess=%s&message=%s",
-        afterLoginRedirectUrl,
-        userLoginByNotionInfo.isSuccess(),
-        userLoginByNotionInfo.message()
-    );
+    String redirectUrl = new StringBuilder(afterLoginRedirectUrl)
+        .append("?isSuccess=").append(userLoginByNotionInfo.isSuccess())
+        .append("&message=").append(userLoginByNotionInfo.message())
+        .append("&event=").append(event)
+        .toString();
 
     response.sendRedirect(redirectUrl);
     return Response.success();
   }
+
 
 }

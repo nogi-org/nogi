@@ -132,6 +132,10 @@ public class NogiFacade {
 
 
   private void logStartTilResults(List<NotionStartTILResult> notionStartTILResults) {
+    if (notionStartTILResults.isEmpty()) {
+      return;
+    }
+
     log.info("After Notion StartTIL:\n{}",
         notionStartTILResults.stream()
             .map(result -> String.format(
