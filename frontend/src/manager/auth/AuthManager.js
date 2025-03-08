@@ -11,12 +11,20 @@ import { ApiResponse } from '@/api/apiResponse.js';
 
 export class AuthManager {
   #router = useRouter();
+  #routerName = {
+    setting: 'settingPage',
+    home: 'home'
+  };
   #apiResponseModalStore = useNotifyStore();
   #authStore = useAuthStore();
   #spinnerStore = useSpinnerStore();
   #LOGIN_TYPE = {
     GITHUB: 'GITHUB',
     NOTION: 'NOTION'
+  };
+  #NOTION_AUTH_EVENT = {
+    LOGIN: 'login',
+    NEW: 'new'
   };
 
   static get AUTH_KEY() {
@@ -45,25 +53,47 @@ export class AuthManager {
     if (!isRequireNotionInfo) {
       return;
     }
-    this.#spinnerStore.on();
-    const response = await getNotionLoginURL();
+    const response = await getNotionLoginURL({
+      event: this.#NOTION_AUTH_EVENT.LOGIN
+    });
     window.location.href = response.result;
-    this.#spinnerStore.off();
+  }
+
+  // 새로운 노션 데이터베이스 생성 페이지로 이동
+  async toCreateNewDatabaseNotionPage() {
+    const response = await getNotionLoginURL({
+      event: this.#NOTION_AUTH_EVENT.NEW
+    });
+    window.location.href = response.result;
+  }
+
+  isNewNotionDatabaseEvent(event) {
+    return this.#NOTION_AUTH_EVENT.NEW === event;
+  }
+
+  createDisplayTextOfAuthPage(event) {
+    return this.#NOTION_AUTH_EVENT.NEW === event
+      ? '새로운 Database 생성중....'
+      : '로그인중....';
+  }
+
+  async processNewNotionDatabaseEvent(isSuccess, message) {
+    // 성공, 실패 상관없이 setting 페이지로
+    await this.#router.push({ name: 'settingPage' });
+    this.#apiResponseModalStore.onActive({
+      isSuccess: isSuccess,
+      message: isSuccess ? '새로운 Database가 생성되었습니다.' : message
+    });
   }
 
   // 로그인 실패 시 페이지 이동
-  // todo: 문구 바꾸기
-  async processLoginFail(type) {
-    const routerName = type === this.#LOGIN_TYPE.GITHUB ? 'home' : 'myPage';
-    await this.#router.push({ name: routerName });
-
-    const message =
+  async processLoginFail(type, message) {
+    const routerName =
       type === this.#LOGIN_TYPE.GITHUB
-        ? '앗, GitHub 로그인이 실패했어요. 다시 한번 시도해 주세요!'
-        : 'Notion 로그인에 실패했습니다. 다시 시도해 주세요.';
-    this.#apiResponseModalStore.fail({
-      message: message
-    });
+        ? this.#routerName.home
+        : this.#routerName.setting;
+    await this.#router.push({ name: routerName });
+    this.#apiResponseModalStore.fail({ message: message });
   }
 
   // 깃헙, 노션 리다이렉트 경우 url 파라미터로 정보 추출
@@ -101,7 +131,9 @@ export class AuthManager {
     }
 
     const auth = this.#authStore.getAuth().value;
-    const routeName = auth.isRequireInfo ? 'myPage' : 'home';
+    const routeName = auth.isRequireInfo
+      ? this.#routerName.setting
+      : this.#routerName.home;
     await this.#router.push({ name: routeName });
     this.#noticeLogin(auth.isRequireInfo);
   }

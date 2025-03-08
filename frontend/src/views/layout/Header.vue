@@ -20,7 +20,7 @@ onMounted(() => {
 
 watch(
   () => authInfo.value,
-  (newValue) => {
+  () => {
     navigationStore.setIsVisibleByAuth();
   },
   { deep: true }

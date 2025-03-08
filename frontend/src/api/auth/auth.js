@@ -5,8 +5,10 @@ export const getGithubLoginURL = () => {
   return api.get('/github/auth-url').then((success) => success);
 };
 
-export const getNotionLoginURL = () => {
-  return api.get('/notion/auth-url').then((success) => success);
+export const getNotionLoginURL = (params) => {
+  return api
+    .get('/notion/auth-url', { params: params })
+    .then((success) => success);
 };
 
 export const apiLogout = () => {

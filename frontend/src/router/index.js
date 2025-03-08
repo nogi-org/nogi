@@ -57,6 +57,12 @@ const router = createRouter({
             requiresRole: AuthManager.ROLE.ADMIN
           },
           component: () => import('@/views/admin/AdminPage.vue')
+        },
+        {
+          path: '/setting',
+          name: 'settingPage',
+          meta: { category: 'setting', requiresAuth: true },
+          component: () => import('@/views/user/SettingPage.vue')
         }
       ]
     }
