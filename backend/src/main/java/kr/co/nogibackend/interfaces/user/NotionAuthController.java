@@ -2,6 +2,8 @@ package kr.co.nogibackend.interfaces.user;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import kr.co.nogibackend.application.user.UserFacade;
@@ -26,8 +28,8 @@ public class NotionAuthController {
 
   private final UserFacade userFacade;
   private final JwtProvider jwtProvider;
-
   private final NotionFeignClient notionFeignClient;
+
   @Value("${notion.client.id}")
   private String notionClientId;
   @Value("${notion.redirect-uri}")
@@ -45,13 +47,7 @@ public class NotionAuthController {
       Auth auth,
       @RequestParam(value = "event") String event // notion 로그인 or notion new 생성
   ) {
-
-    // TODO 추가 코드 리팩터링
-    Date date = new Date();
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(date);
-    calendar.add(Calendar.MINUTE, 10);
-    Date expirationDate = calendar.getTime();
+    Date expirationDate = getExpirationDate(10); // 토큰 만료 시간 설정
 
     String token = jwtProvider.generateToken(auth.getUserId(), auth.getRole(), expirationDate);
 
@@ -75,10 +71,11 @@ public class NotionAuthController {
   ) throws IOException {
     // 유저가 로그인을 취소한 경우
     if (error != null) {
+      String encodedMessage = encodeParam("NOGI 서비스를 이용하기 위해서는 Notion 인증이 필요합니다.");
       String redirectUrl = new StringBuilder(afterLoginRedirectUrl)
           .append("?isSuccess=false")
           .append("&type=NOTION")
-          .append("&message=notion login cancel")
+          .append("&message=").append(encodedMessage)
           .toString();
 
       response.sendRedirect(redirectUrl);
@@ -91,10 +88,11 @@ public class NotionAuthController {
 
     // 토큰이 유효한지 체크
     if (!jwtProvider.validateToken(token)) {
+      String encodedMessage = encodeParam("유효하지 않은 토큰 입니다. 적절한 경로로 이용해주세요.");
       String redirectUrl = new StringBuilder(afterLoginRedirectUrl)
           .append("?isSuccess=false")
           .append("&type=NOTION")
-          .append("&message=Invalid token")
+          .append("&message=").append(encodedMessage)
           .toString();
 
       response.sendRedirect(redirectUrl);
@@ -109,7 +107,7 @@ public class NotionAuthController {
 
     String redirectUrl = new StringBuilder(afterLoginRedirectUrl)
         .append("?isSuccess=").append(userLoginByNotionInfo.isSuccess())
-        .append("&message=").append(userLoginByNotionInfo.message())
+        .append("&message=").append(encodeParam(userLoginByNotionInfo.message()))
         .append("&event=").append(event)
         .toString();
 
@@ -117,5 +115,24 @@ public class NotionAuthController {
     return Response.success();
   }
 
+  /**
+   * URL 인코딩을 수행하는 유틸리티 메서드
+   */
+  private String encodeParam(String param) {
+    try {
+      return URLEncoder.encode(param, StandardCharsets.UTF_8);
+    } catch (Exception e) {
+      log.error("URL 인코딩 중 오류 발생: {}", param, e);
+      return "encoding_error"; // 인코딩 실패 시 원본 값 반환
+    }
+  }
 
+  /**
+   * 특정 시간(분) 후 만료되는 Date 객체 생성
+   */
+  private Date getExpirationDate(int minutes) {
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.MINUTE, minutes);
+    return calendar.getTime();
+  }
 }

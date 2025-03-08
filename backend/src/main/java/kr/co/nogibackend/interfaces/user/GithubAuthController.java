@@ -5,6 +5,8 @@ import static kr.co.nogibackend.util.CookieUtils.createAccessTokenCookieExpTime;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import kr.co.nogibackend.application.user.UserFacade;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
@@ -65,7 +67,7 @@ public class GithubAuthController {
         userLoginByGithubInfo.getUserId(),
         userLoginByGithubInfo.getRole(),
         userLoginByGithubInfo.isSuccess(),
-        userLoginByGithubInfo.getMessage()
+        URLEncoder.encode(userLoginByGithubInfo.getMessage(), StandardCharsets.UTF_8)
     );
 
     // access token 쿠키 설정

@@ -81,10 +81,10 @@ public class UserFacade {
           sinUpOrUpdateResult,
           nogiAccessToken,
           true,
-          "success github login"
+          "Github 로그인을 성공하였어요!"
       );
     } catch (Exception e) {
-      return UserLoginByGithubInfo.from(true, "fail github login");
+      return UserLoginByGithubInfo.from(false, "Github 로그인에 실패했어요.");
     }
   }
 
@@ -124,9 +124,9 @@ public class UserFacade {
               .build()
       );
 
-      return new UserLoginByNotionInfo(true, "notion connection success");
+      return new UserLoginByNotionInfo(true, "Notion 과 성공적으로 연결하였어요!");
     } catch (Exception e) {
-      return new UserLoginByNotionInfo(false, "notion connection fail");
+      return new UserLoginByNotionInfo(false, "Notion 과 연결하는데 실패했어요.");
     }
   }
 
