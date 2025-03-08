@@ -70,14 +70,16 @@ public class GithubAuthController {
         URLEncoder.encode(userLoginByGithubInfo.getMessage(), StandardCharsets.UTF_8)
     );
 
-    // access token 쿠키 설정
-    CookieUtils.createCookie(
-        response,
-        ACCESS_COOKIE_NAME,
-        userLoginByGithubInfo.getAccessToken(),
-        createAccessTokenCookieExpTime(),
-        true
-    );
+    // 성공일 경우 access token 쿠키 설정
+    if (userLoginByGithubInfo.isSuccess()) {
+      CookieUtils.createCookie(
+          response,
+          ACCESS_COOKIE_NAME,
+          userLoginByGithubInfo.getAccessToken(),
+          createAccessTokenCookieExpTime(),
+          true
+      );
+    }
 
     // 프론트엔드 리다이렉트 주소로 이동
     response.sendRedirect(redirectUrl);
