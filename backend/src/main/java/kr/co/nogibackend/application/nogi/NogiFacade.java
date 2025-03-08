@@ -22,6 +22,8 @@ import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.command.UserStoreNogiHistoryCommand;
+import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
+import kr.co.nogibackend.domain.user.dto.info.UserInfo;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
 import lombok.RequiredArgsConstructor;
@@ -75,11 +77,29 @@ public class NogiFacade {
    * </ul>
    */
   private void onNogi(UserResult user) {
-    // TODO notion_page_id 값이 있으면서 notion_database_id 가 없는 경우 notion api 요청하여 user 정보 업데이트
-
     // 1️⃣ 처리 불가능한 경우 바로 종료
     if (user.isUnProcessableToNogi()) {
       return;
+    }
+
+    // 유저가 Notion Database ID를 가지고 있지 않은 경우
+    if (user.isNotionDatabaseIdEmpty()) {
+      // 1. notion database id 조회
+      String notionDatabaseId = notionService.getNotionDatabaseInfo(
+          user.notionAccessToken(),
+          user.notionPageId()
+      );
+
+      // 2. user 정보 업데이트
+      UserInfo updateUser = userService.updateUser(
+          UserUpdateCommand.builder()
+              .id(user.id())
+              .notionDatabaseId(notionDatabaseId)
+              .build()
+      );
+
+      // 3. 업데이트된 유저 정보로 변경
+      user = UserResult.from(updateUser);
     }
 
     try {
