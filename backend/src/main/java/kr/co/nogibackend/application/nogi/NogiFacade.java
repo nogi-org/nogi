@@ -77,32 +77,20 @@ public class NogiFacade {
    * </ul>
    */
   private void onNogi(UserResult user) {
-    // 1️⃣ 처리 불가능한 경우 바로 종료
-    if (user.isUnProcessableToNogi()) {
-      return;
-    }
-
-    // 유저가 Notion Database ID를 가지고 있지 않은 경우
-    if (user.isNotionDatabaseIdEmpty()) {
-      // 1. notion database id 조회
-      String notionDatabaseId = notionService.getNotionDatabaseInfo(
-          user.notionAccessToken(),
-          user.notionPageId()
-      );
-
-      // 2. user 정보 업데이트
-      UserInfo updateUser = userService.updateUser(
-          UserUpdateCommand.builder()
-              .id(user.id())
-              .notionDatabaseId(notionDatabaseId)
-              .build()
-      );
-
-      // 3. 업데이트된 유저 정보로 변경
-      user = UserResult.from(updateUser);
-    }
-
     try {
+      // 1️⃣ 처리 불가능한 경우 바로 종료
+      if (user.isUnProcessableToNogi()) {
+        return;
+      }
+
+      // 유저가 Notion Database ID를 가지고 있지 않은 경우
+      if (user.isNotionDatabaseIdEmpty()) {
+        Optional<UserResult> optional = getAndSetNotionDatabaseInfo(user);
+        if (optional.isPresent()) {
+          user = optional.get();
+        }
+      }
+
       // 2️⃣ Notion TIL 페이지 조회 후 Markdown 변환 📝
       List<NotionStartTILResult> notionStartTILResults =
           notionService.startTIL(NotionStartTILCommand.from(user));
@@ -150,18 +138,43 @@ public class NogiFacade {
     }
   }
 
-
-  private void logStartTilResults(List<NotionStartTILResult> notionStartTILResults) {
-    if (notionStartTILResults.isEmpty()) {
-      return;
+  private Optional<UserResult> getAndSetNotionDatabaseInfo(UserResult user) {
+    String notionDatabaseId = null;
+    // 1. notion database id 조회
+    try {
+      notionDatabaseId = notionService.getNotionDatabaseInfo(
+          user.notionAccessToken(),
+          user.notionPageId()
+      );
+    } catch (Exception e) {
+      ExecutionResultContext.addUserErrorResult("Notion Database 정보를 가져올 수 없어요.", user.id());
+      log.error("Notion Database 정보를 가져오는 중 오류가 발생했습니다. userId: {}", user.id(), e);
+      return Optional.empty();
     }
 
-    log.info("After Notion StartTIL:\n{}",
-        notionStartTILResults.stream()
-            .map(result -> String.format(
-                " - userId: %d, category: %s, title: %s, notionPageId: %s",
-                result.userId(), result.category(), result.title(), result.notionPageId()))
-            .collect(Collectors.joining("\n")));
+    // 2. user 정보 업데이트
+    UserInfo updateUser = userService.updateUser(
+        UserUpdateCommand.builder()
+            .id(user.id())
+            .notionDatabaseId(notionDatabaseId)
+            .build()
+    );
+
+    // 3. 업데이트된 유저 정보로 변경
+    user = UserResult.from(updateUser);
+    return Optional.of(user);
+  }
+
+
+  private void logStartTilResults(List<NotionStartTILResult> notionStartTILResults) {
+    if (!notionStartTILResults.isEmpty()) {
+      log.info("After Notion StartTIL:\n{}",
+          notionStartTILResults.stream()
+              .map(result -> String.format(
+                  " - userId: %d, category: %s, title: %s, notionPageId: %s",
+                  result.userId(), result.category(), result.title(), result.notionPageId()))
+              .collect(Collectors.joining("\n")));
+    }
   }
 
   private void logFailureResults() {

@@ -52,3 +52,5 @@ spy.log
 /src/main/resources/sql/
 monitoring/logs/*.*
 /src/main/resources/keystore.p12
+/localhost.pem
+/localhost-key.pem
