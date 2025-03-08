@@ -3,6 +3,7 @@ package kr.co.nogibackend.application.user;
 import static kr.co.nogibackend.response.code.GitResponseCode.F_ALREADY_USING_REPOSITORY_NAME;
 import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
+import kr.co.nogibackend.application.notion.dto.NotionLoginEventCommand;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.audit.AuditContext;
 import kr.co.nogibackend.config.exception.GlobalException;
@@ -24,7 +25,9 @@ import kr.co.nogibackend.domain.user.dto.result.UserResult;
 import kr.co.nogibackend.domain.user.dto.result.UserSinUpOrUpdateResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +37,7 @@ public class UserFacade {
   private final NotionService notionService;
   private final UserService userService;
   private final JwtProvider jwtProvider;
+  private final ApplicationEventPublisher applicationEventPublisher;
 
   public UserLoginByGithubInfo loginByGithub(UserFacadeCommand.GithubLogin command) {
     try {
@@ -92,29 +96,26 @@ public class UserFacade {
           command.code(),
           command.notionRedirectUri()
       );
-
-      // 2. database 정보 가져오기 (비동기)
-      // TODO : 비동기로 처리하기, event driven 방식으로 리팩터링하기
-      try {
-        Thread.sleep(5000);
-      } catch (InterruptedException e) {
-        throw new RuntimeException(e);
+      String notionPageId = notionResult.notionPageId();
+      // 1-1. notion page id 가 없는 경우 -> 유저가 개발자가 제공한 템플릿을 선택하지 않은 경우
+      if (!StringUtils.hasText(notionPageId)) {
+        String message = "개발자가 제공한 템플릿을 선택해야해주세요!";
+        return new UserLoginByNotionInfo(false, message);
       }
-      String notionDatabaseId = notionService.getNotionDatabaseInfo(
-          notionResult.notionAccessToken(),
-          notionResult.notionPageId()
-      );
-      userService.updateUser(
-          UserUpdateCommand.builder()
-              .id(command.userId())
-              .notionDatabaseId(notionDatabaseId)
-              .build()
+
+      // 2. database 정보 가져와서 user 정보 업데이트(notionDatabaseId 저장)
+      applicationEventPublisher.publishEvent(
+          new NotionLoginEventCommand(
+              command.userId(),
+              notionResult.notionAccessToken(),
+              notionResult.notionPageId()
+          )
       );
 
-      // 3. AuditContext 에 저장(DB auditing 을 위함) -> callUrl 로 동작하는 메서드라 따로 처리
+      // 3. AuditContext 에 저장(DB auditing 을 위함) -> callbackUrl 로 동작하는 메서드라 따로 처리
       AuditContext.setUserId(command.userId());
 
-      // 4. user 정보 저장하기
+      // 4. user 정보 업데이트(notionPageId 저장)
       userService.updateUser(
           UserUpdateCommand.builder()
               .id(command.userId())

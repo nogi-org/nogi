@@ -66,9 +66,6 @@ public class NotionAuthController {
   /**
    * Notion OAuth 인증 후, 액세스 토큰 요청 및 처리
    */
-  /**
-   * Notion OAuth 인증 후, 액세스 토큰 요청 및 처리
-   */
   @GetMapping("/login/code/notion")
   public ResponseEntity<?> loginByNotion(
       @RequestParam(value = "code", required = false) String code,
@@ -104,7 +101,7 @@ public class NotionAuthController {
       return Response.success();
     }
 
-    Long userId = jwtProvider.getUserInfoFromToken(state).getUserId();
+    Long userId = jwtProvider.getUserInfoFromToken(token).getUserId();
 
     UserLoginByNotionInfo userLoginByNotionInfo = userFacade.loginByNotion(
         new NotionLogin(userId, notionClientId, notionClientSecret, notionRedirectUri, code)
