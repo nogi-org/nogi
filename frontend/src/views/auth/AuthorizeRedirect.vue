@@ -57,7 +57,9 @@ const processRedirect = async () => {
           size="2x"
           class="text-white opacity-80"
         />
-        <h1 class="text-2xl font-semibold text-white drop-shadow-md">
+        <h1
+          class="text-2xl font-semibold text-white drop-shadow-md whitespace-pre-line"
+        >
           {{ displayText }}
         </h1>
       </div>

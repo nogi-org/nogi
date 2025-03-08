@@ -53,15 +53,17 @@ export class AuthManager {
     if (!isRequireNotionInfo) {
       return;
     }
-    const response = this.#requestNotionLoginPage(
-      this.#NOTION_AUTH_EVENT.LOGIN
-    );
+    const response = await getNotionLoginURL({
+      event: this.#NOTION_AUTH_EVENT.LOGIN
+    });
     window.location.href = response.result;
   }
 
   // 새로운 노션 데이터베이스 생성 페이지로 이동
   async toCreateNewDatabaseNotionPage() {
-    const response = this.#requestNotionLoginPage(this.#NOTION_AUTH_EVENT.NEW);
+    const response = await getNotionLoginURL({
+      event: this.#NOTION_AUTH_EVENT.NEW
+    });
     window.location.href = response.result;
   }
 
@@ -155,12 +157,5 @@ export class AuthManager {
       code: ApiResponse.S_0,
       message: message
     });
-  }
-
-  async #requestNotionLoginPage(event) {
-    this.#spinnerStore.on();
-    const response = await getNotionLoginURL({ event: event });
-    this.#spinnerStore.off();
-    return response;
   }
 }
