@@ -78,17 +78,17 @@ public class NogiFacade {
    */
   private void onNogi(UserResult user) {
     try {
-      // 1️⃣ 처리 불가능한 경우 바로 종료
-      if (user.isUnProcessableToNogi()) {
-        return;
-      }
-
       // 유저가 Notion Database ID를 가지고 있지 않은 경우
       if (user.isNotionDatabaseIdEmpty()) {
         Optional<UserResult> optional = getAndSetNotionDatabaseInfo(user);
         if (optional.isPresent()) {
           user = optional.get();
         }
+      }
+
+      // 1️⃣ 처리 불가능한 경우 바로 종료
+      if (user.isUnProcessableToNogi()) {
+        return;
       }
 
       // 2️⃣ Notion TIL 페이지 조회 후 Markdown 변환 📝

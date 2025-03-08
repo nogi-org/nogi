@@ -59,6 +59,11 @@ public class GithubClientImpl implements GithubClient {
   }
 
   @Override
+  public List<GithubRepoInfo> getUserRepositories(String token) {
+    return githubFeignClient.getUserRepositories(token);
+  }
+
+  @Override
   public GithubRepoInfo createUserRepository(GithubRepoRequest request, String token) {
     try {
       return githubFeignClient.createUserRepository(request, token);

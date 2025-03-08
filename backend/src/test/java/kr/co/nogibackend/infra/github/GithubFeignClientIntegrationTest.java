@@ -3,6 +3,7 @@ package kr.co.nogibackend.infra.github;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
+import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
@@ -72,5 +73,16 @@ class GithubFeignClientIntegrationTest extends GithubTestEnvironment {
         .findFirst()
         .orElse(null);
     assertThat(githubUserEmailInfo).isNotNull();
+  }
+
+  @Test
+  @DisplayName("토큰으로 유저의 레포지토리 목록을 조회하면 레포지토리 목록을 조회할 수 있다.")
+  public void getRepositories() {
+    // when
+    List<GithubRepoInfo> githubRepoInfos = githubFeignClient.getUserRepositories(testUserToken);
+
+    // then
+    log.info("githubRepoInfos: {}", githubRepoInfos);
+    assertThat(githubRepoInfos).isNotEmpty();
   }
 }

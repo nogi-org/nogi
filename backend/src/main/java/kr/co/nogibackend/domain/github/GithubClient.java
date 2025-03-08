@@ -30,6 +30,8 @@ public interface GithubClient {
       String token
   );
 
+  List<GithubRepoInfo> getUserRepositories(String token);
+
   GithubRepoInfo createUserRepository(
       GithubRepoRequest request,
       String token
