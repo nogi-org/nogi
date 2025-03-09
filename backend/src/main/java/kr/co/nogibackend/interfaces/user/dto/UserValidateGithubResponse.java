@@ -83,24 +83,136 @@ public record UserValidateGithubResponse(
 
   // ✅ GitHub Repository 응답 객체
   public record GithubRepositoryResponse(
+      Long id,
+      String nodeId,
       String name,
       String fullName,
+      GithubOwnerResponse owner,
+      Boolean privateRepo,
       String htmlUrl,
-      Boolean isPrivate,
+      String description,
+      Boolean fork,
+      String url,
       String defaultBranch,
+      Boolean hasIssues,
+      Boolean hasProjects,
+      Boolean hasWiki,
+      Boolean hasPages,
+      Boolean hasDownloads,
+      Boolean archived,
+      Boolean disabled,
+      String visibility,
+      String createdAt,
+      String updatedAt,
+      String pushedAt,
+      Integer forksCount,
       Integer stargazersCount,
-      Integer forksCount
+      Integer watchersCount,
+      Integer size,
+      Integer openIssuesCount,
+      Boolean isTemplate,
+      GithubLicenseResponse license,
+      List<String> topics,
+      GithubPermissionsResponse permissions
   ) {
 
     public static GithubRepositoryResponse from(GithubRepoInfo info) {
       return new GithubRepositoryResponse(
+          info.id(),
+          info.nodeId(),
           info.name(),
           info.fullName(),
-          info.htmlUrl(),
+          GithubOwnerResponse.from(info.owner()),
           info.privateRepo(),
+          info.htmlUrl(),
+          info.description(),
+          info.fork(),
+          info.url(),
           info.defaultBranch(),
+          info.hasIssues(),
+          info.hasProjects(),
+          info.hasWiki(),
+          info.hasPages(),
+          info.hasDownloads(),
+          info.archived(),
+          info.disabled(),
+          info.visibility(),
+          info.createdAt(),
+          info.updatedAt(),
+          info.pushedAt(),
+          info.forksCount(),
           info.stargazersCount(),
-          info.forksCount()
+          info.watchersCount(),
+          info.size(),
+          info.openIssuesCount(),
+          info.isTemplate(),
+          info.license() != null ? GithubLicenseResponse.from(info.license()) : null,
+          info.topics(),
+          info.permissions() != null ? GithubPermissionsResponse.from(info.permissions()) : null
+      );
+    }
+  }
+
+  // ✅ GitHub Owner 응답 객체
+  public record GithubOwnerResponse(
+      String login,
+      Long id,
+      String nodeId,
+      String avatarUrl,
+      String url,
+      String htmlUrl,
+      String type,
+      Boolean siteAdmin
+  ) {
+
+    public static GithubOwnerResponse from(GithubRepoInfo.GithubOwnerInfo info) {
+      return new GithubOwnerResponse(
+          info.login(),
+          info.id(),
+          info.nodeId(),
+          info.avatarUrl(),
+          info.url(),
+          info.htmlUrl(),
+          info.type(),
+          info.siteAdmin()
+      );
+    }
+  }
+
+  // ✅ GitHub License 응답 객체
+  public record GithubLicenseResponse(
+      String key,
+      String name,
+      String url,
+      String spdxId,
+      String nodeId,
+      String htmlUrl
+  ) {
+
+    public static GithubLicenseResponse from(GithubRepoInfo.GithubLicenseInfo info) {
+      return new GithubLicenseResponse(
+          info.key(),
+          info.name(),
+          info.url(),
+          info.spdxId(),
+          info.nodeId(),
+          info.htmlUrl()
+      );
+    }
+  }
+
+  // ✅ GitHub Permissions 응답 객체
+  public record GithubPermissionsResponse(
+      Boolean admin,
+      Boolean push,
+      Boolean pull
+  ) {
+
+    public static GithubPermissionsResponse from(GithubRepoInfo.GithubPermissions info) {
+      return new GithubPermissionsResponse(
+          info.admin(),
+          info.push(),
+          info.pull()
       );
     }
   }
