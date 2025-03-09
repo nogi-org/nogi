@@ -60,6 +60,14 @@ public interface GithubFeignClient {
   );
 
   /*
+  ➡️ 유저의 repository 목록 가져오기
+   */
+  @GetMapping("/user/repos")
+  List<GithubRepoInfo> getUserRepositories(
+      @RequestHeader("Authorization") String token
+  );
+
+  /*
   ➡️ repository 생성
   doc: https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28#create-a-repository-for-the-authenticated-user
    */

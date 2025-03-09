@@ -3,15 +3,20 @@ package kr.co.nogibackend.application.user;
 import static kr.co.nogibackend.response.code.GitResponseCode.F_ALREADY_USING_REPOSITORY_NAME;
 import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
+import java.util.List;
 import kr.co.nogibackend.application.notion.dto.NotionLoginEventCommand;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.config.audit.AuditContext;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.config.security.JwtProvider;
+import kr.co.nogibackend.domain.github.GithubClient;
 import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubValidateInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.domain.notion.NotionService;
@@ -33,9 +38,10 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class UserFacade {
 
-  private final GithubService githubService;
-  private final NotionService notionService;
   private final UserService userService;
+  private final GithubService githubService;
+  private final GithubClient githubClient;
+  private final NotionService notionService;
   private final JwtProvider jwtProvider;
   private final ApplicationEventPublisher applicationEventPublisher;
 
@@ -214,5 +220,19 @@ public class UserFacade {
     if (!isUniqueName) {
       throw new GlobalException(GitResponseCode.F_DUPLICATION_REPO_NAME_GIT);
     }
+  }
+
+  public GithubValidateInfo validateGithub(Long userId) {
+    UserInfo userInfo = userService.findUserById(userId);
+
+    GithubUserInfo githubInfo = githubClient.getUserInfo(userInfo.githubAuthToken());
+
+    List<GithubUserEmailInfo> githubEmails = githubClient.getUserEmails(
+        userInfo.githubAuthToken());
+
+    List<GithubRepoInfo> githubRepositories = githubClient.getUserRepositories(
+        userInfo.githubAuthToken());
+
+    return new GithubValidateInfo(userInfo, githubInfo, githubEmails, githubRepositories);
   }
 }

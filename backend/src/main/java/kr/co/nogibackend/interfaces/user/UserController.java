@@ -7,6 +7,7 @@ import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.interfaces.user.dto.UserResponse;
 import kr.co.nogibackend.interfaces.user.dto.UserUpdateRequest;
+import kr.co.nogibackend.interfaces.user.dto.UserValidateGithubResponse;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +31,13 @@ public class UserController {
   @GetMapping
   public ResponseEntity<?> getUser(Auth auth) {
     return Response.success(UserResponse.from(userService.findUserById(auth.getUserId())));
+  }
+
+  @GetMapping("github/validate")
+  public ResponseEntity<?> validateGithub(Auth auth) {
+    return Response.success(
+        UserValidateGithubResponse.from(userFacade.validateGithub(auth.getUserId()))
+    );
   }
 
   @PatchMapping
