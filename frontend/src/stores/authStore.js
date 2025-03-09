@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     const authInfo = {
       userId: payload.userId,
       role: payload.role,
-      isRequireInfo: payload.requireUserInfo === 'true'
+      isRequireInfo: payload.requireUserInfo
     };
     auth.value = authInfo;
     localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(authInfo));
