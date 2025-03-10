@@ -149,35 +149,33 @@ public class UserFacade {
   }
 
   private void handleRepositoryCreationOrUpdate(UserUpdateCommand command, UserResult userResult) {
-    String existingRepo = userResult.githubRepository();
     String newRepo = command.getGithubRepository();
-
-    // 기존 repository가 없으면 새로 생성
-    if (existingRepo == null) {
-      createRepositoryAndAddCollaborator(command, userResult);
+    if (!StringUtils.hasText(newRepo)) {
       return;
     }
 
-    boolean isDeletedOnGithub = isRepositoryDeletedOnGithub(userResult);
+    boolean isDeletedOnGithub = isRepositoryDeletedOnGithub(
+        userResult.githubOwner(),
+        newRepo,
+        userResult.githubAuthToken()
+    );
 
-    // GitHub에서 삭제된 상태일 때
+    // GitHub 에서 삭제된 상태일 때 새롭게 생성
     if (isDeletedOnGithub) {
       createRepositoryAndAddCollaborator(command, userResult);
-      return;
-    }
-
-    // repository 이름이 변경된 경우
-    if (!existingRepo.equals(newRepo)) {
-      githubService.updateRepository(
-          userResult.githubOwner(), existingRepo, newRepo, userResult.githubAuthToken()
-      );
     }
   }
 
-  private boolean isRepositoryDeletedOnGithub(UserResult userResult) {
+  private boolean isRepositoryDeletedOnGithub(
+      String githubOwner,
+      String githubRepository,
+      String githubAuthToken
+  ) {
     return githubService.isUniqueRepositoryName(
         new GithubGetRepositoryCommand(
-            userResult.githubOwner(), userResult.githubRepository(), userResult.githubAuthToken()
+            githubOwner,
+            githubRepository,
+            githubAuthToken
         )
     );
   }
