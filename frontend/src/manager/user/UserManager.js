@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/stores/authStore.js';
 import {
   checkValidationGithubRepositoryApi,
+  getConnectedGithubInfoApi,
   getUserInfoApi,
   onManualNogiApi,
   updateUserInfoApi
@@ -15,6 +16,7 @@ export class UserManager {
   #spinnerStore = useSpinnerStore();
 
   #info = ref({});
+  #githubInfo = ref({});
   #infoUpdateValidation = ref({
     isSuccess: false,
     result: {}
@@ -22,12 +24,36 @@ export class UserManager {
   #isSuccessRepositoryNameCheck = ref(false);
   #isSuccessNotionDatabaseConnectionTest = ref(false);
 
-  get isSuccessNotionDatabaseConnectionTest() {
-    return this.#isSuccessNotionDatabaseConnectionTest;
+  async getConnectedGithubInfo() {
+    this.#spinnerStore.on();
+    this.#githubInfo.value = await getConnectedGithubInfoApi();
+    this.#spinnerStore.off();
+    console.log('response : ', this.#githubInfo.value);
+  }
+
+  async getInfo() {
+    this.#spinnerStore.on();
+    const response = await getUserInfoApi();
+    this.#spinnerStore.off();
+    this.#info.value = response.result;
+    this.#isSuccessNotionDatabaseConnectionTest.value =
+      this.#info.value.notionDatabaseId && this.#info.value.notionBotToken;
+    this.#isSuccessRepositoryNameCheck.value =
+      this.#info.value.githubRepository !== '';
+  }
+
+  get githubInfo() {
+    return this.#githubInfo;
   }
 
   get info() {
     return this.#info;
+  }
+
+  /// --- 검토 코드
+
+  get isSuccessNotionDatabaseConnectionTest() {
+    return this.#isSuccessNotionDatabaseConnectionTest;
   }
 
   get infoUpdateValidation() {
@@ -55,17 +81,6 @@ export class UserManager {
     this.#apiResponseModalStore.onActive(response);
   }
 
-  async getInfo() {
-    this.#spinnerStore.on();
-    const response = await getUserInfoApi();
-    this.#spinnerStore.off();
-    this.#info.value = response.result;
-    this.#isSuccessNotionDatabaseConnectionTest.value =
-      this.#info.value.notionDatabaseId && this.#info.value.notionBotToken;
-    this.#isSuccessRepositoryNameCheck.value =
-      this.#info.value.githubRepository !== '';
-  }
-
   async checkRepositoryName() {
     // todo: 이름 최소 길이, 최대 길이 체크
     if (this.#info.value.githubRepository.trim() === '') {
@@ -84,6 +99,12 @@ export class UserManager {
       this.initInfoUpdateValidation();
     }
     this.#apiResponseModalStore.onActive(response);
+  }
+
+  async updateNotificationAllow() {
+    this.#info.value.isNotificationAllowed =
+      !this.#info.value.isNotificationAllowed;
+    await this.updateInfo();
   }
 
   async updateInfo() {
@@ -143,5 +164,11 @@ export class UserManager {
       isSuccess: false,
       result: {}
     };
+  }
+
+  deleteUser() {
+    this.#apiResponseModalStore.success({
+      message: '회원 탈퇴를 원하시면 문의 사항에 남겨주시면 도와드리겠습니다'
+    });
   }
 }

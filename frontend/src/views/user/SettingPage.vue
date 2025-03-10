@@ -16,13 +16,8 @@ const notion = new NotionManager();
 
 onMounted(async () => {
   await user.getInfo();
+  user.getConnectedGithubInfo();
 });
-
-// 알림 여부 토글
-const toggleNotification = () => {
-  user.info.value.isNotificationAllowed =
-    !user.info.value.isNotificationAllowed;
-};
 
 const updateUserInfo = async () => {
   const validationResult = user.checkUpdateInfoValidation();
@@ -58,6 +53,10 @@ const createNewNotionDatabase = () => {
 };
 
 const repositoryName = 'superpil';
+
+const deleteUser = () => {
+  user.deleteUser();
+};
 </script>
 
 <template>
@@ -94,14 +93,23 @@ const repositoryName = 'superpil';
       <hr class="border-main my-2" />
       <ul class="border border-main p-4">
         <li class="flex justify-between border-b border-main pb-4 items-center">
-          <ConnectionStatus />
+          <ConnectionStatus
+            :isConnected="user.githubInfo.value?.isGithubValid"
+          />
           <ActionButton name="연결 확인" @action="createNewNotionDatabase" />
         </li>
         <li class="border-b border-main py-4">
-          <h3 class="font-noto_sans_m mb-2">Repository name</h3>
+          <h3
+            class="font-noto_sans_m mb-2"
+            :class="{
+              'text-danger': !user.githubInfo.value?.isGithubRepositoryValid
+            }"
+          >
+            Repository name
+          </h3>
           <div class="flex justify-between items-center mb-4">
             <SimpleTextInput
-              v-model="repositoryName"
+              v-model="user.info.value.githubRepository"
               placeholder="Repository Name"
               class="w-[50%]"
             />
@@ -111,60 +119,59 @@ const repositoryName = 'superpil';
               class="w-[50%] text-right"
             />
           </div>
-          <ul class="mt-9">
-            <li class="font-noto_sans_m mb-3">
-              <h3>Github Public Repository</h3>
-              <InformationText
-                text="현재 생성된 Git Public Repository에서 선택하여 NOGI와 연결할 수 있어요"
-              />
-            </li>
-            <li class="sm:flex sm:gap-5 mb-3">
+
+          <div class="mt-8 flex items-center gap-2">
+            <h3 class="font-noto_sans_m">Github Public Repository</h3>
+            <span class="text-xs font-noto_sans_m">
+              {{ user.githubInfo.value?.githubRepositories?.length }}
+            </span>
+          </div>
+          <InformationText
+            text="기존 Git Public Repository를 선택하여 NOGI와 연결할 수 있어요"
+            class="mb-2"
+          />
+          <ul class="max-h-32 overflow-scroll">
+            <li
+              class="sm:flex sm:gap-5 mb-3"
+              v-for="(item, index) in user.githubInfo.value?.githubRepositories"
+              :key="index"
+            >
               <p
                 class="cursor-pointer text-neutral"
                 @click="repositoryName = 'DEMO3'"
               >
-                nogi-til-prod
+                {{ item.name }}
               </p>
               <a
-                href="https://github.com/chatgptisgod/nogi-til-prod"
+                :href="item.htmlUrl"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="text-action hover:underline break-all"
               >
                 <font-awesome-icon icon="fa-solid fa-link" class="text-sm" />
-                https://github.com/chatgptisgod/nogi-til-prod
-              </a>
-            </li>
-            <li class="sm:flex sm:gap-5 mb-3">
-              <p
-                class="cursor-pointer text-neutral"
-                @click="repositoryName = 'DEMO3'"
-              >
-                nogi-til-prod
-              </p>
-              <a
-                href="https://github.com/chatgptisgod/nogi-til-prod"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="text-action hover:underline break-all"
-              >
-                <font-awesome-icon icon="fa-solid fa-link" class="text-sm" />
-                https://github.com/chatgptisgod/nogi-til-prod
+                {{ item.htmlUrl }}
               </a>
             </li>
           </ul>
         </li>
         <li class="border-b border-main py-4">
-          <h3 class="font-noto_sans_m mb-2">Owner</h3>
+          <h3
+            class="font-noto_sans_m mb-2"
+            :class="{
+              'text-danger': !user.githubInfo.value?.isGithubOwnerValid
+            }"
+          >
+            Owner
+          </h3>
           <SimpleTextInput
-            v-model="repositoryName"
+            v-model="user.info.value.githubOwner"
             placeholder="Git Owner"
             class="w-[50%] mb-1"
             :disabled="true"
           />
           <div class="flex justify-between items-center">
             <SimpleTextInput
-              v-model="repositoryName"
+              v-model="user.info.value.githubOwner"
               placeholder="NOGI Owner"
               class="w-[50%]"
             />
@@ -176,7 +183,14 @@ const repositoryName = 'superpil';
           </div>
         </li>
         <li class="py-4">
-          <h3 class="font-noto_sans_m mb-2">Email</h3>
+          <h3
+            class="font-noto_sans_m mb-2"
+            :class="{
+              'text-danger': !user.githubInfo.value?.isGithubEmailValid
+            }"
+          >
+            Email
+          </h3>
           <SimpleTextInput
             v-model="repositoryName"
             placeholder="Git Email"
@@ -185,7 +199,7 @@ const repositoryName = 'superpil';
           />
           <div class="flex justify-between items-center">
             <SimpleTextInput
-              v-model="repositoryName"
+              v-model="user.info.value.githubEmail"
               placeholder="NOGI Email"
               class="w-[50%]"
             />
@@ -225,7 +239,10 @@ const repositoryName = 'superpil';
           <span class="text-sm">
             GitHub 전송 성공 여부를 Issue로 알림 받기
           </span>
-          <OnOffToggleButton :isOn="true" />
+          <OnOffToggleButton
+            :isOn="user.info.value.isNotificationAllowed"
+            @action="user.updateNotificationAllow()"
+          />
         </li>
       </ul>
     </li>
@@ -237,7 +254,7 @@ const repositoryName = 'superpil';
       <ul class="border border-danger rounded-sm p-4">
         <li class="flex justify-between items-center">
           <span class="text-sm">회원탈퇴</span>
-          <DangerButton name="Delete" />
+          <DangerButton name="Delete" @action="deleteUser" />
         </li>
       </ul>
     </li>
