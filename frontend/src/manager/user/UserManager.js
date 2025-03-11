@@ -28,7 +28,6 @@ export class UserManager {
     this.#spinnerStore.on();
     this.#githubInfo.value = await getConnectedGithubInfoApi();
     this.#spinnerStore.off();
-    console.log('response : ', this.#githubInfo.value);
   }
 
   async getInfo() {

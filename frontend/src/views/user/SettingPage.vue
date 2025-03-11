@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { UserManager } from '@/manager/user/UserManager.js';
 import { NotionManager } from '@/manager/notion/NotionManager.js';
 import InformationText from '@/components/common/InformationText.vue';
@@ -12,16 +12,35 @@ import SimpleTextInput from '@/components/input/SimpleTextInput.vue';
 const user = new UserManager();
 const notion = new NotionManager();
 
-const nogiGithubInfo = {
+const nogiGithubInfo = ref({
   repositoryName: '',
   email: '',
   owner: ''
-};
+});
+const validations = ref({
+  repositoryName: ''
+});
 
 onMounted(async () => {
-  await user.getInfo();
+  await getUserInfo();
   await user.getConnectedGithubInfo();
 });
+
+const getUserInfo = async () => {
+  await user.getInfo();
+  nogiGithubInfo.value.repositoryName = user.info.value.githubRepository;
+  nogiGithubInfo.value.email = user.info.value.githubEmail;
+  nogiGithubInfo.value.owner = user.info.value.githubOwner;
+};
+
+const saveRepositoryName = () => {
+  const validation = user.validation(nogiGithubInfo.value.repositoryName);
+  if (validation.isSuccess) {
+    validations.value.repositoryName = validation.message;
+    return;
+  }
+  user.updateRepositoryName(nogiGithubInfo.value.repositoryName);
+};
 
 const updateUserInfo = async () => {
   const validationResult = user.checkUpdateInfoValidation();
@@ -52,6 +71,7 @@ const checkNotionDatabaseConnectionTest = async () => {
   user.info.value.notionDatabaseId = response.databaseId;
   user.initInfoUpdateValidation();
 };
+
 const createNewNotionDatabase = () => {
   console.log('노션 데이터베이스 새로 생성! : ');
 };
@@ -116,13 +136,13 @@ const deleteUser = () => {
           </h3>
           <div class="sm:flex sm:justify-between sm:items-center sm:mb-4">
             <SimpleTextInput
-              v-model="user.info.value.githubRepository"
+              v-model="nogiGithubInfo.repositoryName"
               placeholder="Repository Name"
               class="sm:w-[50%]"
             />
             <ActionButton
               name="저장"
-              @action="createNewNotionDatabase"
+              @action="saveRepositoryName"
               class="sm:w-[50%] text-right mt-1 sm:mt-0"
             />
           </div>
@@ -178,7 +198,7 @@ const deleteUser = () => {
           />
           <div class="sm:flex sm:justify-between sm:items-center">
             <SimpleTextInput
-              v-model="user.info.value.githubOwner"
+              v-model="nogiGithubInfo.owner"
               placeholder="NOGI Owner"
               class="sm:w-[50%]"
             />
@@ -206,7 +226,7 @@ const deleteUser = () => {
           />
           <div class="sm:flex sm:justify-between sm:items-center">
             <SimpleTextInput
-              v-model="user.info.value"
+              v-model="nogiGithubInfo.email"
               placeholder="NOGI Email"
               class="sm:w-[50%]"
             />
