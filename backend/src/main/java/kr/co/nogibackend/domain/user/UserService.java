@@ -207,19 +207,21 @@ public class UserService {
     AtomicBoolean isSinUp = new AtomicBoolean(false);
     User user = userRepository.findByGithubOwner(command.getGithubOwner())
         .map(existingUser -> {
-          existingUser.update(command);
+          // access token update
+          existingUser.update(
+              UserUpdateCommand.builder()
+                  .githubAuthToken(command.getGithubAuthToken())
+                  .build()
+          );
           isSinUp.set(false);
           return existingUser;
         })
         .orElseGet(() -> {
+          // create new user
           User newUser =
               User.builder()
                   .role(Role.USER)
-                  .notionAccessToken(command.getNotionAccessToken())
-                  .notionDatabaseId(command.getNotionDatabaseId())
                   .githubAuthToken(command.getGithubAuthToken())
-                  .githubRepository(command.getGithubRepository())
-                  .githubDefaultBranch(command.getGithubDefaultBranch())
                   .githubEmail(command.getGithubEmail())
                   .githubOwner(command.getGithubOwner())
                   .isNotificationAllowed(true)
