@@ -1,10 +1,8 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
 import { UserManager } from '@/manager/user/UserManager.js';
-import Validation from '@/components/common/Validation.vue';
 import { NotionManager } from '@/manager/notion/NotionManager.js';
 import InformationText from '@/components/common/InformationText.vue';
-import ConfirmModal from '@/components/modal/ConfirmModal.vue';
 import ConnectionStatus from '@/components/common/ConnectionStatus.vue';
 import OnOffToggleButton from '@/components/buttons/OnOffToggleButton.vue';
 import ActionButton from '@/components/buttons/ActionButton.vue';
@@ -14,9 +12,15 @@ import SimpleTextInput from '@/components/input/SimpleTextInput.vue';
 const user = new UserManager();
 const notion = new NotionManager();
 
+const nogiGithubInfo = {
+  repositoryName: '',
+  email: '',
+  owner: ''
+};
+
 onMounted(async () => {
   await user.getInfo();
-  user.getConnectedGithubInfo();
+  await user.getConnectedGithubInfo();
 });
 
 const updateUserInfo = async () => {
@@ -96,7 +100,10 @@ const deleteUser = () => {
           <ConnectionStatus
             :isConnected="user.githubInfo.value?.isGithubValid"
           />
-          <ActionButton name="연결 확인" @action="createNewNotionDatabase" />
+          <ActionButton
+            name="연결 확인"
+            @action="user.getConnectedGithubInfo()"
+          />
         </li>
         <li class="border-b border-main py-4">
           <h3
@@ -107,16 +114,16 @@ const deleteUser = () => {
           >
             Repository name
           </h3>
-          <div class="flex justify-between items-center mb-4">
+          <div class="sm:flex sm:justify-between sm:items-center sm:mb-4">
             <SimpleTextInput
               v-model="user.info.value.githubRepository"
               placeholder="Repository Name"
-              class="w-[50%]"
+              class="sm:w-[50%]"
             />
             <ActionButton
               name="저장"
               @action="createNewNotionDatabase"
-              class="w-[50%] text-right"
+              class="sm:w-[50%] text-right mt-1 sm:mt-0"
             />
           </div>
 
@@ -130,14 +137,14 @@ const deleteUser = () => {
             text="기존 Git Public Repository를 선택하여 NOGI와 연결할 수 있어요"
             class="mb-2"
           />
-          <ul class="max-h-32 overflow-scroll">
+          <ul class="max-h-40 overflow-scroll">
             <li
               class="sm:flex sm:gap-5 mb-3"
               v-for="(item, index) in user.githubInfo.value?.githubRepositories"
               :key="index"
             >
               <p
-                class="cursor-pointer text-neutral"
+                class="text-xs sm:text-base cursor-pointer text-neutral"
                 @click="repositoryName = 'DEMO3'"
               >
                 {{ item.name }}
@@ -146,7 +153,7 @@ const deleteUser = () => {
                 :href="item.htmlUrl"
                 target="_blank"
                 rel="noopener noreferrer"
-                class="text-action hover:underline break-all"
+                class="text-action hover:underline break-all text-xs sm:text-base"
               >
                 <font-awesome-icon icon="fa-solid fa-link" class="text-sm" />
                 {{ item.htmlUrl }}
@@ -164,21 +171,21 @@ const deleteUser = () => {
             Owner
           </h3>
           <SimpleTextInput
-            v-model="user.info.value.githubOwner"
+            :value="user.githubInfo.value.user?.githubOwner"
             placeholder="Git Owner"
-            class="w-[50%] mb-1"
+            class="sm:w-[50%] mb-1"
             :disabled="true"
           />
-          <div class="flex justify-between items-center">
+          <div class="sm:flex sm:justify-between sm:items-center">
             <SimpleTextInput
               v-model="user.info.value.githubOwner"
               placeholder="NOGI Owner"
-              class="w-[50%]"
+              class="sm:w-[50%]"
             />
             <ActionButton
               name="저장"
               @action="createNewNotionDatabase"
-              class="w-[50%] text-right"
+              class="sm:w-[50%] text-right mt-1 sm:mt-0"
             />
           </div>
         </li>
@@ -192,21 +199,21 @@ const deleteUser = () => {
             Email
           </h3>
           <SimpleTextInput
-            v-model="repositoryName"
+            :value="user.githubInfo.value.user?.githubEmail"
             placeholder="Git Email"
-            class="w-[50%] mb-1"
+            class="sm:w-[50%] mb-1"
             :disabled="true"
           />
-          <div class="flex justify-between items-center">
+          <div class="sm:flex sm:justify-between sm:items-center">
             <SimpleTextInput
-              v-model="user.info.value.githubEmail"
+              v-model="user.info.value"
               placeholder="NOGI Email"
-              class="w-[50%]"
+              class="sm:w-[50%]"
             />
             <ActionButton
               name="저장"
               @action="createNewNotionDatabase"
-              class="w-[50%] text-right"
+              class="sm:w-[50%] text-right mt-1 sm:mt-0"
             />
           </div>
         </li>
