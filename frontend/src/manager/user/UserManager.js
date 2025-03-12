@@ -30,7 +30,8 @@ export class UserManager {
     this.#spinnerStore.off();
   }
 
-  async getInfo() {
+  // 리턴
+  async getReturnInfo() {
     this.#spinnerStore.on();
     const response = await getUserInfoApi();
     this.#spinnerStore.off();

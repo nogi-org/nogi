@@ -1,5 +1,6 @@
 <script setup>
-import TextEditorContent from '@/components/editor/TextEditorContent.vue';
+import TextEditorContent from '@/shared/editor/TextEditorContent.vue';
+
 const content =
   '<h1>NOGI 운영정책</h1>\n' +
   '    <ol>\n' +

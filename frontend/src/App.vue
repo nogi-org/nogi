@@ -1,6 +1,7 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import SystemChecking from '@/components/common/SystemChecking.vue';
+import SystemChecking from '@/shared/common/SystemChecking.vue';
+
 const SYSTEM_CHECKING = false;
 </script>
 

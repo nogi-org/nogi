@@ -2,8 +2,8 @@
 import { EditorContent, useEditor } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
-import { onBeforeMount, onBeforeUnmount, ref, watch } from 'vue';
-import TextEditorMenu from '@/components/editor/TextEditorMenu.vue';
+import { onBeforeMount, onBeforeUnmount, watch } from 'vue';
+import TextEditorMenu from '@/shared/editor/TextEditorMenu.vue';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
@@ -104,10 +104,10 @@ const uploadImage = async (file) => {
   <div>
     <!--    todo: 활성화 메뉴 props로 받기(key로 처리), 메뉴를 감싸고잇는 dev style props로 받기-->
     <TextEditorMenu
+      v-if="hasActiveEditor"
       :editor="editor"
       @registerPost="registerPost"
       @uploadImage="uploadImage"
-      v-if="hasActiveEditor"
     />
     <editor-content :editor="editor" />
   </div>
@@ -123,9 +123,11 @@ const uploadImage = async (file) => {
 .tiptap h1 {
   @apply font-noto_sans_b py-3 text-2xl sm:text-3xl text-white;
 }
+
 .tiptap h2 {
   @apply font-noto_sans_b py-2 text-xl sm:text-2xl text-gray-200;
 }
+
 .tiptap h3 {
   @apply font-noto_sans_m py-1 text-lg sm:text-xl text-gray-300;
 }
@@ -154,6 +156,7 @@ const uploadImage = async (file) => {
 .tiptap ul li {
   @apply list-disc ml-10 text-gray-300;
 }
+
 .tiptap ol li {
   @apply list-decimal ml-10 text-gray-300;
 }
@@ -181,13 +184,16 @@ const uploadImage = async (file) => {
 .tiptap table {
   @apply max-w-full border-collapse border border-gray-600;
 }
+
 .tiptap table th,
 .tiptap table td {
   @apply border border-gray-600 p-2 text-left text-gray-200;
 }
+
 .tiptap table th {
   @apply bg-[#3a3a3a] text-white;
 }
+
 .tiptap table tr:nth-child(even) td {
   @apply bg-[#2b2b2b];
 }

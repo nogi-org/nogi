@@ -2,8 +2,8 @@
 import { RouterLink, useRoute } from 'vue-router';
 import { onMounted, watch, watchEffect } from 'vue';
 import { useNavigationStore } from '@/stores/navigationStore.js';
-import LoginButton from '@/components/buttons/LoginButton.vue';
-import LogoutButton from '@/components/buttons/LogoutButton.vue';
+import LoginButton from '@/shared/buttons/LoginButton.vue';
+import LogoutButton from '@/shared/buttons/LogoutButton.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
 
 const route = useRoute();
@@ -38,9 +38,9 @@ watchEffect(() => {
       <h1 class="text-2xl tracking-widest sm:text-4xl">
         <RouterLink to="/">
           <img
-            src="/assets/images/logo.png"
-            class="w-24 sm:w-28 md:w-32 lg:w-36"
             alt="로고 이미지"
+            class="w-24 sm:w-28 md:w-32 lg:w-36"
+            src="/assets/images/logo.png"
           />
         </RouterLink>
       </h1>
@@ -50,7 +50,7 @@ watchEffect(() => {
 
     <!--두번째줄-->
     <ul class="flex py-4 text-sm sm:text-base">
-      <li class="mr-4 sm:mr-5 last:mr-0" v-for="item in navigations">
+      <li v-for="item in navigations" class="mr-4 sm:mr-5 last:mr-0">
         <router-link :to="{ name: item.routeName }">
           <span
             :class="{

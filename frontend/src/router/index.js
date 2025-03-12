@@ -62,7 +62,7 @@ const router = createRouter({
           path: '/setting',
           name: 'settingPage',
           meta: { category: 'setting', requiresAuth: true },
-          component: () => import('@/views/user/SettingPage.vue')
+          component: () => import('@/views/user/setting/SettingPage.vue')
         }
       ]
     }
