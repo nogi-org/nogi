@@ -42,6 +42,7 @@ public class User extends BaseEntity {
   private String notionPageId; // notionDatabase 가 있는 page 의 id
   @Column(nullable = true, length = 255, unique = true)
   private String notionDatabaseId;
+  private Long githubId;// github user 의 고유 값
   private String githubAuthToken;
   private String githubRepository;
   private String githubDefaultBranch;

@@ -42,8 +42,8 @@ public class UserRepositoryImpl implements UserRepository {
   }
 
   @Override
-  public Optional<User> findByGithubOwner(String accessToken) {
-    return userQueryRepository.findByGithubOwner(accessToken);
+  public Optional<User> findByGithubId(Long githubId) {
+    return userQueryRepository.findByGithubId(githubId);
   }
 
   @Override

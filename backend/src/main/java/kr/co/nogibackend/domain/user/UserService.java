@@ -203,9 +203,9 @@ public class UserService {
   }
 
   @Transactional
-  public UserSinUpOrUpdateResult signUpOrUpdateUser(UserUpdateCommand command) {
+  public UserSinUpOrUpdateResult signUpOrUpdateUser(Long githubId, UserUpdateCommand command) {
     AtomicBoolean isSinUp = new AtomicBoolean(false);
-    User user = userRepository.findByGithubOwner(command.getGithubOwner())
+    User user = userRepository.findByGithubId(githubId)
         .map(existingUser -> {
           // access token update
           existingUser.update(
@@ -221,6 +221,7 @@ public class UserService {
           User newUser =
               User.builder()
                   .role(Role.USER)
+                  .githubId(githubId)
                   .githubAuthToken(command.getGithubAuthToken())
                   .githubEmail(command.getGithubEmail())
                   .githubOwner(command.getGithubOwner())

@@ -66,6 +66,7 @@ public class UserFacade {
       // 4. user 정보 저장하기
       UserSinUpOrUpdateResult sinUpOrUpdateResult =
           userService.signUpOrUpdateUser(
+              githubUserResult.id(),
               UserUpdateCommand.fromGithubLogin(githubUserResult, githubAccessToken)
           );
 
@@ -76,12 +77,12 @@ public class UserFacade {
       );
 
       // 6. 신규유저일 경우 알림보내개(경축!)
-//      if (sinUpOrUpdateResult.isSinUp()) {
-//        userService.sendSinUpNotification(
-//            sinUpOrUpdateResult.id(),
-//            sinUpOrUpdateResult.githubOwner()
-//        );
-//      }
+      if (sinUpOrUpdateResult.isSinUp()) {
+        userService.sendSinUpNotification(
+            sinUpOrUpdateResult.id(),
+            sinUpOrUpdateResult.githubOwner()
+        );
+      }
 
       return UserLoginByGithubInfo.from(
           sinUpOrUpdateResult,
