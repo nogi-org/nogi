@@ -11,7 +11,7 @@ const user = new UserManager();
 provide('userManager', user);
 
 onBeforeMount(async () => {
-  await user.getReturnInfo();
+  await user.getInfo();
 });
 </script>
 

@@ -1,5 +1,5 @@
 <script setup>
-import InformationText from '@/shared/common/InformationText.vue';
+import SInformationHint from '@/shared/hints/SInformationHint.vue';
 import ConnectionStatus from '@/shared/common/ConnectionStatus.vue';
 import ActionButton from '@/shared/buttons/ActionButton.vue';
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
@@ -22,7 +22,7 @@ const createNewNotionDatabase = () => {
           <ActionButton name="연결 확인" @action="createNewNotionDatabase" />
         </div>
       </div>
-      <InformationText
+      <SInformationHint
         text="새로 만들기 버튼으로 새로운 노션 Database를 생성할 수 있어요"
       />
     </div>

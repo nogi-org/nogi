@@ -28,15 +28,9 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(authInfo));
   }
 
-  function updateIsRequireInfo(isRequire) {
-    auth.value.isRequireInfo = isRequire;
-    localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(auth.value));
-  }
-
   return {
     getAuth,
     deleteAuth,
-    setAuth,
-    updateIsRequireInfo
+    setAuth
   };
 });

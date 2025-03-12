@@ -3,24 +3,40 @@ import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
 import ConnectionStatus from '@/shared/common/ConnectionStatus.vue';
 import ActionButton from '@/shared/buttons/ActionButton.vue';
 import CSettingSubTitle from '@/views/user/setting/components/CSettingSubTitle.vue';
-import InformationText from '@/shared/common/InformationText.vue';
-import { inject, watch } from 'vue';
+import SInformationHint from '@/shared/hints/SInformationHint.vue';
+import { inject, onMounted, ref, watch } from 'vue';
+import SimpleTextInput from '@/shared/input/SimpleTextInput.vue';
+import SpinnerInner from '@/shared/common/SpinnerInner.vue';
+import SWarningHint from '@/shared/hints/SWarningHint.vue';
 
 const user = inject('userManager');
-const props = defineProps({
-  userInfo: {
-    type: Object,
-    default: () => {}
-  }
+const githubInfoFrom = ref({
+  repositoryName: '',
+  owner: '',
+  email: ''
 });
 
-watch(user.info, (value) => {
-  console.log('user info value :: ', value);
+watch(user.info, (info) => {
+  githubInfoFrom.value.repositoryName = info.githubRepository;
+  githubInfoFrom.value.owner = info.githubOwner;
+  githubInfoFrom.value.email = info.githubEmail;
 });
+
+onMounted(() => {
+  getGithubInfo();
+});
+
+const getGithubInfo = () => {
+  user.getConnectedGithubInfo();
+};
 
 const bindRepositoryName = (repository) => {
-  console.log('repository => ', repository);
-  // nogiGithubInfo.value.repositoryName =
+  githubInfoFrom.value.repositoryName = repository.name;
+};
+
+const checkConnectedGithub = () => {
+  user.getConnectedGithubInfo();
+  user.getInfo();
 };
 </script>
 
@@ -30,27 +46,37 @@ const bindRepositoryName = (repository) => {
     <ul class="border border-main p-4">
       <!--      connected -->
       <li class="flex justify-between border-b border-main pb-4 items-center">
-        <ConnectionStatus :isConnected="user.githubInfo.value?.isGithubValid" />
-        <ActionButton
-          name="연결 확인"
-          @action="user.getConnectedGithubInfo()"
-        />
+        <div>
+          <ConnectionStatus
+            :isConnected="user.githubInfo.value?.isGithubValid"
+          />
+          <SWarningHint
+            class="mt-1 text-danger"
+            v-if="!user.githubInfo.value?.isGithubValid"
+            text="Github정보와 아래정보가 동일한지 확인해주세요."
+          />
+        </div>
+        <ActionButton name="연결 확인" @action="checkConnectedGithub" />
       </li>
 
       <!--          repository -->
       <li class="border-b border-main py-4">
         <CSettingSubTitle title="Repository name" />
         <div class="sm:flex sm:justify-between sm:items-center sm:mb-4">
-          <!--          <SimpleTextInput-->
-          <!--            v-model=".value.repositoryName"-->
-          <!--            class="sm:w-[50%]"-->
-          <!--            placeholder="Repository Name"-->
-          <!--          />-->
-          <!--          <ActionButton-->
-          <!--            class="sm:w-[50%] text-right mt-1 sm:mt-0"-->
-          <!--            name="저장"-->
-          <!--            @action="saveRepositoryName"-->
-          <!--          />-->
+          <SimpleTextInput
+            v-model="githubInfoFrom.repositoryName"
+            class="sm:w-[50%]"
+            placeholder="Repository Name"
+            :class="{
+              'border-2 border-danger rounded-md outline-none':
+                !user.githubInfo.value.isGithubRepositoryValid
+            }"
+          />
+          <ActionButton
+            class="sm:w-[50%] text-right mt-1 sm:mt-0"
+            name="저장"
+            @action="user.saveRepositoryName(githubInfoFrom.repositoryName)"
+          />
         </div>
 
         <div class="mt-8 flex items-center gap-2">
@@ -59,11 +85,14 @@ const bindRepositoryName = (repository) => {
             {{ user.githubInfo.value?.githubRepositories?.length }}
           </span>
         </div>
-        <InformationText
+        <SInformationHint
           class="mb-2"
-          text="기존 Git Public Repository를 선택하여 NOGI와 연결할 수 있어요"
+          text="기존 Git Repository를 NOGI와 연결할 수 있어요"
         />
-        <ul class="max-h-40 overflow-scroll">
+        <ul
+          class="max-h-40 overflow-x-scroll"
+          v-if="user.githubInfo.value.githubRepositories"
+        >
           <li
             v-for="(item, index) in user.githubInfo.value?.githubRepositories"
             :key="index"
@@ -86,22 +115,27 @@ const bindRepositoryName = (repository) => {
             </a>
           </li>
         </ul>
+        <SpinnerInner class="h-40" v-else />
       </li>
 
       <!--          owner -->
       <li class="border-b border-main py-4">
         <CSettingSubTitle title="Owner" />
         <div class="sm:flex sm:justify-between sm:items-center">
-          <!--          <SimpleTextInput-->
-          <!--            v-model="nogiGithubInfo.owner"-->
-          <!--            class="sm:w-[50%]"-->
-          <!--            placeholder="NOGI Owner"-->
-          <!--          />-->
-          <!--          <ActionButton-->
-          <!--            class="sm:w-[50%] text-right mt-1 sm:mt-0"-->
-          <!--            name="저장"-->
-          <!--            @action="createNewNotionDatabase"-->
-          <!--          />-->
+          <SimpleTextInput
+            v-model="githubInfoFrom.owner"
+            class="sm:w-[50%]"
+            placeholder="NOGI Owner"
+            :class="{
+              'border-2 border-danger rounded-md outline-none':
+                !user.githubInfo.value.isGithubOwnerValid
+            }"
+          />
+          <ActionButton
+            class="sm:w-[50%] text-right mt-1 sm:mt-0"
+            name="저장"
+            @action="user.saveGithubOwner(githubInfoFrom.owner)"
+          />
         </div>
       </li>
 
@@ -109,20 +143,22 @@ const bindRepositoryName = (repository) => {
       <li class="py-4">
         <CSettingSubTitle title="Email" />
         <div class="sm:flex sm:justify-between sm:items-center">
-          <!--          <SimpleTextInput-->
-          <!--            v-model="nogiGithubInfo.email"-->
-          <!--            class="sm:w-[50%]"-->
-          <!--            placeholder="NOGI Email"-->
-          <!--          />-->
-          <!--          <ActionButton-->
-          <!--            class="sm:w-[50%] text-right mt-1 sm:mt-0"-->
-          <!--            name="저장"-->
-          <!--            @action="createNewNotionDatabase"-->
-          <!--          />-->
+          <SimpleTextInput
+            v-model="githubInfoFrom.email"
+            class="sm:w-[50%]"
+            placeholder="NOGI Email"
+            :class="{
+              'border-2 border-danger rounded-md outline-none':
+                !user.githubInfo.value.isGithubEmailValid
+            }"
+          />
+          <ActionButton
+            class="sm:w-[50%] text-right mt-1 sm:mt-0"
+            name="저장"
+            @action="user.saveGithubEmail(githubInfoFrom.email)"
+          />
         </div>
       </li>
     </ul>
   </div>
 </template>
-
-<style scoped></style>
