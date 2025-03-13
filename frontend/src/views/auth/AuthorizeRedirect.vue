@@ -24,18 +24,18 @@ const processRedirect = async () => {
     role,
     type,
     message,
-    event // [노션 로그인] 또는 [노션 새로만들기] case 를 판단하기 위한 플래그값
+    event // [노션 로그인] 또는 [노션 새로연결] case 를 판단하기 위한 플래그값
   } = auth.getLoginInfoFromRedirectURL();
 
   displayText.value = auth.createDisplayTextOfAuthPage();
 
   // 노션 새로운 데이터베이스 생성 프로세스
   if (auth.isNewNotionDatabaseEvent(event)) {
-    await auth.processNewNotionDatabaseEvent();
+    await auth.processNewNotionDatabaseEvent(isSuccess, message);
     return;
   }
 
-  // 깃허브 로그인 및 노션 로그인 프로세스
+  // 깃허브 로그인 및 노션 로그인 프로세스 실패 경우
   if (!isSuccess) {
     await auth.processLoginFail(type, message);
     return;

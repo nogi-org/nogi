@@ -1,11 +1,11 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import SystemChecking from '@/shared/common/SystemChecking.vue';
+import SSystemChecking from '@/shared/common/SSystemChecking.vue';
 
 const SYSTEM_CHECKING = false;
 </script>
 
 <template>
-  <SystemChecking v-if="SYSTEM_CHECKING" />
+  <SSystemChecking v-if="SYSTEM_CHECKING" />
   <RouterView v-else />
 </template>

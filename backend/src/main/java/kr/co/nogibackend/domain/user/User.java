@@ -50,6 +50,7 @@ public class User extends BaseEntity {
   @Builder.Default
   private Boolean isNotificationAllowed = true;
 
+
   public User update(UserUpdateCommand command) {
     if (StringUtils.hasText(command.getNotionAccessToken())) {
       this.notionAccessToken = command.getNotionAccessToken();
@@ -79,6 +80,14 @@ public class User extends BaseEntity {
       this.isNotificationAllowed = command.getIsNotificationAllowed();
     }
     return this;
+  }
+
+  public boolean isEmptyNotionPageId() {
+    return this.notionPageId == null;
+  }
+
+  public boolean isEmptyNotionDatabaseId() {
+    return this.notionDatabaseId == null;
   }
 
   public enum Role {

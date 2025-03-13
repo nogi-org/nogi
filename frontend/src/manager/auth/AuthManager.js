@@ -22,6 +22,8 @@ export class AuthManager {
     GITHUB: 'GITHUB',
     NOTION: 'NOTION'
   };
+
+  // [노션 로그인] 또는 [노션 새로연결] case 를 판단하기 위한 플래그값
   #NOTION_AUTH_EVENT = {
     LOGIN: 'login',
     NEW: 'new'
@@ -60,7 +62,7 @@ export class AuthManager {
   }
 
   // 새로운 노션 데이터베이스 생성 페이지로 이동
-  async toCreateNewDatabaseNotionPage() {
+  async toNotionPageForCreateNewDatabase() {
     const response = await getNotionLoginURL({
       event: this.#NOTION_AUTH_EVENT.NEW
     });
@@ -82,7 +84,7 @@ export class AuthManager {
     await this.#router.push({ name: 'settingPage' });
     this.#apiResponseModalStore.onActive({
       isSuccess: isSuccess,
-      message: isSuccess ? '새로운 Database가 생성되었습니다.' : message
+      message: isSuccess ? '새로운 Notion Database를 연결 완료했어요.' : message
     });
   }
 

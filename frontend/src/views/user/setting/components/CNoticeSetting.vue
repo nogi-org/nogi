@@ -1,7 +1,7 @@
 <script setup>
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
 import { inject } from 'vue';
-import OnOffToggleButton from '@/shared/buttons/OnOffToggleButton.vue';
+import SOnOffToggleButton from '@/shared/buttons/SOnOffToggleButton.vue';
 
 const user = inject('userManager');
 </script>
@@ -15,7 +15,7 @@ const user = inject('userManager');
           <span class="text-sm">
             GitHub 전송 성공 여부를 Issue로 알림 받기
           </span>
-          <OnOffToggleButton
+          <SOnOffToggleButton
             :isOn="user.info.value.isNotificationAllowed"
             @action="user.updateNotificationAllow()"
           />

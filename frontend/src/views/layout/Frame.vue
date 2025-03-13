@@ -2,9 +2,9 @@
 import Header from '@/views/layout/Header.vue';
 import Footer from '@/views/layout/Footer.vue';
 import { RouterView } from 'vue-router';
-import ApiResponseAlerts from '@/shared/modal/ApiResponseModal.vue';
-import Spinner from '@/shared/common/Spinner.vue';
-import IssueButton from '@/shared/buttons/IssueButton.vue';
+import SApiResponseModal from '@/shared/modal/SApiResponseModal.vue';
+import SSpinner from '@/shared/spinner/SSpinner.vue';
+import SIssueButton from '@/shared/buttons/SIssueButton.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 const spinnerStore = useSpinnerStore();
@@ -29,9 +29,9 @@ const spinnerStore = useSpinnerStore();
     </div>
   </div>
 
-  <Spinner v-if="spinnerStore.getStatus" />
-  <ApiResponseAlerts />
-  <IssueButton />
+  <SSpinner v-if="spinnerStore.getStatus" />
+  <SApiResponseModal />
+  <SIssueButton />
 </template>
 
 <style scoped>

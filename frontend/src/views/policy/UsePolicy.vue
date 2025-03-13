@@ -1,5 +1,5 @@
 <script setup>
-import TextEditorContent from '@/shared/editor/TextEditorContent.vue';
+import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
 
 const content =
   '<h1>NOGI 운영정책</h1>\n' +
@@ -236,7 +236,7 @@ const content =
 
 <template>
   <div>
-    <TextEditorContent
+    <STextEditorContent
       :content="content"
       :content-style="'max-w-xl m-auto py-10'"
     />

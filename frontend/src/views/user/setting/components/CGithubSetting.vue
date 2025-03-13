@@ -1,12 +1,12 @@
 <script setup>
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
-import ConnectionStatus from '@/shared/common/ConnectionStatus.vue';
-import ActionButton from '@/shared/buttons/ActionButton.vue';
+import SConnectionStatus from '@/shared/common/SConnectionStatus.vue';
+import SActionButton from '@/shared/buttons/SActionButton.vue';
 import CSettingSubTitle from '@/views/user/setting/components/CSettingSubTitle.vue';
 import SInformationHint from '@/shared/hints/SInformationHint.vue';
 import { inject, onMounted, ref, watch } from 'vue';
-import SimpleTextInput from '@/shared/input/SimpleTextInput.vue';
-import SpinnerInner from '@/shared/common/SpinnerInner.vue';
+import SSimpleTextInput from '@/shared/input/SSimpleTextInput.vue';
+import SSpinnerInner from '@/shared/spinner/SSpinnerInner.vue';
 import SWarningHint from '@/shared/hints/SWarningHint.vue';
 
 const user = inject('userManager');
@@ -47,7 +47,7 @@ const checkConnectedGithub = () => {
       <!--      connected -->
       <li class="flex justify-between border-b border-main pb-4 items-center">
         <div>
-          <ConnectionStatus
+          <SConnectionStatus
             :isConnected="user.githubInfo.value?.isGithubValid"
           />
           <SWarningHint
@@ -56,14 +56,14 @@ const checkConnectedGithub = () => {
             text="Github정보와 아래정보가 동일한지 확인해주세요."
           />
         </div>
-        <ActionButton name="연결 확인" @action="checkConnectedGithub" />
+        <SActionButton name="연결 확인" @action="checkConnectedGithub" />
       </li>
 
       <!--          repository -->
       <li class="border-b border-main py-4">
         <CSettingSubTitle title="Repository name" />
         <div class="sm:flex sm:justify-between sm:items-center sm:mb-4">
-          <SimpleTextInput
+          <SSimpleTextInput
             v-model="githubInfoFrom.repositoryName"
             class="sm:w-[50%]"
             placeholder="Repository Name"
@@ -72,7 +72,7 @@ const checkConnectedGithub = () => {
                 !user.githubInfo.value.isGithubRepositoryValid
             }"
           />
-          <ActionButton
+          <SActionButton
             class="sm:w-[50%] text-right mt-1 sm:mt-0"
             name="저장"
             @action="user.saveRepositoryName(githubInfoFrom.repositoryName)"
@@ -90,7 +90,7 @@ const checkConnectedGithub = () => {
           text="기존 Git Repository를 NOGI와 연결할 수 있어요"
         />
         <ul
-          class="max-h-40 overflow-x-scroll"
+          class="max-h-40 overflow-y-scroll"
           v-if="user.githubInfo.value.githubRepositories"
         >
           <li
@@ -115,14 +115,16 @@ const checkConnectedGithub = () => {
             </a>
           </li>
         </ul>
-        <SpinnerInner class="h-40" v-else />
+        <div class="h-40" v-else>
+          <SSpinnerInner />
+        </div>
       </li>
 
       <!--          owner -->
       <li class="border-b border-main py-4">
         <CSettingSubTitle title="Owner" />
         <div class="sm:flex sm:justify-between sm:items-center">
-          <SimpleTextInput
+          <SSimpleTextInput
             v-model="githubInfoFrom.owner"
             class="sm:w-[50%]"
             placeholder="NOGI Owner"
@@ -131,7 +133,7 @@ const checkConnectedGithub = () => {
                 !user.githubInfo.value.isGithubOwnerValid
             }"
           />
-          <ActionButton
+          <SActionButton
             class="sm:w-[50%] text-right mt-1 sm:mt-0"
             name="저장"
             @action="user.saveGithubOwner(githubInfoFrom.owner)"
@@ -143,7 +145,7 @@ const checkConnectedGithub = () => {
       <li class="py-4">
         <CSettingSubTitle title="Email" />
         <div class="sm:flex sm:justify-between sm:items-center">
-          <SimpleTextInput
+          <SSimpleTextInput
             v-model="githubInfoFrom.email"
             class="sm:w-[50%]"
             placeholder="NOGI Email"
@@ -152,7 +154,7 @@ const checkConnectedGithub = () => {
                 !user.githubInfo.value.isGithubEmailValid
             }"
           />
-          <ActionButton
+          <SActionButton
             class="sm:w-[50%] text-right mt-1 sm:mt-0"
             name="저장"
             @action="user.saveGithubEmail(githubInfoFrom.email)"

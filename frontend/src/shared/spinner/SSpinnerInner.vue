@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
   <div role="status" class="relative h-full w-full">
     <div

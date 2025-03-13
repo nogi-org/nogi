@@ -50,7 +50,7 @@ export const handleUserInfo = (response) => {
 export const handleNotionDatabaseConnectionTest = (response) => {
   switch (response.code) {
     case ApiResponse.S_0:
-      response.message = 'Notion Database 연결이 성공적으로 완료되었어요.';
+      response.message = '현재 정상적으로 연결된 상태입니다.';
       break;
     case ApiResponse.NOTION_4:
       response.message =

@@ -1,5 +1,5 @@
 <script setup>
-import TextEditorContent from '@/shared/editor/TextEditorContent.vue';
+import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
 import { ref } from 'vue';
 
 const base64Image = ref('');
@@ -69,7 +69,7 @@ const registerPost = (data) => {
       </p>
     </div>
 
-    <TextEditorContent
+    <STextEditorContent
       :content-style="'border rounded-md outline-0 min-h-[400px] p-3'"
       :has-active-editor="true"
       @addImage="addImage"

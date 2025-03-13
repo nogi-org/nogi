@@ -15,6 +15,7 @@ export const updateUserInfoApi = (payload) => {
     .catch((error) => handleUserInfo(error));
 };
 
+// todo: 필요없으면 삭제
 export const checkValidationGithubRepositoryApi = (params) => {
   return api
     .get(`/users/validate-repository-name`, { params: params })

@@ -1,13 +1,21 @@
 <script setup>
 import SInformationHint from '@/shared/hints/SInformationHint.vue';
-import ConnectionStatus from '@/shared/common/ConnectionStatus.vue';
-import ActionButton from '@/shared/buttons/ActionButton.vue';
+import SConnectionStatus from '@/shared/common/SConnectionStatus.vue';
+import SActionButton from '@/shared/buttons/SActionButton.vue';
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
-import { inject } from 'vue';
+import { inject, onMounted } from 'vue';
+import { NotionManager } from '@/manager/notion/NotionManager.js';
 
+const notion = new NotionManager();
+const auth = inject('authManager');
 const user = inject('userManager');
-const createNewNotionDatabase = () => {
-  console.log('createNewNotionDatabase');
+
+onMounted(() => {
+  checkNotionConnected();
+});
+
+const checkNotionConnected = () => {
+  user.getConnectedNotion();
 };
 </script>
 
@@ -16,14 +24,21 @@ const createNewNotionDatabase = () => {
     <CSettingTitle title="Notion" />
     <div class="border border-main p-4">
       <div class="flex justify-between">
-        <ConnectionStatus :isConnected="true" />
+        <SConnectionStatus :isConnected="user.notionConnected.value" />
         <div class="flex gap-2">
-          <ActionButton name="새로 만들기" @action="createNewNotionDatabase" />
-          <ActionButton name="연결 확인" @action="createNewNotionDatabase" />
+          <SActionButton
+            name="New연결"
+            @action="auth.toNotionPageForCreateNewDatabase()"
+          />
+          <SActionButton
+            name="연결 확인"
+            @action="notion.onDatabaseConnectionTest()"
+          />
         </div>
       </div>
       <SInformationHint
-        text="새로 만들기 버튼으로 새로운 노션 Database를 생성할 수 있어요"
+        text="New연결 버튼으로 새로운 노션 Database를 생성할 수 있어요"
+        class="mt-1"
       />
     </div>
   </div>

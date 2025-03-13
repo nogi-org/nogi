@@ -1,5 +1,5 @@
 <script setup>
-import DangerButton from '@/shared/buttons/DangerButton.vue';
+import SDangerButton from '@/shared/buttons/SDangerButton.vue';
 import { inject } from 'vue';
 
 const user = inject('userManager');
@@ -12,7 +12,7 @@ const user = inject('userManager');
     <ul class="border border-danger rounded-sm p-4">
       <li class="flex justify-between items-center">
         <span class="text-sm">회원탈퇴</span>
-        <DangerButton name="Delete" @action="user.deleteUser()" />
+        <SDangerButton name="Delete" @action="user.deleteUser()" />
       </li>
     </ul>
   </div>

@@ -1,6 +1,5 @@
 import { useAuthStore } from '@/stores/authStore.js';
 import {
-  checkValidationGithubRepositoryApi,
   getConnectedGithubInfoApi,
   getUserInfoApi,
   onManualNogiApi,
@@ -9,6 +8,7 @@ import {
 import { ref } from 'vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
+import { onDatabaseConnectTest } from '@/api/notion/notion.js';
 
 export class UserManager {
   #authStore = useAuthStore();
@@ -17,6 +17,7 @@ export class UserManager {
 
   #info = ref({});
   #githubInfo = ref({});
+  #notionConnected = ref(false);
 
   async getInfo() {
     this.#spinnerStore.on();
@@ -71,12 +72,35 @@ export class UserManager {
     this.#spinnerStore.off();
   }
 
+  async getConnectedNotion() {
+    this.#spinnerStore.on();
+    const response = await onDatabaseConnectTest();
+    this.#spinnerStore.off();
+    this.#notionConnected.value = response.isSuccess;
+  }
+
   async updateNotificationAllow() {
     this.#info.value.isNotificationAllowed =
       !this.#info.value.isNotificationAllowed;
     await this.updateInfo({
       isNotificationAllowed: this.#info.value.isNotificationAllowed
     });
+  }
+
+  async onManual() {
+    if (
+      !this.#notionConnected.value ||
+      !this.#githubInfo.value?.isGithubValid
+    ) {
+      this.#apiResponseModalStore.fail({
+        message: 'Notion과 GitHub을 모두 연결상태면 이용할 수 있어요.'
+      });
+      return;
+    }
+    this.#spinnerStore.on();
+    const response = await onManualNogiApi();
+    this.#spinnerStore.off();
+    this.#apiResponseModalStore.onActive(response);
   }
 
   deleteUser() {
@@ -93,6 +117,10 @@ export class UserManager {
     return this.#info;
   }
 
+  get notionConnected() {
+    return this.#notionConnected;
+  }
+
   #isEmptyText(text) {
     return !text || !text.trim();
   }
@@ -100,44 +128,5 @@ export class UserManager {
   async #updateGithubInfo(param) {
     await this.updateInfo(param);
     await this.getConnectedGithubInfo();
-  }
-
-  /// --- 검토 코드
-
-  async onManual() {
-    if (this.#authStore.getAuth().value.isRequireInfo) {
-      this.#apiResponseModalStore.onActive({
-        isSuccess: false,
-        message: '필수 정보를 입력하면 바로 서비스를 이용할 수 있어요! 🚀'
-      });
-      return;
-    }
-    this.#spinnerStore.on();
-    const response = await onManualNogiApi();
-    this.#spinnerStore.off();
-    if (!response.isSuccess) {
-      response.message = response.result;
-    }
-    this.#apiResponseModalStore.onActive(response);
-  }
-
-  async checkRepositoryName() {
-    // todo: 이름 최소 길이, 최대 길이 체크
-    if (this.#info.value.githubRepository.trim() === '') {
-      // this.#infoUpdateValidation.value.result.githubRepository =
-      //   '이름을 입력해주세요.';
-      return;
-    }
-
-    this.#spinnerStore.on();
-    const params = { repositoryName: this.#info.value.githubRepository.trim() };
-    const response = await checkValidationGithubRepositoryApi(params);
-    this.#spinnerStore.off();
-
-    if (response.isSuccess) {
-      // this.#isSuccessRepositoryNameCheck.value = true;
-      // this.initInfoUpdateValidation();
-    }
-    this.#apiResponseModalStore.onActive(response);
   }
 }

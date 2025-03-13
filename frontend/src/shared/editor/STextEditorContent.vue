@@ -3,7 +3,7 @@ import { EditorContent, useEditor } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import { onBeforeMount, onBeforeUnmount, watch } from 'vue';
-import TextEditorMenu from '@/shared/editor/TextEditorMenu.vue';
+import STextEditorMenu from '@/shared/editor/STextEditorMenu.vue';
 import { Placeholder } from '@tiptap/extension-placeholder';
 import { Table } from '@tiptap/extension-table';
 import { TableRow } from '@tiptap/extension-table-row';
@@ -103,7 +103,7 @@ const uploadImage = async (file) => {
 <template>
   <div>
     <!--    todo: 활성화 메뉴 props로 받기(key로 처리), 메뉴를 감싸고잇는 dev style props로 받기-->
-    <TextEditorMenu
+    <STextEditorMenu
       v-if="hasActiveEditor"
       :editor="editor"
       @registerPost="registerPost"

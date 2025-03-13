@@ -1,6 +1,7 @@
 package kr.co.nogibackend.domain.notion;
 
 import static kr.co.nogibackend.domain.notion.constant.NotionPropertyValue.STATUS_COMPLETED;
+import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import kr.co.nogibackend.config.context.ExecutionResultContext;
-import kr.co.nogibackend.domain.notion.dto.command.NotionConnectionTestCommand;
+import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
@@ -19,9 +20,12 @@ import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
+import kr.co.nogibackend.domain.notion.dto.response.NotionConnectionResponse;
 import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionGetAccessResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
+import kr.co.nogibackend.domain.user.User;
+import kr.co.nogibackend.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -40,9 +44,40 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NotionService {
 
+  private final NotionClient notionClient;
+  private final UserRepository userRepository;
   @Value("${github.resources-base-path}")
   public String RESOURCES_BASE_PATH;
-  private final NotionClient notionClient;
+
+  public NotionConnectionResponse onConnectionTest(Long userId) {
+    User user =
+        userRepository
+            .findById(userId)
+            .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+
+    // notion page id 없으면 연결 실패
+    if (user.isEmptyNotionPageId()) {
+      return new NotionConnectionResponse(false, "Notion Page ID가 없어요.");
+    }
+
+    // notion database id 가 없는 경우 page id 로 조회 후 체크
+    if (user.isEmptyNotionDatabaseId()) {
+      try {
+        this.getNotionDatabaseInfo(user.getNotionAccessToken(), user.getNotionPageId());
+        return new NotionConnectionResponse(true, "연결 확인되었어요.");
+      } catch (Exception error) {
+        return new NotionConnectionResponse(false, "Notion 페이지에서 Database를 조회할 수 없어요.");
+      }
+    }
+
+    // notion database id 가 있는 경우 access token 으로 조회 후 체크
+    try {
+      notionClient.getDatabase(user.getNotionAccessToken(), user.getNotionDatabaseId());
+      return new NotionConnectionResponse(true, "연결 확인되었어요.");
+    } catch (Exception error) {
+      return new NotionConnectionResponse(false, "Notion Access 정보로 Database를 조회할 수 없어요.");
+    }
+  }
 
   /**
    * <h2>📝 Notion에서 작성완료된 TIL 조회 및 Markdown 변환</h2>
@@ -124,12 +159,6 @@ public class NotionService {
             ))
             // 4️⃣ 실패한 경우 Optional.empty() 반환
             : Optional.empty();
-  }
-
-
-  // 노션 데이터베이스 연결 확인(단순 노션 데이터베이스에 페이지 조회 후 에러 없으면 성공처리)
-  public void onConnectionTest(NotionConnectionTestCommand command) {
-    notionClient.getDatabase(command.notionBotToken(), command.notionDatabaseId());
   }
 
   private boolean updateTILResultStatus(boolean isSuccess, String AuthToken, String pageId,

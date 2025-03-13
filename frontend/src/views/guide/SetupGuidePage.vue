@@ -1,8 +1,8 @@
 <script setup>
-import TextEditorContent from '@/shared/editor/TextEditorContent.vue';
+import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
 import { onBeforeMount, reactive, ref } from 'vue';
-import { UserGuideManager } from '@/manager/user/UserGuideManager.js';
-import FullSizeImageModal from '@/shared/modal/FullSizeImageModal.vue';
+import { UserGuideManager } from '@/manager/guide/UserGuideManager.js';
+import SFullSizeImageModal from '@/shared/modal/SFullSizeImageModal.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 const userGuideManager = new UserGuideManager();
@@ -50,14 +50,14 @@ const toggleFullImage = (hasAction) => {
           class="rounded-md md:w-[60%] cursor-pointer border-main border"
           @click="showFullProfileImage(guide.image)"
         />
-        <TextEditorContent
+        <STextEditorContent
           :content="guide.content"
           :content-style="'outline-0'"
           class="md:w-[40%]"
         />
       </li>
     </ul>
-    <FullSizeImageModal
+    <SFullSizeImageModal
       :action="confirmModalAction"
       @onAction="toggleFullImage"
     />

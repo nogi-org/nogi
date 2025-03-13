@@ -2,8 +2,8 @@
 import { RouterLink, useRoute } from 'vue-router';
 import { onMounted, watch, watchEffect } from 'vue';
 import { useNavigationStore } from '@/stores/navigationStore.js';
-import LoginButton from '@/shared/buttons/LoginButton.vue';
-import LogoutButton from '@/shared/buttons/LogoutButton.vue';
+import SLoginButton from '@/shared/buttons/SLoginButton.vue';
+import SLogoutButton from '@/shared/buttons/SLogoutButton.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
 
 const route = useRoute();
@@ -44,8 +44,8 @@ watchEffect(() => {
           />
         </RouterLink>
       </h1>
-      <LoginButton v-if="!authInfo" />
-      <LogoutButton v-if="authInfo" @onLogout="auth.onLogout()" />
+      <SLoginButton v-if="!authInfo" />
+      <SLogoutButton v-if="authInfo" @onLogout="auth.onLogout()" />
     </div>
 
     <!--두번째줄-->

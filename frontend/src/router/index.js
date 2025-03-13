@@ -41,13 +41,13 @@ const router = createRouter({
           path: '/user-guide',
           name: 'userGuidePage',
           meta: { category: 'userGuide' },
-          component: () => import('@/views/user/UserGuidePage.vue')
+          component: () => import('@/views/guide/UsageGuidePage.vue')
         },
         {
           path: '/my-page',
           name: 'myPage',
           meta: { category: 'myPage', requiresAuth: true },
-          component: () => import('@/views/user/MyPage.vue')
+          component: () => import('@/views/user/mypage/MyPage.vue')
         },
         {
           path: '/admin',

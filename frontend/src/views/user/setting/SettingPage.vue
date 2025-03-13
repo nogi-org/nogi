@@ -6,9 +6,12 @@ import CGithubSetting from '@/views/user/setting/components/CGithubSetting.vue';
 import CActionSetting from '@/views/user/setting/components/CActionSetting.vue';
 import CNoticeSetting from '@/views/user/setting/components/CNoticeSetting.vue';
 import CDangerZoneSetting from '@/views/user/setting/components/CDangerSetting.vue';
+import { AuthManager } from '@/manager/auth/AuthManager.js';
 
 const user = new UserManager();
+const auth = new AuthManager();
 provide('userManager', user);
+provide('authManager', auth);
 
 onBeforeMount(async () => {
   await user.getInfo();
