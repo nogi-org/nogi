@@ -1,13 +1,12 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { defineStore } from 'pinia';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
-import { useAuthStore } from '@/stores/authStore.js';
 
-const router = createRouter({
-  history: createWebHistory(),
-  scrollBehavior() {
-    return { top: 0 };
-  },
-  routes: [
+export const useRoutesStore = defineStore('routesStore', () => {
+  const LAYOUT_STYLES = {
+    FULL: 'full'
+  };
+
+  const routes = [
     {
       path: '/authorize/redirect',
       name: 'authorizeRedirect',
@@ -35,6 +34,7 @@ const router = createRouter({
         {
           path: '/',
           name: 'home',
+          meta: { layoutStyle: LAYOUT_STYLES.FULL },
           component: () => import('@/views/layout/Home.vue')
         },
         {
@@ -66,22 +66,22 @@ const router = createRouter({
         }
       ]
     }
-  ]
-});
+  ];
 
-router.beforeEach((to, from, next) => {
-  const authStore = useAuthStore();
-  const auth = authStore.getAuth().value;
-  if (to.meta?.requiresAuth && !auth) {
-    // 로그인 필요한 페이지인데 로그인하지 않은 경우
-    next('/');
-  } else if (to.meta?.requiresRole && to.meta?.requiresRole !== auth.role) {
-    // 권한이 부족 경우
-    next('/');
-  } else {
-    // 정상적으로 라우팅 진행
-    next();
+  function getRoutes() {
+    return routes;
   }
-});
 
-export default router;
+  // frame에 routerView 넓이 처리
+  function createLayoutStyle(route) {
+    const defaultStyle = 'max-w-[1280px] m-auto px-5 py-12';
+    return route.meta.layoutStyle === LAYOUT_STYLES.FULL
+      ? 'w-full'
+      : defaultStyle;
+  }
+
+  return {
+    getRoutes,
+    createLayoutStyle
+  };
+});

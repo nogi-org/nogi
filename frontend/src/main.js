@@ -2,7 +2,7 @@ import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 
 import App from './App.vue';
-import router from './router';
+import router, { setupRouter } from './router/router.js';
 import './style/main.css';
 
 // fontawesome
@@ -17,6 +17,7 @@ import '@vuepic/vue-datepicker/dist/main.css';
 const app = createApp(App);
 
 app.use(createPinia());
+setupRouter();
 app.use(router);
 app.component('font-awesome-icon', FontAwesomeIcon).mount('#app');
 app.component('VueDatePicker', VueDatePicker);

@@ -1,13 +1,26 @@
 <script setup>
 import Header from '@/views/layout/Header.vue';
 import Footer from '@/views/layout/Footer.vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRoute } from 'vue-router';
 import SApiResponseModal from '@/shared/modal/SApiResponseModal.vue';
 import SSpinner from '@/shared/spinner/SSpinner.vue';
 import SIssueButton from '@/shared/buttons/SIssueButton.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
+import { onMounted, ref, watch } from 'vue';
+import { useRoutesStore } from '@/stores/routeStore.js';
 
+const route = useRoute();
 const spinnerStore = useSpinnerStore();
+const routesStore = useRoutesStore();
+const layoutStyle = ref('');
+
+onMounted(() => {
+  layoutStyle.value = routesStore.createLayoutStyle(route);
+});
+
+watch(route, (value) => {
+  layoutStyle.value = routesStore.createLayoutStyle(value);
+});
 </script>
 
 <template>
@@ -15,13 +28,7 @@ const spinnerStore = useSpinnerStore();
     <div class="border-b border-main">
       <Header class="layout" />
     </div>
-    <!-- 현재 라우트가 Home일 경우 layout 및 py-12 스타일 제거 -->
-    <div
-      :class="{
-        'layout': $route.name !== 'home',
-        'py-12': $route.name !== 'home'
-      }"
-    >
+    <div :class="layoutStyle">
       <RouterView />
     </div>
     <div>
