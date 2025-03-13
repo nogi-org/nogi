@@ -1,7 +1,7 @@
 <script setup>
 import { RouterLink, useRoute } from 'vue-router';
 import { onMounted, watch, watchEffect } from 'vue';
-import { useNavigationStore } from '@/stores/navigationStore.js';
+import { useNavigationStore } from '@/stores/navigationStore_afterDelete.js';
 import SLoginButton from '@/shared/buttons/SLoginButton.vue';
 import SLogoutButton from '@/shared/buttons/SLogoutButton.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';

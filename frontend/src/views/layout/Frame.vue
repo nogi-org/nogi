@@ -7,7 +7,7 @@ import SSpinner from '@/shared/spinner/SSpinner.vue';
 import SIssueButton from '@/shared/buttons/SIssueButton.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { onMounted, ref, watch } from 'vue';
-import { useRoutesStore } from '@/stores/routeStore.js';
+import { useRoutesStore } from '@/stores/navigationStore.js';
 
 const route = useRoute();
 const spinnerStore = useSpinnerStore();

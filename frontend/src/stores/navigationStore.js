@@ -1,75 +1,97 @@
 import { defineStore } from 'pinia';
-import { computed, reactive } from 'vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
-import { useAuthStore } from '@/stores/authStore.js';
 
-export const useNavigationStore = defineStore('useNavigationStore', () => {
-  const authStore = useAuthStore();
-  const navigations = reactive([
+export const useRoutesStore = defineStore('routesStore', () => {
+  const LAYOUT_STYLES = {
+    FULL: 'full'
+  };
+
+  const routes = [
     {
-      title: '사용 가이드',
-      routeName: 'userGuidePage',
-      category: 'userGuide',
-      isActive: false,
-      isVisible: true
+      path: '/authorize/redirect',
+      name: 'authorizeRedirect',
+      component: () => import('@/views/auth/AuthorizeRedirect.vue')
     },
     {
-      title: 'My Page',
-      routeName: 'myPage',
-      category: 'myPage',
-      isActive: false,
-      isVisible: false
+      path: '/404',
+      name: 'notFound',
+      component: () => import('@/views/common/NotFound.vue')
     },
     {
-      title: 'Setting',
-      routeName: 'settingPage',
-      category: 'setting',
-      isActive: false,
-      isVisible: false
+      path: '/:pathMatch(.*)*',
+      redirect: '/404'
     },
     {
-      title: '관리자',
-      routeName: 'adminPage',
-      category: 'admin',
-      isActive: false,
-      isVisible: false
+      path: '/use-policy',
+      name: 'usePolicy',
+      component: () => import('@/views/policy/UsePolicy.vue')
+    },
+    {
+      path: '/',
+      name: 'frame',
+      component: () => import('@/views/layout/Frame.vue'),
+      children: [
+        {
+          path: '/',
+          name: 'home',
+          meta: { layoutStyle: LAYOUT_STYLES.FULL },
+          component: () => import('@/views/layout/Home.vue')
+        },
+        {
+          path: '/',
+          name: 'GuidePage',
+          meta: { category: 'userGuide' },
+          component: () => import('@/views/guide/GuidePage.vue'),
+          children: [
+            {
+              path: '/user-guide',
+              name: 'userGuidePage',
+              meta: { category: 'userGuide' },
+              component: () => import('@/views/guide/UsageGuidePage.vue')
+            }
+          ]
+        },
+        {
+          path: '/my-page',
+          name: 'myPage',
+          meta: { category: 'myPage', requiresAuth: true },
+          component: () => import('@/views/user/mypage/MyPage.vue')
+        },
+        {
+          path: '/admin',
+          name: 'adminPage',
+          meta: {
+            category: 'admin',
+            requiresRole: AuthManager.ROLE.ADMIN
+          },
+          component: () => import('@/views/admin/AdminPage.vue')
+        },
+        {
+          path: '/setting',
+          name: 'settingPage',
+          meta: { category: 'setting', requiresAuth: true },
+          component: () => import('@/views/user/setting/SettingPage.vue')
+        }
+      ]
     }
-  ]);
+  ];
 
-  function getNavigations() {
-    return computed(() => navigations.filter((item) => item.isVisible));
+  function getRoutes() {
+    return routes;
   }
 
-  function setIsActiveByRoute(route) {
-    const category = route.meta.category;
-    navigations.find((navigation) => {
-      navigation.isActive = navigation.category === category;
-    });
-  }
+  // frame에 routerView 넓이 처리
+  function createLayoutStyle(route) {
+    const defaultStyle = 'max-w-[1280px] m-auto px-5 py-12';
+    const fullStyle = 'w-full';
 
-  // todo: 리팩토링 필요
-  function setIsVisibleByAuth() {
-    const myPage = navigations.find((nav) => nav.category === 'myPage');
-    const adminPage = navigations.find((nav) => nav.category === 'admin');
-    const settingPage = navigations.find((nav) => nav.category === 'setting');
-
-    if (!authStore.getAuth().value) {
-      if (myPage) myPage.isVisible = false;
-      if (adminPage) adminPage.isVisible = false;
-      if (settingPage) settingPage.isVisible = false;
-      return;
-    }
-
-    const { userId = null, role = '' } = authStore.getAuth().value;
-
-    if (myPage) myPage.isVisible = !!userId;
-    if (settingPage) settingPage.isVisible = !!userId;
-    if (adminPage) adminPage.isVisible = role === AuthManager.ROLE.ADMIN;
+    return route.meta.layoutStyle === LAYOUT_STYLES.FULL
+      ? fullStyle
+      : defaultStyle;
   }
 
   return {
-    getNavigations,
-    setIsActiveByRoute,
-    setIsVisibleByAuth
+    getRoutes,
+    createLayoutStyle
   };
 });

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore.js';
-import { useRoutesStore } from '@/stores/routeStore.js';
+import { useRoutesStore } from '@/stores/navigationStore.js';
 
 const router = createRouter({
   history: createWebHistory(),
