@@ -52,7 +52,7 @@ const checkConnectedGithub = () => {
           />
           <SWarningHint
             class="mt-1 text-danger"
-            v-if="!user.githubInfo.value?.isGithubValid"
+            v-if="user.githubInfo.value?.isGithubValid === false"
             text="Github정보와 아래정보가 동일한지 확인해주세요."
           />
         </div>
@@ -69,7 +69,7 @@ const checkConnectedGithub = () => {
             placeholder="Repository Name"
             :class="{
               'border-2 border-danger rounded-md outline-none':
-                !user.githubInfo.value.isGithubRepositoryValid
+                user.githubInfo.value.isGithubRepositoryValid === false
             }"
           />
           <SActionButton
@@ -130,7 +130,7 @@ const checkConnectedGithub = () => {
             placeholder="NOGI Owner"
             :class="{
               'border-2 border-danger rounded-md outline-none':
-                !user.githubInfo.value.isGithubOwnerValid
+                user.githubInfo.value.isGithubOwnerValid === false
             }"
           />
           <SActionButton
@@ -151,7 +151,7 @@ const checkConnectedGithub = () => {
             placeholder="NOGI Email"
             :class="{
               'border-2 border-danger rounded-md outline-none':
-                !user.githubInfo.value.isGithubEmailValid
+                user.githubInfo.value.isGithubEmailValid === false
             }"
           />
           <SActionButton

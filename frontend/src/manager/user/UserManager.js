@@ -17,7 +17,7 @@ export class UserManager {
 
   #info = ref({});
   #githubInfo = ref({});
-  #notionConnected = ref(false);
+  #notionConnected = ref(null);
 
   async getInfo() {
     this.#spinnerStore.on();
