@@ -17,7 +17,7 @@ onBeforeMount(async () => {
 const getUserGuides = async () => {
   spinnerStore.on();
   const response = await userGuideManager.getUserGuides();
-  userGuides.value = response;
+  userGuides.value = response.filter((guide) => guide.step === 1);
   spinnerStore.off();
 };
 
@@ -39,21 +39,16 @@ const toggleFullImage = (hasAction) => {
 <template>
   <div>
     <ul>
-      <li
-        v-for="guide in userGuides"
-        :key="guide.id"
-        class="mb-16 last:mb-0 rounded-md gap-5 flex flex-col md:flex-row md:justify-between md:items-center"
-      >
+      <li v-for="guide in userGuides" :key="guide.id" class="mb-16 rounded-md">
         <img
           :src="guide.image"
           alt="가이드 이미지"
-          class="rounded-md md:w-[60%] cursor-pointer border-main border"
+          class="mb-8 rounded-md cursor-pointer border-main border"
           @click="showFullProfileImage(guide.image)"
         />
         <STextEditorContent
           :content="guide.content"
-          :content-style="'outline-0'"
-          class="md:w-[40%]"
+          content-style="outline-0"
         />
       </li>
     </ul>

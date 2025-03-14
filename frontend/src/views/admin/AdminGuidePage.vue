@@ -40,34 +40,34 @@ const registerPost = (data) => {
 
 <template>
   <div>
-    <div class="mb-10">
-      <input
-        id="file-upload"
-        accept="image/*"
-        class="hidden"
-        type="file"
-        @change="handleFileUpload"
-      />
-      <div class="flex justify-end items-center gap-2 mb-2">
-        <label
-          class="cursor-pointer bg-action px-3 py-2 rounded-md text-white text-xs"
-          for="file-upload"
-        >
-          이미지 변환
-        </label>
-        <button @click="copyToClipboard('image')">
-          <font-awesome-icon
-            class="bg-main p-2 rounded-md"
-            icon="fa-solid fa-copy"
-          />
-        </button>
-      </div>
-      <p
-        class="border border-main rounded-md p-2 h-[200px] max-h-[200px] whitespace-pre-wrap break-all overflow-scroll scrollbar-hide"
-      >
-        {{ base64Image }}
-      </p>
-    </div>
+    <!--    <div class="mb-10">-->
+    <!--      <input-->
+    <!--        id="file-upload"-->
+    <!--        accept="image/*"-->
+    <!--        class="hidden"-->
+    <!--        type="file"-->
+    <!--        @change="handleFileUpload"-->
+    <!--      />-->
+    <!--      <div class="flex justify-end items-center gap-2 mb-2">-->
+    <!--        <label-->
+    <!--          class="cursor-pointer bg-action px-3 py-2 rounded-md text-white text-xs"-->
+    <!--          for="file-upload"-->
+    <!--        >-->
+    <!--          이미지 변환-->
+    <!--        </label>-->
+    <!--        <button @click="copyToClipboard('image')">-->
+    <!--          <font-awesome-icon-->
+    <!--            class="bg-main p-2 rounded-md"-->
+    <!--            icon="fa-solid fa-copy"-->
+    <!--          />-->
+    <!--        </button>-->
+    <!--      </div>-->
+    <!--      <p-->
+    <!--        class="border border-main rounded-md p-2 h-[200px] max-h-[200px] whitespace-pre-wrap break-all overflow-scroll scrollbar-hide"-->
+    <!--      >-->
+    <!--        {{ base64Image }}-->
+    <!--      </p>-->
+    <!--    </div>-->
 
     <STextEditorContent
       :content-style="'border rounded-md outline-0 min-h-[400px] p-3'"

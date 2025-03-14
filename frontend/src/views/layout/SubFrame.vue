@@ -25,7 +25,7 @@ const initNavigation = () => {
 <template>
   <div class="sm:flex">
     <ul
-      class="mb-10 flex flex-col gap-2 border-b border-main sm:border-b-0 sm:w-[25%]"
+      class="mb-10 flex flex-col gap-2 border-b border-main sm:border-b-0 sm:w-[20%]"
     >
       <li v-for="item in navigations" class="w-full last:mb-0">
         <router-link :to="{ name: item.name }">
@@ -41,7 +41,7 @@ const initNavigation = () => {
       </li>
     </ul>
 
-    <div class="sm:w-[75%] sm:pl-5">
+    <div class="sm:w-[80%] sm:pl-8">
       <RouterView />
     </div>
   </div>

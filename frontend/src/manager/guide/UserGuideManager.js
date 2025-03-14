@@ -1,4 +1,4 @@
-import { getUserGuidesApi } from '@/api/guide/usageGuide.js';
+import { getUserGuidesApi } from '@/api/guide/guide.js';
 
 export class UserGuideManager {
   async getUserGuides() {

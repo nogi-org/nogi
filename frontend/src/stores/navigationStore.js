@@ -51,7 +51,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           component: () => import('@/views/layout/SubFrame.vue'),
           children: [
             {
-              path: '/usage-guide',
+              path: '/guide/usage',
               name: 'usageGuidePage',
               meta: {
                 subNavigation: {
@@ -63,7 +63,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               component: () => import('@/views/guide/UsageGuidePage.vue')
             },
             {
-              path: '/setup-guide',
+              path: '/guide/setup',
               name: 'setupGuidePage',
               meta: {
                 subNavigation: {
@@ -91,7 +91,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           component: () => import('@/views/layout/SubFrame.vue'),
           children: [
             {
-              path: '/demo1-my-page',
+              path: '/my-page/demo1',
               name: 'demo1mypage',
               meta: {
                 subNavigation: {
@@ -103,7 +103,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               component: () => import('@/views/user/mypage/Demo1MyPage.vue')
             },
             {
-              path: '/demo2-my-page',
+              path: '/my-page/demo2',
               name: 'demo2mypage',
               meta: {
                 subNavigation: {
@@ -127,7 +127,34 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/admin/AdminPage.vue')
+          component: () => import('@/views/layout/SubFrame.vue'),
+          redirect: { name: 'adminGuidePage' },
+          children: [
+            {
+              path: '/admin/guide',
+              name: 'adminGuidePage',
+              meta: {
+                subNavigation: {
+                  title: '가이드 관리',
+                  order: 1,
+                  isActive: false
+                }
+              },
+              component: () => import('@/views/admin/AdminGuidePage.vue')
+            },
+            {
+              path: '/admin/user',
+              name: 'adminUserPage',
+              meta: {
+                subNavigation: {
+                  title: '유저 관리',
+                  order: 2,
+                  isActive: false
+                }
+              },
+              component: () => import('@/views/admin/AdminUserPage.vue')
+            }
+          ]
         },
         {
           path: '/setting',
@@ -152,7 +179,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
 
   // frame에 routerView 넓이 처리
   function createLayoutStyle(route) {
-    const defaultStyle = 'max-w-[1270px] m-auto px-5 py-12';
+    const defaultStyle = 'max-w-[1200px] m-auto px-5 py-12';
     const fullStyle = 'w-full';
 
     return route.meta.layoutStyle === LAYOUT_STYLES.FULL
