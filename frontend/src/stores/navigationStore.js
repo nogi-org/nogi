@@ -38,8 +38,8 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           component: () => import('@/views/layout/Home.vue')
         },
         {
-          path: '/usage-guide',
-          name: 'GuidePage',
+          path: '/guide',
+          name: 'guidePage',
           meta: {
             headerNavigation: {
               title: '가이드',
@@ -47,18 +47,31 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/guide/GuidePage.vue'),
+          redirect: { name: 'setupGuidePage' },
+          component: () => import('@/views/layout/SubFrame.vue'),
           children: [
             {
               path: '/usage-guide',
               name: 'usageGuidePage',
-              meta: {},
+              meta: {
+                subNavigation: {
+                  title: '사용 가이드',
+                  order: 2,
+                  isActive: false
+                }
+              },
               component: () => import('@/views/guide/UsageGuidePage.vue')
             },
             {
               path: '/setup-guide',
               name: 'setupGuidePage',
-              meta: {},
+              meta: {
+                subNavigation: {
+                  title: '설정 가이드',
+                  order: 1,
+                  isActive: false
+                }
+              },
               component: () => import('@/views/guide/SetupGuidePage.vue')
             }
           ]
@@ -74,7 +87,34 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/user/mypage/MyPage.vue')
+          redirect: { name: 'demo1mypage' },
+          component: () => import('@/views/layout/SubFrame.vue'),
+          children: [
+            {
+              path: '/demo1-my-page',
+              name: 'demo1mypage',
+              meta: {
+                subNavigation: {
+                  title: '업데이트중',
+                  order: 2,
+                  isActive: false
+                }
+              },
+              component: () => import('@/views/user/mypage/Demo1MyPage.vue')
+            },
+            {
+              path: '/demo2-my-page',
+              name: 'demo2mypage',
+              meta: {
+                subNavigation: {
+                  title: '업데이트중',
+                  order: 2,
+                  isActive: false
+                }
+              },
+              component: () => import('@/views/user/mypage/Demo2MyPage.vue')
+            }
+          ]
         },
         {
           path: '/admin',
@@ -112,7 +152,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
 
   // frame에 routerView 넓이 처리
   function createLayoutStyle(route) {
-    const defaultStyle = 'max-w-[1280px] m-auto px-5 py-12';
+    const defaultStyle = 'max-w-[1270px] m-auto px-5 py-12';
     const fullStyle = 'w-full';
 
     return route.meta.layoutStyle === LAYOUT_STYLES.FULL
@@ -135,14 +175,47 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
       .sort((a, b) => a.order - b.order);
   }
 
-  function onActiveHeaderNavigation(navigations, name) {
+  function getSubNavigations(route) {
+    const parentRoute =
+      route.matched.find(
+        (r, index, arr) => arr[index + 1]?.name === route.name
+      ) || [];
+
+    return parentRoute.children
+      .map((route) => ({
+        name: route.name,
+        title: route.meta.subNavigation.title,
+        isActive: route.meta.subNavigation.isActive,
+        order: route.meta.subNavigation.order
+      }))
+      .sort((a, b) => a.order - b.order);
+  }
+
+  function onActiveSubNavigation(navigations, name) {
     navigations.value.forEach((navi) => (navi.isActive = navi.name === name));
+  }
+
+  function onActiveHeaderNavigation(navigations, route) {
+    const parentRoute =
+      route.matched.find(
+        (r, index, arr) => arr[index + 1]?.name === route.name
+      ) || [];
+
+    // route.matched 가 2개 아래면 단일 페이지, 2개 이상이면 서브 네비게이션이 있는 페이지
+    const isParentActive = route.matched.length > 2;
+    navigations.value.forEach((navi) => {
+      navi.isActive = isParentActive
+        ? navi.name === parentRoute.name
+        : navi.name === route.name;
+    });
   }
 
   return {
     getRoutes,
     createLayoutStyle,
     getHeaderNavigations,
-    onActiveHeaderNavigation
+    onActiveHeaderNavigation,
+    getSubNavigations,
+    onActiveSubNavigation
   };
 });

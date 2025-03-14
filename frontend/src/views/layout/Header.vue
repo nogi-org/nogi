@@ -17,11 +17,11 @@ const navigations = ref([]);
 
 onMounted(() => {
   navigations.value = navigationStore.getHeaderNavigations(router);
-  navigationStore.onActiveHeaderNavigation(navigations, route.name);
+  navigationStore.onActiveHeaderNavigation(navigations, route);
 });
 
 watch(route, () => {
-  navigationStore.onActiveHeaderNavigation(navigations, route.name);
+  navigationStore.onActiveHeaderNavigation(navigations, route);
 });
 </script>
 

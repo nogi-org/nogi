@@ -2,6 +2,6 @@
 
 <template>
   <div>
-    <h1>설정가이드</h1>
+    <h1>demo1</h1>
   </div>
 </template>
