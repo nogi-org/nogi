@@ -1,5 +1,4 @@
 <script setup>
-import Header from '@/views/layout/Header.vue';
 import Footer from '@/views/layout/Footer.vue';
 import { RouterView, useRoute } from 'vue-router';
 import SApiResponseModal from '@/shared/modal/SApiResponseModal.vue';
@@ -7,19 +6,20 @@ import SSpinner from '@/shared/spinner/SSpinner.vue';
 import SIssueButton from '@/shared/buttons/SIssueButton.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { onMounted, ref, watch } from 'vue';
-import { useRoutesStore } from '@/stores/navigationStore.js';
+import { useNavigationStore } from '@/stores/navigationStore.js';
+import Header from '@/views/layout/Header.vue';
 
 const route = useRoute();
 const spinnerStore = useSpinnerStore();
-const routesStore = useRoutesStore();
+const navigationStore = useNavigationStore();
 const layoutStyle = ref('');
 
 onMounted(() => {
-  layoutStyle.value = routesStore.createLayoutStyle(route);
+  layoutStyle.value = navigationStore.createLayoutStyle(route);
 });
 
 watch(route, (value) => {
-  layoutStyle.value = routesStore.createLayoutStyle(value);
+  layoutStyle.value = navigationStore.createLayoutStyle(value);
 });
 </script>
 

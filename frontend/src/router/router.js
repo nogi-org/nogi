@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import { useAuthStore } from '@/stores/authStore.js';
-import { useRoutesStore } from '@/stores/navigationStore.js';
+import { useNavigationStore } from '@/stores/navigationStore.js';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -12,7 +12,7 @@ const router = createRouter({
 
 // store에 정의한 routes를 가져와서 등록
 export function setupRouter() {
-  const routesStore = useRoutesStore();
+  const routesStore = useNavigationStore();
   routesStore.getRoutes().forEach((route) => {
     router.addRoute(route);
   });

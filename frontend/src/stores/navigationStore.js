@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
 
-export const useRoutesStore = defineStore('routesStore', () => {
+export const useNavigationStore = defineStore('useNavigationStore', () => {
   const LAYOUT_STYLES = {
     FULL: 'full'
   };
@@ -38,38 +38,68 @@ export const useRoutesStore = defineStore('routesStore', () => {
           component: () => import('@/views/layout/Home.vue')
         },
         {
-          path: '/',
+          path: '/usage-guide',
           name: 'GuidePage',
-          meta: { category: 'userGuide' },
+          meta: {
+            headerNavigation: {
+              title: '가이드',
+              order: 1,
+              isActive: false
+            }
+          },
           component: () => import('@/views/guide/GuidePage.vue'),
           children: [
             {
-              path: '/user-guide',
-              name: 'userGuidePage',
-              meta: { category: 'userGuide' },
+              path: '/usage-guide',
+              name: 'usageGuidePage',
+              meta: {},
               component: () => import('@/views/guide/UsageGuidePage.vue')
+            },
+            {
+              path: '/setup-guide',
+              name: 'setupGuidePage',
+              meta: {},
+              component: () => import('@/views/guide/SetupGuidePage.vue')
             }
           ]
         },
         {
           path: '/my-page',
           name: 'myPage',
-          meta: { category: 'myPage', requiresAuth: true },
+          meta: {
+            requiresAuth: true,
+            headerNavigation: {
+              title: 'My Page',
+              order: 2,
+              isActive: false
+            }
+          },
           component: () => import('@/views/user/mypage/MyPage.vue')
         },
         {
           path: '/admin',
           name: 'adminPage',
           meta: {
-            category: 'admin',
-            requiresRole: AuthManager.ROLE.ADMIN
+            requiresRole: AuthManager.ROLE.ADMIN,
+            headerNavigation: {
+              title: '관리자',
+              order: 4,
+              isActive: false
+            }
           },
           component: () => import('@/views/admin/AdminPage.vue')
         },
         {
           path: '/setting',
           name: 'settingPage',
-          meta: { category: 'setting', requiresAuth: true },
+          meta: {
+            requiresAuth: true,
+            headerNavigation: {
+              title: 'Setting',
+              order: 3,
+              isActive: false
+            }
+          },
           component: () => import('@/views/user/setting/SettingPage.vue')
         }
       ]
@@ -90,8 +120,29 @@ export const useRoutesStore = defineStore('routesStore', () => {
       : defaultStyle;
   }
 
+  function getHeaderNavigations(router) {
+    return router
+      .getRoutes()
+      .filter((route) => route?.meta?.headerNavigation)
+      .map((route) => {
+        return {
+          name: route.name,
+          title: route.meta.headerNavigation.title,
+          isActive: route.meta.headerNavigation.isActive,
+          order: route.meta.headerNavigation.order
+        };
+      })
+      .sort((a, b) => a.order - b.order);
+  }
+
+  function onActiveHeaderNavigation(navigations, name) {
+    navigations.value.forEach((navi) => (navi.isActive = navi.name === name));
+  }
+
   return {
     getRoutes,
-    createLayoutStyle
+    createLayoutStyle,
+    getHeaderNavigations,
+    onActiveHeaderNavigation
   };
 });
