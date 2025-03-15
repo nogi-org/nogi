@@ -90,34 +90,37 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          redirect: { name: 'demo1mypage' },
-          component: () => import('@/views/layout/SubFrame.vue'),
-          children: [
-            {
-              path: '/my-page/demo1',
-              name: 'demo1mypage',
-              meta: {
-                subNavigation: {
-                  title: '업데이트중',
-                  order: 2,
-                  isActive: false
-                }
-              },
-              component: () => import('@/views/user/mypage/Demo1MyPage.vue')
-            },
-            {
-              path: '/my-page/demo2',
-              name: 'demo2mypage',
-              meta: {
-                subNavigation: {
-                  title: '업데이트중',
-                  order: 2,
-                  isActive: false
-                }
-              },
-              component: () => import('@/views/user/mypage/Demo2MyPage.vue')
-            }
-          ]
+          component: () => import('@/views/user/mypage/Demo1MyPage.vue')
+
+          // todo: 아래 주석 풀어서 사용하시면 됩니다.
+          // redirect: { name: 'demo1mypage' },
+          // component: () => import('@/views/layout/SubFrame.vue')
+          // children: [
+          //   {
+          //     path: '/my-page/demo1',
+          //     name: 'demo1mypage',
+          //     meta: {
+          //       subNavigation: {
+          //         title: '다음버전',
+          //         order: 2,
+          //         isActive: false
+          //       }
+          //     },
+          //     component: () => import('@/views/user/mypage/Demo1MyPage.vue')
+          //   },
+          //   {
+          //     path: '/my-page/demo2',
+          //     name: 'demo2mypage',
+          //     meta: {
+          //       subNavigation: {
+          //         title: '기대해주세요 ✨ ',
+          //         order: 2,
+          //         isActive: false
+          //       }
+          //     },
+          //     component: () => import('@/views/user/mypage/Demo2MyPage.vue')
+          //   }
+          // ]
         },
         {
           path: '/admin',
