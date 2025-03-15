@@ -23,7 +23,7 @@ onBeforeMount(async () => {});
             >GitHub Contributions(🌱 잔디)</span
           >도 채우세요!
         </p>
-        <router-link to="/user-guide">
+        <router-link to="/guide/setup">
           <button
             class="mt-6 bg-white text-blue-600 font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-gray-100"
           >
@@ -175,7 +175,7 @@ onBeforeMount(async () => {});
         <p class="mt-4 text-lg">
           무료로 Notion과 GitHub을 연동하고 자동 커밋을 경험해보세요!
         </p>
-        <router-link to="/user-guide">
+        <router-link to="/guide/setup">
           <button
             class="mt-6 bg-white text-purple-600 font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-gray-100"
           >

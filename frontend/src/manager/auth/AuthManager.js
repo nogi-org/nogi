@@ -148,6 +148,7 @@ export class AuthManager {
     this.#spinnerStore.off();
     await this.#router.push({ name: 'home' });
     this.#apiResponseModalStore.onActive(response);
+    return response;
   }
 
   #noticeLogin(isRequireInfo) {

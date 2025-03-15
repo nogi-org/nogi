@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
+import { useAuthStore } from '@/stores/authStore.js';
 
 export const useNavigationStore = defineStore('useNavigationStore', () => {
+  const authStore = useAuthStore();
   const LAYOUT_STYLES = {
     FULL: 'full'
   };
@@ -41,6 +43,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           path: '/guide',
           name: 'guidePage',
           meta: {
+            requiresLogin: false,
             headerNavigation: {
               title: '가이드',
               order: 1,
@@ -80,7 +83,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           path: '/my-page',
           name: 'myPage',
           meta: {
-            requiresAuth: true,
+            requiresLogin: true,
             headerNavigation: {
               title: 'My Page',
               order: 2,
@@ -120,6 +123,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           path: '/admin',
           name: 'adminPage',
           meta: {
+            requiresLogin: true,
             requiresRole: AuthManager.ROLE.ADMIN,
             headerNavigation: {
               title: '관리자',
@@ -160,7 +164,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           path: '/setting',
           name: 'settingPage',
           meta: {
-            requiresAuth: true,
+            requiresLogin: true,
             headerNavigation: {
               title: 'Setting',
               order: 3,
@@ -188,9 +192,30 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
   }
 
   function getHeaderNavigations(router) {
+    const auth = authStore.getAuth().value;
     return router
       .getRoutes()
-      .filter((route) => route?.meta?.headerNavigation)
+      .filter((route) => {
+        const headerNavigation = route.meta?.headerNavigation;
+
+        // 헤더 네비게이션만 가져오기
+        if (!headerNavigation) return false;
+
+        // 로그인해야 보이는 메뉴인데 로그인 안했으면 제외
+        if (route.meta?.requiresLogin && !auth) {
+          return false;
+        }
+
+        // 관리자 권한 확인
+        if (route.meta?.requiresRole) {
+          return (
+            authStore.isAdmin() &&
+            route.meta?.requiresRole === AuthManager.ROLE.ADMIN
+          );
+        }
+
+        return true;
+      })
       .map((route) => {
         return {
           name: route.name,

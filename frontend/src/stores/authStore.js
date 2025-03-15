@@ -28,9 +28,14 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(authInfo));
   }
 
+  function isAdmin() {
+    return auth.value?.role === AuthManager.ROLE.ADMIN;
+  }
+
   return {
     getAuth,
     deleteAuth,
-    setAuth
+    setAuth,
+    isAdmin
   };
 });

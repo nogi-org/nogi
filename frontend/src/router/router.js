@@ -21,7 +21,7 @@ export function setupRouter() {
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore();
   const auth = authStore.getAuth().value;
-  if (to.meta?.requiresAuth && !auth) {
+  if (to.meta?.requiresLogin && !auth) {
     // 로그인 필요한 페이지인데 로그인하지 않은 경우
     next('/');
   } else if (to.meta?.requiresRole && to.meta?.requiresRole !== auth.role) {

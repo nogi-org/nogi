@@ -12,6 +12,7 @@ const router = useRouter();
 const auth = new AuthManager();
 const authInfo = auth.getAuthInfo();
 
+// todo: navigation manager에 넣기
 const navigationStore = useNavigationStore();
 const navigations = ref([]);
 
@@ -23,6 +24,13 @@ onMounted(() => {
 watch(route, () => {
   navigationStore.onActiveHeaderNavigation(navigations, route);
 });
+
+const logOut = async () => {
+  const response = await auth.onLogout();
+  if (response.isSuccess) {
+    navigations.value = navigationStore.getHeaderNavigations(router);
+  }
+};
 </script>
 
 <template>
@@ -39,7 +47,7 @@ watch(route, () => {
         </RouterLink>
       </h1>
       <SLoginButton v-if="!authInfo" />
-      <SLogoutButton v-if="authInfo" @onLogout="auth.onLogout()" />
+      <SLogoutButton v-if="authInfo" @onLogout="logOut" />
     </div>
 
     <!--두번째줄-->
