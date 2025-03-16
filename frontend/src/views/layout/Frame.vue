@@ -1,12 +1,26 @@
 <script setup>
-import Header from '@/views/layout/Header.vue';
 import Footer from '@/views/layout/Footer.vue';
-import { RouterView } from 'vue-router';
-import ApiResponseAlerts from '@/components/modal/ApiResponseModal.vue';
-import Spinner from '@/components/common/Spinner.vue';
-import IssueButton from '@/components/buttons/IssueButton.vue';
+import { RouterView, useRoute } from 'vue-router';
+import SApiResponseModal from '@/shared/modal/SApiResponseModal.vue';
+import SSpinner from '@/shared/spinner/SSpinner.vue';
+import SIssueButton from '@/shared/buttons/SIssueButton.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
+import { onMounted, ref, watch } from 'vue';
+import { useNavigationStore } from '@/stores/navigationStore.js';
+import Header from '@/views/layout/Header.vue';
+
+const route = useRoute();
 const spinnerStore = useSpinnerStore();
+const navigationStore = useNavigationStore();
+const layoutStyle = ref('');
+
+onMounted(() => {
+  layoutStyle.value = navigationStore.createLayoutStyle(route);
+});
+
+watch(route, (value) => {
+  layoutStyle.value = navigationStore.createLayoutStyle(value);
+});
 </script>
 
 <template>
@@ -14,13 +28,7 @@ const spinnerStore = useSpinnerStore();
     <div class="border-b border-main">
       <Header class="layout" />
     </div>
-    <!-- 현재 라우트가 Home일 경우 layout 및 py-12 스타일 제거 -->
-    <div
-      :class="{
-        'layout': $route.name !== 'home',
-        'py-12': $route.name !== 'home'
-      }"
-    >
+    <div :class="layoutStyle">
       <RouterView />
     </div>
     <div>
@@ -28,9 +36,9 @@ const spinnerStore = useSpinnerStore();
     </div>
   </div>
 
-  <Spinner v-if="spinnerStore.getStatus" />
-  <ApiResponseAlerts />
-  <IssueButton />
+  <SSpinner v-if="spinnerStore.getStatus" />
+  <SApiResponseModal />
+  <SIssueButton />
 </template>
 
 <style scoped>

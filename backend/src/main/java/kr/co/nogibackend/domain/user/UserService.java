@@ -5,6 +5,7 @@ import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.config.exception.GlobalException;
@@ -15,9 +16,11 @@ import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 import kr.co.nogibackend.domain.user.dto.info.UserInfo;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
+import kr.co.nogibackend.domain.user.dto.result.UserSinUpOrUpdateResult;
 import kr.co.nogibackend.domain.user.dto.result.UserStoreNogiHistoryResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final UserSender userSender;
 
   public List<UserCheckTILResult> checkTIL(List<UserCheckTILCommand> commands) {
 
@@ -86,7 +90,7 @@ public class UserService {
           user.getGithubDefaultBranch(),
           user.getGithubEmail(),
           command.notionPageId(),
-          user.getNotionBotToken(),
+          user.getNotionAccessToken(),
           NogiHistoryType.CREATE_OR_UPDATE_CONTENT,
           command.category(),
           command.title(),
@@ -109,7 +113,7 @@ public class UserService {
         user.getGithubDefaultBranch(),
         user.getGithubEmail(),
         command.notionPageId(),
-        user.getNotionBotToken(),
+        user.getNotionAccessToken(),
         historyType,
         command.category(),
         command.title(),
@@ -199,29 +203,35 @@ public class UserService {
   }
 
   @Transactional
-  public UserResult createOrUpdateUser(UserUpdateCommand command) {
-    User user = userRepository.findByGithubOwner(command.getGithubOwner())
+  public UserSinUpOrUpdateResult signUpOrUpdateUser(Long githubId, UserUpdateCommand command) {
+    AtomicBoolean isSinUp = new AtomicBoolean(false);
+    User user = userRepository.findByGithubId(githubId)
         .map(existingUser -> {
-          existingUser.update(command);
+          // access token update
+          existingUser.update(
+              UserUpdateCommand.builder()
+                  .githubAuthToken(command.getGithubAuthToken())
+                  .build()
+          );
+          isSinUp.set(false);
           return existingUser;
         })
         .orElseGet(() -> {
+          // create new user
           User newUser =
               User.builder()
                   .role(Role.USER)
-                  .notionBotToken(command.getNotionBotToken())
-                  .notionDatabaseId(command.getNotionDatabaseId())
+                  .githubId(githubId)
                   .githubAuthToken(command.getGithubAuthToken())
-                  .githubRepository(command.getGithubRepository())
-                  .githubDefaultBranch(command.getGithubDefaultBranch())
                   .githubEmail(command.getGithubEmail())
                   .githubOwner(command.getGithubOwner())
                   .isNotificationAllowed(true)
                   .build();
+          isSinUp.set(true);
           return userRepository.saveUser(newUser);
         });
 
-    return UserResult.from(user);
+    return UserSinUpOrUpdateResult.from(user, isSinUp.get());
   }
 
   @Transactional
@@ -244,5 +254,10 @@ public class UserService {
             .findById(id)
             .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
     return UserResult.from(user);
+  }
+
+  @Async
+  public void sendSinUpNotification(Long userId, String ownerName) {
+    userSender.sendSignUpNotification(userId, ownerName);
   }
 }

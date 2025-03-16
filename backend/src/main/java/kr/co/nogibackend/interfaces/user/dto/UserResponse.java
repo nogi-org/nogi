@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.util.StringUtils;
 
 @Getter
 @Setter
@@ -15,25 +16,19 @@ import lombok.Setter;
 public class UserResponse {
 
   private Long id;
-  private String notionBotToken;
-  private String notionDatabaseId;
-  private String githubAuthToken;
   private String githubRepository;
-  private String githubDefaultBranch;
   private String githubEmail;
   private String githubOwner;
+  private Boolean isConnectToNotion;// notionPageId 가 있으면 연결이 되었다고 판단
   private Boolean isNotificationAllowed;
 
   public static UserResponse from(UserInfo userInfo) {
     return UserResponse.builder()
         .id(userInfo.id())
-        .notionBotToken(userInfo.notionBotToken())
-        .notionDatabaseId(userInfo.notionDatabaseId())
-        .githubAuthToken(userInfo.githubAuthToken())
         .githubRepository(userInfo.githubRepository())
-        .githubDefaultBranch(userInfo.githubDefaultBranch())
         .githubEmail(userInfo.githubEmail())
         .githubOwner(userInfo.githubOwner())
+        .isConnectToNotion(StringUtils.hasText(userInfo.notionPageId()))
         .isNotificationAllowed(userInfo.isNotificationAllowed())
         .build();
   }

@@ -1,34 +1,36 @@
 <script setup>
-import { RouterLink, useRoute } from 'vue-router';
-import { onMounted, watch, watchEffect } from 'vue';
-import { useNavigationStore } from '@/stores/navigationStore.js';
-import LoginButton from '@/components/buttons/LoginButton.vue';
-import LogoutButton from '@/components/buttons/LogoutButton.vue';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import { onMounted, ref, watch } from 'vue';
+import SLoginButton from '@/shared/buttons/SLoginButton.vue';
+import SLogoutButton from '@/shared/buttons/SLogoutButton.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
+import { useNavigationStore } from '@/stores/navigationStore.js';
 
 const route = useRoute();
+const router = useRouter();
 
 const auth = new AuthManager();
 const authInfo = auth.getAuthInfo();
 
+// todo: navigation manager에 넣기
 const navigationStore = useNavigationStore();
-const navigations = navigationStore.getNavigations();
+const navigations = ref([]);
 
 onMounted(() => {
-  navigationStore.setIsVisibleByAuth();
+  navigations.value = navigationStore.getHeaderNavigations(router);
+  navigationStore.onActiveHeaderNavigation(navigations, route);
 });
 
-watch(
-  () => authInfo.value,
-  newValue => {
-    navigationStore.setIsVisibleByAuth();
-  },
-  { deep: true }
-);
-
-watchEffect(() => {
-  navigationStore.setIsActiveByRoute(route);
+watch(route, () => {
+  navigationStore.onActiveHeaderNavigation(navigations, route);
 });
+
+const logOut = async () => {
+  const response = await auth.onLogout();
+  if (response.isSuccess) {
+    navigations.value = navigationStore.getHeaderNavigations(router);
+  }
+};
 </script>
 
 <template>
@@ -38,20 +40,20 @@ watchEffect(() => {
       <h1 class="text-2xl tracking-widest sm:text-4xl">
         <RouterLink to="/">
           <img
-            src="/assets/images/logo.png"
-            class="w-24 sm:w-28 md:w-32 lg:w-36"
             alt="로고 이미지"
+            class="w-24 sm:w-28 md:w-32 lg:w-36"
+            src="/assets/images/logo.png"
           />
         </RouterLink>
       </h1>
-      <LoginButton v-if="!authInfo" @onLogin="auth.toGithubLoginPage()" />
-      <LogoutButton v-if="authInfo" @onLogout="auth.onLogout()" />
+      <SLoginButton v-if="!authInfo" />
+      <SLogoutButton v-if="authInfo" @onLogout="logOut" />
     </div>
 
     <!--두번째줄-->
     <ul class="flex py-4 text-sm sm:text-base">
-      <li class="mr-4 sm:mr-5 last:mr-0" v-for="item in navigations">
-        <router-link :to="{ name: item.routeName }">
+      <li v-for="item in navigations" class="mr-4 sm:mr-5 last:mr-0">
+        <router-link :to="{ name: item.name }">
           <span
             :class="{
               'font-noto_sans_m relative after:block after:w-full after:h-[0.3px] after:bg-white after:mt-1 after:content-[\'\']':

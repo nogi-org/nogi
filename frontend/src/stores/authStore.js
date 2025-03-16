@@ -22,21 +22,20 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     const authInfo = {
       userId: payload.userId,
       role: payload.role,
-      isRequireInfo: payload.requireUserInfo === 'true'
+      isRequireInfo: payload.requireUserInfo
     };
     auth.value = authInfo;
     localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(authInfo));
   }
 
-  function updateIsRequireInfo(isRequire) {
-    auth.value.isRequireInfo = isRequire;
-    localStorage.setItem(AuthManager.AUTH_KEY, JSON.stringify(auth.value));
+  function isAdmin() {
+    return auth.value?.role === AuthManager.ROLE.ADMIN;
   }
 
   return {
     getAuth,
     deleteAuth,
     setAuth,
-    updateIsRequireInfo
+    isAdmin
   };
 });

@@ -3,7 +3,7 @@ import {
   convertResponseFormat,
   handleCommonError
 } from '@/api/apiResponse.js';
-import router from '@/router/index.js';
+import router from '@/router/router.js';
 import { useAuthStore } from '@/stores/authStore.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';

@@ -12,8 +12,10 @@ import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
+import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -95,6 +97,14 @@ public class NotionClientImpl implements NotionClient {
     } catch (Exception error) {
       throw new GlobalException(F_GET_NOTION_DATABASE);
     }
+  }
+
+  @Override
+  public NotionGetAccessInfo getAccessToken(
+      String basicToken,
+      NotionGetAccessTokenRequest request
+  ) {
+    return notionFeignClient.getAccessToken(basicToken, request).getBody();
   }
 
 }

@@ -1,0 +1,118 @@
+name: CI/CD Pipeline
+
+on:
+  pull_request:
+    branches:
+      - main  # main 브랜치에 push하면 실행
+  workflow_dispatch:  # 수동 실행 버튼 추가
+
+jobs:
+  # 🔹 1️⃣ Build & Test (Dockerfile을 Artifact로 저장)
+  build-and-test:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'deploy-backend'))
+
+    steps:
+      # ✅ Git Clone
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # ✅ application-prod.yml & application-test.yml을 환경 변수에서 생성
+      - name: Create application.yml files
+        run: |
+          mkdir -p backend/src/main/resources
+          echo "${{ secrets.APPLICATION_PROD_YML }}" > backend/src/main/resources/application-prod.yml
+          echo "${{ secrets.APPLICATION_TEST_YML }}" > backend/src/main/resources/application-test.yml
+
+      # ✅ Java 17 설치
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      # ✅ Gradle 실행 권한 부여
+      - name: Grant execute permission for gradlew
+        run: chmod +x backend/gradlew
+
+      # ✅ Build (테스트 포함)
+      - name: Build with Gradle (Including Tests)
+        run: |
+          cd backend
+          ./gradlew clean build -x test  # 테스트 포함하려면 `-x test` 제거
+
+      # ✅ Dockerfile을 Artifact로 업로드
+      - name: Upload Dockerfile as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dockerfile
+          path: backend/Dockerfile  # Dockerfile이 위치한 경로
+
+      # ✅ Build 결과물 (JAR 파일)도 Artifact로 업로드
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: backend/build/libs/*.jar  # 빌드된 JAR 파일 업로드
+
+  # 🔹 2️⃣ Docker Image Build & Push
+  docker-build-and-push:
+    runs-on: ubuntu-latest
+    needs: build-and-test  # build-and-test 완료 후 실행
+
+    steps:
+      # ✅ Dockerfile Artifact 다운로드
+      - name: Download Dockerfile Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dockerfile
+          path: backend/  # Dockerfile을 저장할 위치
+
+      # ✅ Build 결과물 다운로드 (JAR 파일)
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: backend/build/libs/  # 빌드된 JAR 저장
+
+      # ✅ Docker Buildx 설정
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      # ✅ Docker Hub 로그인
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      # ✅ Docker 이미지 Build & Push
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: backend  # Spring Boot 프로젝트 폴더 기준
+          push: true
+          tags: nogiteam/nogi-api:latest, nogiteam/nogi-api:${{ github.sha }}
+
+  # 🔹 3️⃣ Deploy to EC2 via SSH
+  deploy-to-ec2:
+    runs-on: ubuntu-latest
+    needs: docker-build-and-push  # Docker Build 완료 후 실행
+
+    steps:
+      # ✅ EC2에 SSH로 접속 후 배포 스크립트 실행
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            echo ls
+            cd /home/ubuntu/nogi
+            echo "Pulling the latest Docker image..."
+            docker pull nogiteam/nogi-api:latest
+            echo "Running the deployment script..."
+            echo ls
+            chmod +x deploy.sh
+            ./deploy.sh

@@ -1,11 +1,14 @@
 package kr.co.nogibackend.domain.user.dto.result;
 
 import kr.co.nogibackend.domain.user.User;
+import kr.co.nogibackend.domain.user.dto.info.UserInfo;
+import org.springframework.util.StringUtils;
 
 public record UserResult(
     Long id,
     User.Role role,
-    String notionBotToken,
+    String notionAccessToken,
+    String notionPageId,
     String notionDatabaseId,
     String githubAuthToken,
     String githubRepository,
@@ -21,7 +24,8 @@ public record UserResult(
     return new UserResult(
         user.getId(),
         user.getRole(),
-        user.getNotionBotToken(),
+        user.getNotionAccessToken(),
+        user.getNotionPageId(),
         user.getNotionDatabaseId(),
         user.getGithubAuthToken(),
         user.getGithubRepository(),
@@ -32,7 +36,31 @@ public record UserResult(
     );
   }
 
+  public static UserResult from(UserInfo userInfo) {
+    return new UserResult(
+        userInfo.id(),
+        userInfo.role(),
+        userInfo.notionAccessToken(),
+        userInfo.notionPageId(),
+        userInfo.notionDatabaseId(),
+        userInfo.githubAuthToken(),
+        userInfo.githubRepository(),
+        userInfo.githubDefaultBranch(),
+        userInfo.githubEmail(),
+        userInfo.githubOwner(),
+        userInfo.isNotificationAllowed()
+    );
+  }
+
   public boolean isUnProcessableToNogi() {
-    return githubRepository == null || notionDatabaseId == null || notionBotToken == null;
+    return !StringUtils.hasText(githubRepository)
+        || !StringUtils.hasText(notionDatabaseId)
+        || !StringUtils.hasText(notionAccessToken);
+  }
+
+  public boolean isNotionDatabaseIdEmpty() {
+    return StringUtils.hasText(notionAccessToken)
+        && StringUtils.hasText(notionPageId)
+        && !StringUtils.hasText(notionDatabaseId);
   }
 }

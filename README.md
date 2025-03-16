@@ -98,10 +98,10 @@
 ## 🛠 시스템 아키텍처
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/624d7f8d-23b8-494b-8794-2fb5aaa1abda" alt="Nogi 프로젝트 아키텍처" width="80%">
+  <img src="https://raw.githubusercontent.com/nogi-bot/resources/main/images/readme/nogi-cloud-architecture.png" alt="Nogi 프로젝트 아키텍처" width="80%">
 </p>
 
-- 아래 다이어그램은 **Nogi 프로젝트의 전체 인프라 및 서비스 구성**을 나타냅니다.
+- 위 다이어그램은 **Nogi 프로젝트의 전체 인프라 및 서비스 구성**을 나타냅니다.
 - AWS와 Oracle Cloud를 기반으로 **프론트엔드, 백엔드, 데이터베이스, 모니터링 시스템**이 어떻게 연동되는지 확인할 수 있습니다.
 
 ### 🔹 **클라우드 및 역할 분리 이유**

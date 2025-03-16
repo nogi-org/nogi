@@ -8,21 +8,21 @@ import lombok.Getter;
 @Builder
 public class NotionStartTILCommand {
 
-	private Long userId;
-	private String githubOwner;
-	private String notionBotToken;
-	private String notionDatabaseId;
+  private Long userId;
+  private String githubOwner;
+  private String notionBotToken;
+  private String notionDatabaseId;
 
-	public static NotionStartTILCommand from(
-			UserResult userResult
-	) {
-		return
-				NotionStartTILCommand
-						.builder()
-						.userId(userResult.id())
-						.githubOwner(userResult.githubOwner())
-						.notionBotToken(userResult.notionBotToken())
-						.notionDatabaseId(userResult.notionDatabaseId())
-						.build();
-	}
+  public static NotionStartTILCommand from(
+      UserResult userResult
+  ) {
+    return
+        NotionStartTILCommand
+            .builder()
+            .userId(userResult.id())
+            .githubOwner(userResult.githubOwner())
+            .notionBotToken(userResult.notionAccessToken())
+            .notionDatabaseId(userResult.notionDatabaseId())
+            .build();
+  }
 }
