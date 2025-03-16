@@ -38,7 +38,7 @@ public class SecurityConfig {
 		Map<HttpMethod, List<String>> ADMIN_URL =
 				Map.ofEntries(
 						Map.entry(HttpMethod.POST, List.of("/guides")),
-						Map.entry(HttpMethod.PUT, List.of("/guides")),
+						Map.entry(HttpMethod.PUT, List.of("/guides", "/admin/notion-page-id")),
 						Map.entry(HttpMethod.DELETE, List.of("/guides"))
 				);
 

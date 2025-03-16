@@ -1,11 +1,20 @@
-<script setup></script>
+<script setup>
+import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
+import { AdminManager } from '@/manager/admin/AdminManager.js';
+
+const admin = new AdminManager();
+</script>
 
 <template>
   <div>
-    <ul>
-      <li>유저들 정보</li>
-      <li>각 유저들 notion 글 리스트</li>
-      <li>유저들 notion pageID 업데이트</li>
-    </ul>
+    <CSettingTitle title="Action" />
+    <div class="border border-main p-4">
+      <button
+        class="bg-action px-3 py-1 rounded-md"
+        @click="admin.updateNotionPageIdOfAllUser()"
+      >
+        모든 유저 Notion Page ID 업데이트
+      </button>
+    </div>
   </div>
 </template>

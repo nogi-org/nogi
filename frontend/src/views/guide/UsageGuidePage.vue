@@ -1,11 +1,11 @@
 <script setup>
 import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
 import { onBeforeMount, reactive, ref } from 'vue';
-import { UserGuideManager } from '@/manager/guide/UserGuideManager.js';
+import { GuideManager } from '@/manager/guide/GuideManager.js';
 import SFullSizeImageModal from '@/shared/modal/SFullSizeImageModal.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
-const userGuideManager = new UserGuideManager();
+const userGuideManager = new GuideManager();
 const userGuides = ref([]);
 const spinnerStore = useSpinnerStore();
 
