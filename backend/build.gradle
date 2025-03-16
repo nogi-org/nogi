@@ -30,6 +30,7 @@ dependencies {
     testImplementation 'org.projectlombok:lombok:1.18.26'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     // starter
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -38,8 +39,6 @@ dependencies {
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     // FeignClient PATCH for
     implementation 'io.github.openfeign:feign-httpclient:11.8'
-    // dotenv(todo: 필요여부 따라 삭제하기)
-    testImplementation 'io.github.cdimascio:dotenv-java:3.0.0'
     // H2
     runtimeOnly 'com.h2database:h2'
     // MySQL
@@ -53,10 +52,6 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    // implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-    // 기본 Security 및 OAuth2 로그인
-    // implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-
     // JSON 처리 라이브러리 (OAuth2SuccessHandler에서 ObjectMapper 사용)
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     // slack
@@ -72,6 +67,14 @@ dependencies {
 
     // springdoc-openapi
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    // revision
+    implementation 'org.springframework.data:spring-data-envers'
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    // prometheus
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    // loki
+    implementation 'com.github.loki4j:loki-logback-appender:1.4.2'
 }
 
 tasks.named('test') {

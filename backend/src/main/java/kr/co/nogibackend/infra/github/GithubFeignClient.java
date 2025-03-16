@@ -8,6 +8,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubCreateCommitInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubCreateTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubIssueInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
+import kr.co.nogibackend.domain.github.dto.info.GithubTreeInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUpdateReferenceInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
@@ -15,6 +16,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
@@ -29,13 +31,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-/*
-  Package Name : kr.co.nogibackend.infra.github
-  File Name    : GithubFeignClient
-  Author       : won taek oh
-  Created Date : 25. 2. 9.
-  Description  : GIT API를 호출하기 위한 Feign Client
- */
 @FeignClient(name = "GithubClient", url = "https://api.github.com", configuration = GitHubFeignClientConfig.class)
 public interface GithubFeignClient {
 
@@ -118,6 +113,18 @@ public interface GithubFeignClient {
   );
 
   /*
+  ➡️ github tree 조회
+  docs: https://docs.github.com/ko/rest/git/trees?apiVersion=2022-11-28#get-a-tree
+   */
+  @GetMapping("/repos/{owner}/{repo}/git/trees/{treeSha}")
+  GithubTreeInfo getTree(
+      @PathVariable("owner") String owner,
+      @PathVariable("repo") String repo,
+      @PathVariable("treeSha") String treeSha,
+      @RequestHeader("Authorization") String token
+  );
+
+  /*
   ➡️ 새로운 Git Tree 생성
   docs: https://docs.github.com/ko/rest/git/trees?apiVersion=2022-11-28#create-a-tree
   stackoverflow: https://stackoverflow.com/questions/23637961/how-do-i-mark-a-file-as-deleted-in-a-tree-using-the-github-api
@@ -177,6 +184,19 @@ public interface GithubFeignClient {
       @PathVariable("repo") String repo,
       @PathVariable("username") String username,
       @RequestBody GithubAddCollaboratorRequest request,
+      @RequestHeader("Authorization") String token
+  );
+
+  /*
+  ➡️ 파일 업로드 (base64)
+  https://docs.github.com/ko/rest/repos/contents?apiVersion=2022-11-28#create-or-update-file-contents
+   */
+  @PutMapping("/repos/{owner}/{repo}/contents/{path}")
+  void uploadFile(
+      @PathVariable("owner") String owner,
+      @PathVariable("repo") String repo,
+      @PathVariable("path") String path,
+      @RequestBody GithubCreateOrUpdateContentRequest request,
       @RequestHeader("Authorization") String token
   );
 

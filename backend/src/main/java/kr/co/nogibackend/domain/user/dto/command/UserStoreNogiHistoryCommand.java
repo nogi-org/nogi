@@ -6,7 +6,8 @@ public record UserStoreNogiHistoryCommand(
     Long userId, // 유저 ID
     String notionPageId, // 노션 페이지 ID
     String category,
-    String title
+    String title,
+    String content
 ) {
 
   public static UserStoreNogiHistoryCommand from(
@@ -16,7 +17,8 @@ public record UserStoreNogiHistoryCommand(
         notionEndTILResult.userId(),
         notionEndTILResult.notionPageId(),
         notionEndTILResult.category(),
-        notionEndTILResult.title()
+        notionEndTILResult.title(),
+        notionEndTILResult.content()
     );
   }
 }

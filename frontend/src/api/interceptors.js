@@ -6,6 +6,7 @@ import {
 import router from '@/router/index.js';
 import { useAuthStore } from '@/stores/authStore.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 export function setInterceptors(instance) {
   //요청 인터셉터
@@ -41,16 +42,19 @@ async function handleInterceptorCommonError(response) {
   }
 
   const notifyStore = useNotifyStore();
+  const spinnerStore = useSpinnerStore();
 
   switch (response.code) {
     case ApiResponse.USER_2: // 401
       await router.push({ name: 'home' });
       useAuthStore().deleteAuth();
       notifyStore.onActive(response);
+      spinnerStore.off();
       break;
     case ApiResponse.USER_3: // 403
       await router.push({ name: 'home' });
       notifyStore.onActive(response);
+      spinnerStore.off();
       break;
   }
 }

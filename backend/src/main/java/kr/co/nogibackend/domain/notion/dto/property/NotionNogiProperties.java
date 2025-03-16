@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,9 +28,24 @@ public class NotionNogiProperties {
   private NotionNogiTitleProperty nogiTitle;
   private NotionNogiCommitMessageProperty nogiCommitMessage;
 
-  public String getCategory() {
-    return nogiCategory.getSelect().getName();
+  // 카테고리가 깃헙의 디렉토리 경로로 사용됨(ex: java/문법)
+  public String getCategoryPath() {
+    return
+        nogiCategory
+            .getMulti_select()
+            .stream()
+            .map(NotionMultiSelectProperty::getName)
+            .collect(Collectors.joining("/"));
   }
+
+  /*
+  todo: 필요없는 경우 삭제
+  마크다운 파일의 상대 경로를 생성
+   */
+  // public String createRelativePath() {
+  //   int count = nogiCategory.getMulti_select().size();
+  //   return "../".repeat(count);
+  // }
 
   /*
   github 에 UTC_ISO 날짜 포맷으로 커밋할 수 있다.
@@ -39,8 +55,8 @@ public class NotionNogiProperties {
   (한국시간 -9시간 -> UTC 시간)
    */
   public void createCommitDateWithCurrentTime() {
-    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(
-        "yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    DateTimeFormatter dateTimeFormatter =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
     DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // 커밋 날짜가 없을 경우
@@ -53,8 +69,8 @@ public class NotionNogiProperties {
     LocalDateTime commitDateTime;
     try {
       // 날짜와 시간 모두 있는 경우
-      commitDateTime = LocalDateTime.parse(this.nogiCommitDate.getDate().getStart(),
-          dateTimeFormatter);
+      commitDateTime =
+          LocalDateTime.parse(this.nogiCommitDate.getDate().getStart(), dateTimeFormatter);
     } catch (DateTimeParseException error) {
       // 날짜만 있고 시간이 없는 경우
       LocalDate parsedDate =

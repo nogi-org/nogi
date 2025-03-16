@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,6 +10,6 @@ import lombok.ToString;
 @ToString
 public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
 
-  private NotionSelectProperty select;
+  private List<NotionMultiSelectProperty> multi_select;
 
 }

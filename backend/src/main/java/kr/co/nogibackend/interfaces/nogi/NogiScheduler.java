@@ -6,13 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-/*
-  Package Name : kr.co.nogibackend.interfaces.notion
-  File Name    : NotionScheduler
-  Author       : superpil
-  Created Date : 25. 2. 1.
-  Description  :
- */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -22,7 +15,6 @@ public class NogiScheduler {
 
   @Scheduled(cron = "0 */10 * * * *")
   public void onAuto() {
-    log.info("onAuto Scheduler Start 10Min");
     nogiFacade.onAuto();
   }
 

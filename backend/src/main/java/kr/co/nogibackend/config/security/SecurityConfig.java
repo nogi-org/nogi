@@ -76,6 +76,13 @@ public class SecurityConfig {
                 .accessDeniedHandler(customAccessDeniedHandler)
         )
         .authorizeHttpRequests(authorizeRequests -> {
+          // 특정 경로 차단 (403 Forbidden)
+          // 1. PHPUnit RCE 공격 시도 방지
+          // 2. 디렉토리 트래버설 공격 시도
+          // 3. Docker API 탐색 시도
+          authorizeRequests
+              .requestMatchers("/vendor/**", "/backup/**", "/containers/**").denyAll();
+
           ROLE_PERMISSIONS.forEach((role, methodUrls) ->
               methodUrls.forEach((method, urls) ->
                   urls.forEach(

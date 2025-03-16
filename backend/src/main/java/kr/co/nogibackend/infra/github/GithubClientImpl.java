@@ -18,6 +18,7 @@ import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
@@ -28,13 +29,6 @@ import kr.co.nogibackend.util.GithubErrorParser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-/*
-  Package Name : kr.co.nogibackend.infra.github
-  File Name    : GithubClientImpl
-  Author       : won taek oh
-  Created Date : 25. 2. 9.
-  Description  :
- */
 @Component
 @RequiredArgsConstructor
 public class GithubClientImpl implements GithubClient {
@@ -141,5 +135,16 @@ public class GithubClientImpl implements GithubClient {
       String token
   ) {
     githubFeignClient.addCollaborator(owner, repo, username, request, token);
+  }
+
+  @Override
+  public void uploadFile(
+      String owner,
+      String repo,
+      String path,
+      GithubCreateOrUpdateContentRequest request,
+      String token
+  ) {
+    githubFeignClient.uploadFile(owner, repo, path, request, token);
   }
 }

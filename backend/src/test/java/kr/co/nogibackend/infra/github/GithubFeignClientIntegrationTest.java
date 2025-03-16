@@ -8,6 +8,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
   Created Date : 25. 2. 9.
   Description  : GithubFeignClient 통합 테스트
  */
+@Slf4j
 class GithubFeignClientIntegrationTest extends GithubTestEnvironment {
 
   @Autowired

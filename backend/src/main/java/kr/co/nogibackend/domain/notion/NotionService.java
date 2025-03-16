@@ -1,6 +1,6 @@
 package kr.co.nogibackend.domain.notion;
 
-import static kr.co.nogibackend.domain.notion.NotionPropertyValue.STATUS_COMPLETED;
+import static kr.co.nogibackend.domain.notion.constant.NotionPropertyValue.STATUS_COMPLETED;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,14 +21,15 @@ import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /*
-노션 용어정리
-1. 데이터베이스: TIL 페이지를 담고있는 데이터베이스, 속성도 포함
-2. 페이지: 데이터베이스가 담고 있는 여러개의 페이지, 페이지는 각각 TIL 로 구분됨
-3. 블럭: 페이지에 작성된 내용, 한줄이 블럭 한개
+  노션 용어정리
+  1. 데이터베이스: TIL 페이지를 담고있는 데이터베이스, 속성도 포함
+  2. 페이지: 데이터베이스가 담고 있는 여러개의 페이지, 페이지는 각각 TIL 로 구분됨
+  3. 블럭: 페이지에 작성된 내용, 한줄이 블럭 한개
  */
 @Slf4j
 @Service
@@ -36,46 +37,50 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NotionService {
 
+  @Value("${github.resources-base-path}")
+  public String RESOURCES_BASE_PATH;
   private final NotionClient notionClient;
 
-  // Notion 에 작성완료 상태인 TIL 을 조회 후 Markdown 형식으로 가공 작업
-  public List<NotionStartTILResult> startTIL(List<NotionStartTILCommand> commands) {
-    return
-        commands
-            .stream()
-            .map(this::startTIL)
-            .flatMap(List::stream)
-            .toList();
-  }
-
+  /**
+   * <h2>📝 Notion에서 작성완료된 TIL 조회 및 Markdown 변환</h2>
+   *
+   * <ul>
+   *   <li>1️⃣ 작성완료 상태의 TIL 페이지 조회</li>
+   *   <li>2️⃣ 각 페이지에 커밋 일자 및 시간 추가</li>
+   *   <li>3️⃣ Notion 블록 정보 조회</li>
+   *   <li>4️⃣ 블록 데이터를 Markdown 형식으로 변환</li>
+   *   <li>5️⃣ 변환된 결과를 NotionStartTILResult 객체로 생성</li>
+   *   <li>6️⃣ 모든 결과를 리스트에 담아 반환</li>
+   * </ul>
+   */
   public List<NotionStartTILResult> startTIL(NotionStartTILCommand command) {
-    // 작성완료 상태 TIL 페이지 조회
+    // 1️⃣ 작성완료 상태의 TIL 페이지 조회
     List<NotionPageInfo> pages =
         this.getCompletedPages(command.getNotionBotToken(), command.getNotionDatabaseId());
 
     List<NotionStartTILResult> results = new ArrayList<>();
     for (NotionPageInfo page : pages) {
-      // page 에 커밋 일자, 시간 확인 및 주입
+      // 2️⃣ 페이지에 커밋 일자 및 시간 추가
       page.getProperties().createCommitDateWithCurrentTime();
 
-      // 블럭 조회
+      // 3️⃣ Notion 블록 정보 조회
       NotionInfo<NotionBlockInfo> blocks =
           this.getBlocksOfPage(command.getNotionBotToken(), page, command.getUserId());
 
-      // 블럭 markdown 으로 변환
+      // 4️⃣ 블록 데이터를 Markdown 형식으로 변환
       NotionBlockConversionInfo encodingOfBlock =
-          this.convertMarkdown(page, blocks.getResults(), command.getUserId());
+          this.convertMarkdown(blocks.getResults(), command.getUserId(), command.getGithubOwner());
 
-      // result 로 빌드
+      // 5️⃣ 변환된 결과를 NotionStartTILResult 객체로 생성
       results.add(new NotionStartTILResult(command.getUserId(), page, encodingOfBlock));
     }
 
+    // 6️⃣ 변환된 결과 리스트 반환
     return results;
   }
 
-  /*
-  Github 에 commit 된 결과를 notion 상태값 변경
-   */
+
+  // Github 에 commit 된 결과를 notion 상태값 변경
   public List<NotionEndTILResult> endTIL(List<NotionEndTILCommand> commands) {
     return
         commands
@@ -85,23 +90,39 @@ public class NotionService {
             .toList();
   }
 
+  /**
+   * <h2>✅ Notion TIL 상태 업데이트</h2>
+   *
+   * <ul>
+   *   <li>1️⃣ TIL 커밋 성공/실패 여부를 기반으로 상태 업데이트</li>
+   *   <li>2️⃣ Notion 페이지 ID, 사용자 ID를 이용해 상태 변경</li>
+   *   <li>3️⃣ 성공한 경우 NotionEndTILResult 객체 생성</li>
+   *   <li>4️⃣ 실패한 경우 Optional.empty() 반환</li>
+   * </ul>
+   */
   public Optional<NotionEndTILResult> endTIL(NotionEndTILCommand command) {
+    // 1️⃣ TIL 커밋 성공/실패 여부를 기반으로 상태 업데이트
     boolean isUpdateResult =
         this.updateTILResultStatus(command.isSuccess(), command.notionBotToken(),
             command.notionPageId(),
             command.userId());
 
+    // 2️⃣ Notion 페이지 ID, 사용자 ID를 이용해 상태 변경
     return
         isUpdateResult && command.isSuccess()
             ? Optional.of(
+            // 3️⃣ 성공한 경우 NotionEndTILResult 객체 생성
             new NotionEndTILResult(
                 command.userId(),
                 command.notionPageId(),
                 command.category(),
-                command.title()
+                command.title(),
+                command.content()
             ))
+            // 4️⃣ 실패한 경우 Optional.empty() 반환
             : Optional.empty();
   }
+
 
   // 노션 데이터베이스 연결 확인(단순 노션 데이터베이스에 페이지 조회 후 에러 없으면 성공처리)
   public void onConnectionTest(NotionConnectionTestCommand command) {
@@ -121,8 +142,11 @@ public class NotionService {
   }
 
   // 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
-  private NotionInfo<NotionBlockInfo> getBlocksOfPage(String notionBotToken, NotionPageInfo page,
-      Long userId) {
+  private NotionInfo<NotionBlockInfo> getBlocksOfPage(
+      String notionBotToken
+      , NotionPageInfo page
+      , Long userId
+  ) {
     NotionInfo<NotionBlockInfo> blocks = this.getBlocks(notionBotToken, page.getId(), null, userId);
 
     // hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
@@ -164,9 +188,15 @@ public class NotionService {
     }
   }
 
-  // 블럭 조회 후 각각의 블럭을 markdown 으로 변환
-  private NotionBlockConversionInfo convertMarkdown(NotionPageInfo page,
-      List<NotionBlockInfo> blocks, Long userId) {
+  /*
+  블럭 조회 후 각각의 블럭을 markdown 으로 변환
+  줄바꿈 경우: 띄어쓰기 두번 + \n 으로 처리
+   */
+  private NotionBlockConversionInfo convertMarkdown(
+      List<NotionBlockInfo> blocks
+      , Long userId
+      , String githubOwner
+  ) {
     StringBuilder markDown = new StringBuilder();
     List<NotionStartTILResult.ImageOfNotionBlock> images = new ArrayList<>();
 
@@ -178,14 +208,14 @@ public class NotionService {
                 .append("# ")
                 .append(
                     NotionRichTextContent.mergePlainText(block.getHeading_1().getRich_text(), true))
-                .append("\n");
+                .append("  \n");
             break;
           case "heading_2":
             markDown
                 .append("## ")
                 .append(
                     NotionRichTextContent.mergePlainText(block.getHeading_2().getRich_text(), true))
-                .append("\n");
+                .append("  \n");
             break;
 
           case "heading_3":
@@ -193,21 +223,20 @@ public class NotionService {
                 .append("### ")
                 .append(
                     NotionRichTextContent.mergePlainText(block.getHeading_3().getRich_text(), true))
-                .append("\n");
+                .append("  \n");
             break;
 
           case "paragraph":
             if (block.getParagraph().getRich_text().isEmpty()) {
               markDown
-                  .append("\n");
+                  .append("  \n");
             } else {
               markDown
                   .append(NotionRichTextContent.mergePlainText(block.getParagraph().getRich_text(),
                       true))
-                  .append("\n");
+                  .append("  \n");
             }
             break;
-
           case "bulleted_list_item":
             markDown
                 .append("* ")
@@ -215,7 +244,7 @@ public class NotionService {
                     NotionRichTextContent.mergePlainText(
                         block.getBulleted_list_item().getRich_text(),
                         true))
-                .append("\n");
+                .append("  \n");
             break;
 
           case "numbered_list_item":
@@ -225,48 +254,47 @@ public class NotionService {
                     NotionRichTextContent.mergePlainText(
                         block.getNumbered_list_item().getRich_text(), true)
                 )
-                .append("\n");
+                .append("  \n");
             break;
 
           case "code":
             markDown
                 .append("```")
                 .append(block.getCode().getLanguage())
-                .append("\n")
-                .append(NotionRichTextContent.mergePlainText(block.getCode().getRich_text(), true))
-                .append("\n")
-                .append("```\n");
+                .append("  \n");
+
+            for (NotionRichTextContent richTest : block.getCode().getRich_text()) {
+              markDown.append(richTest.getPlain_text()).append("  \n");
+            }
+
+            markDown
+                .append("```")
+                .append("  \n");
             break;
 
           case "divider":
-            markDown
-                .append("---")
-                .append("\n");
+            markDown.append("---").append("  \n");
             break;
 
           case "to_do":
-            String checkBox = block.getTo_do().isChecked() ? "- [x]" : "- [ ]";
+            String checkBox = block.getTo_do().isChecked() ? "- [x] " : "- [ ] ";
             markDown
                 .append(checkBox)
-                .append(" ")
                 .append(NotionRichTextContent.mergePlainText(block.getTo_do().getRich_text(), true))
-                .append("   \n");
+                .append("  \n");
             break;
 
           case "image":
             // 이미지 요청
-            URI imageUri = block.getImage().createURI();
+            URI imageUri = block.getImage().createURL();
             String imageEnc64 = this.getImageOfBlock(imageUri);
 
-            // 이미지명 추출
-            String fileName = block.getImage().parseFileName(imageUri);
-
-            // 이미지 경로 생성
-            String imagePath =
-                block.getImage().createMarkdownPath(page.getProperties().getCategory(), fileName);
+            // 이미지명 생성
+            String fileName = block.getImage().createFileName();
 
             // 마크 다운에 들어갈 이미지 경로 생성
-            String markdownImagePath = "./image/" + fileName;
+            String imagePath =
+                block.getImage().createImagePath(RESOURCES_BASE_PATH, githubOwner, fileName);
 
             // 캡션 생성
             String caption = block.getImage().createCaption();
@@ -275,17 +303,17 @@ public class NotionService {
                 .append("![")
                 .append(caption)
                 .append("](")
-                .append(markdownImagePath)
+                .append(imagePath)
                 .append(")")
-                .append("\n");
+                .append("  \n");
 
-            images.add(
-                new NotionStartTILResult.ImageOfNotionBlock(imageEnc64, fileName, imagePath));
+            images
+                .add(new NotionStartTILResult.ImageOfNotionBlock(imageEnc64, fileName, imagePath));
 
             break;
 
           default:
-            markDown.append("\n");
+            markDown.append("  \n");
         }
       } catch (Exception error) {
         ExecutionResultContext.addNotionPageErrorResult("Markdown 변환 중 문제가 발생했어요.", userId);

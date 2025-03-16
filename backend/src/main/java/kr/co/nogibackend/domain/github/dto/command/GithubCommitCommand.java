@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
+import kr.co.nogibackend.domain.user.dto.result.UserResult;
 
 public record GithubCommitCommand(
     Long userId,               // 유저 ID
@@ -26,15 +27,27 @@ public record GithubCommitCommand(
     String commitMessage,        // 커밋 메시지
     String content,             // markdown 파일 내용
     String githubToken,         // 깃허브 토큰
-    List<ImageOfGithub> images // 이미지 정보
+    List<ImageOfGithub> images, // 이미지 정보
+    NogiBot nogiBot
 ) {
+
+  public record NogiBot(
+      String githubToken,
+      String githubOwner,
+      String githubRepository,
+      String githubBranch,
+      String githubEmail
+  ) {
+
+  }
 
   /**
    * 📌 List<NotionStartTILResult>와 List<UserCheckTILResult>를 조합하여 List<GithubCommitCommand> 생성
    */
   public static List<GithubCommitCommand> of(
       List<NotionStartTILResult> notionResults,
-      List<UserCheckTILResult> userCheckResults
+      List<UserCheckTILResult> userCheckResults,
+      UserResult nogiBotResult
   ) {
     // ✅ userCheckResults를 notionPageId 기준으로 매핑 (빠른 조회를 위해 Map 사용)
     Map<String, UserCheckTILResult> userCheckMap = userCheckResults.stream()
@@ -42,30 +55,37 @@ public record GithubCommitCommand(
 
     // ✅ notionResults를 기반으로 GithubCommitCommand 리스트 생성
     return notionResults.stream()
-        .map(notion -> {
-          UserCheckTILResult userCheckTILResult = userCheckMap.get(notion.notionPageId());
+        .map(notionResult -> {
+          UserCheckTILResult userCheckTILResult = userCheckMap.get(notionResult.notionPageId());
 
           return new GithubCommitCommand(
-              notion.userId(),
+              notionResult.userId(),
               userCheckTILResult.userName(),
               userCheckTILResult.repository(),
               userCheckTILResult.branch(),
               userCheckTILResult.githubEmail(),
-              notion.notionPageId(),
+              notionResult.notionPageId(),
               userCheckTILResult.notionBotToken(),
               userCheckTILResult.type(),
-              notion.category(),
-              notion.title(),
+              notionResult.category(),
+              notionResult.title(),
               userCheckTILResult.prevCategory(),
               userCheckTILResult.prevTitle(),
-              notion.commitDate(),
-              notion.commitMessage(),
-              notion.content(),
+              notionResult.commitDate(),
+              notionResult.commitMessage(),
+              notionResult.content(),
               userCheckTILResult.githubToken(),
-              notion.images().stream()
+              notionResult.images().stream()
                   .map(image -> new ImageOfGithub(image.fileEnc64(), image.fileName(),
                       image.filePath()))
-                  .collect(Collectors.toList())
+                  .collect(Collectors.toList()),
+              new NogiBot(
+                  nogiBotResult.githubAuthToken(),
+                  nogiBotResult.githubOwner(),
+                  nogiBotResult.githubRepository(),
+                  nogiBotResult.githubDefaultBranch(),
+                  nogiBotResult.githubEmail()
+              )
           );
         })
         .collect(Collectors.toList());
@@ -82,8 +102,13 @@ public record GithubCommitCommand(
   public Map<String, String> prepareFiles() {
     Map<String, String> fileMap = new HashMap<>();
     addMarkdownFile(fileMap);
-    addImageFiles(fileMap);
     addHistoryFile(fileMap);
+    return fileMap;
+  }
+
+  public Map<String, String> prepareImageFiles(String resourcesBasePath) {
+    Map<String, String> fileMap = new HashMap<>();
+    addImageFiles(fileMap, resourcesBasePath);
     return fileMap;
   }
 
@@ -101,9 +126,13 @@ public record GithubCommitCommand(
     fileMap.put(getMarkdownFilePath(), this.content);
   }
 
-  private void addImageFiles(Map<String, String> fileMap) {
-    images.forEach(image ->
-        fileMap.put(image.getImageFilePath(), image.getImageFile())
+  private void addImageFiles(Map<String, String> fileMap, String resourcesBasePath) {
+    images.forEach(image -> {
+          // basePath 를 제외한 상대 경로를 key로 사용
+          String imageFilePath = image.getImageFilePath();
+          String relativePath = imageFilePath.replaceFirst(resourcesBasePath, "");
+          fileMap.put(relativePath, image.getImageFile());
+        }
     );
   }
 

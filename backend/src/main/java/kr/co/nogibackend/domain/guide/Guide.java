@@ -1,6 +1,7 @@
 package kr.co.nogibackend.domain.guide;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
@@ -10,20 +11,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import kr.co.nogibackend.domain.BaseEntity;
 import kr.co.nogibackend.domain.user.User;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 
-/*
-  Package Name : kr.co.nogibackend.domain
-  File Name    : User
-  Author       : superpil
-  Created Date : 25. 2. 1.
-  Description  :
- */
 @Table(
     name = "tb_guide"
 )
@@ -32,7 +28,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Guide {
+@SQLDelete(sql = "UPDATE tb_guide SET deleted = true, deleted_on = CURRENT_TIMESTAMP WHERE id = ?")
+public class Guide extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +44,7 @@ public class Guide {
   private int step;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "USER_ID", foreignKey = @ForeignKey(name = "FK_TB_GUIDE__USER_ID"))
+  @JoinColumn(foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
   private User user;
 
   // 모든 필드 수정

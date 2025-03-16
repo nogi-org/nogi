@@ -10,6 +10,7 @@ import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.github.dto.command.GithubAddCollaboratorCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
+import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand.NogiBot;
 import kr.co.nogibackend.domain.github.dto.command.GithubGetRepositoryCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.info.GithubBlobInfo;
@@ -23,6 +24,8 @@ import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateBlobRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateCommitRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest;
+import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRequest.GithubCommitter;
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
@@ -33,19 +36,16 @@ import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-/*
-  Package Name : kr.co.nogibackend.domain.github
-  File Name    : GithubService
-  Author       : won taek oh
-  Created Date : 25. 2. 9.
-  Description  : GitHub API를 호출하는 서비스
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class GithubService {
+
+  @Value("${github.resources-base-path}")
+  private String resourcesBasePath;
 
   private static final Set<String> BINARY_EXTENSIONS = Set.of(".png", ".jpg", ".jpeg", ".gif");
   private final GithubClient githubClient;
@@ -57,8 +57,21 @@ public class GithubService {
         .toList();
   }
 
+  /**
+   * <h2>🚀 GitHub에 파일을 커밋하는 메서드</h2>
+   *
+   * <ul>
+   *   <li>1️⃣ 현재 브랜치의 최신 HEAD 커밋 SHA 조회</li>
+   *   <li>2️⃣ 파일을 Blob으로 변환 후 TreeEntry 생성</li>
+   *   <li>3️⃣ 새로운 Git Tree 생성</li>
+   *   <li>4️⃣ 새로운 Commit 생성 (커밋 날짜 포함)</li>
+   *   <li>5️⃣ 브랜치를 최신 커밋으로 업데이트 (HEAD 이동)</li>
+   *   <li>6️⃣ 성공 여부에 따라 GithubCommitResult 반환</li>
+   * </ul>
+   */
   public Optional<GithubCommitResult> commitToGithub(GithubCommitCommand command) {
     try {
+      // ✅ markdown 파일 업로드할 때 필요한 정보
       String owner = command.githubOwner();
       String repo = command.githubRepository();
       String branch = command.githubBranch();
@@ -66,25 +79,33 @@ public class GithubService {
       String token = command.githubToken();
       String message = command.getCommitMessage();
       String date = command.commitDate();
-      Map<String, String> files = command.prepareFiles();
+      Map<String, String> markdownFiles = command.prepareFiles();
 
-      // 1️⃣ 현재 브랜치의 HEAD 커밋 가져오기
+      // ✅ 이미지 업로드할 때 필요한 정보
+      NogiBot nogiBot = command.nogiBot();
+      Map<String, String> imageFiles = command.prepareImageFiles(resourcesBasePath);
+
+      // 1️⃣ 현재 브랜치의 HEAD 커밋 SHA 조회 🔄
       String latestSha = getLatestCommitSha(owner, repo, branch, token);
 
-      // 2️⃣ 파일들을 Blob 으로 변환하여 TreeEntry 목록 생성
-      List<GithubCreateTreeRequest.TreeEntry> treeEntries = createTreeEntries(files, owner, repo,
-          token);
+      // 2️⃣ 파일들을 Blob으로 변환하여 TreeEntry 목록 생성 📂
+      List<GithubCreateTreeRequest.TreeEntry> treeEntries = createTreeEntries(markdownFiles, owner,
+          repo, token);
 
-      // 3️⃣ 새로운 Git Tree 생성
+      // 3️⃣ 새로운 Git Tree 생성 🌳
       GithubCreateTreeInfo tree = createNewTree(owner, repo, latestSha, treeEntries, token);
 
-      // 4️⃣ 새로운 Commit 생성 (커밋 날짜 지정)
+      // 4️⃣ 새로운 Commit 생성 (커밋 날짜 포함) 📝
       String newCommitSha = createNewCommit(owner, repo, email, message, date, latestSha,
           tree.sha(), token);
 
-      // 5️⃣ 브랜치 업데이트 (HEAD 이동)
+      // 5️⃣ 브랜치 업데이트 (HEAD 이동) 🔄
       updateBranch(owner, repo, branch, newCommitSha, token);
 
+      // 6️⃣ 이미지 저장
+      uploadImageFiles(imageFiles, nogiBot);
+
+      // 7️⃣ 성공 결과 반환 ✅
       return Optional.of(
           new GithubCommitResult(
               command.userId(),
@@ -92,15 +113,21 @@ public class GithubService {
               command.notionBotToken(),
               command.newCategory(),
               command.newTitle(),
-              true
+              command.content(),
+              true // 커밋 성공
           )
       );
     } catch (Exception e) {
+      // ❌ 예외 발생 시 로그 기록 및 에러 처리
       log.error("Github commit error", e);
+
+      // ExecutionResultContext에 오류 기록 📌
       ExecutionResultContext.addNotionPageErrorResult(
           "Github에 Commit 중 문제가 발생했어요",
           command.userId()
       );
+
+      // 7️⃣ 실패 결과 반환 ❌
       return Optional.of(
           new GithubCommitResult(
               command.userId(),
@@ -108,11 +135,32 @@ public class GithubService {
               command.notionBotToken(),
               command.newCategory(),
               command.newTitle(),
-              false
+              command.content(),
+              false // 커밋 실패
           )
       );
     }
   }
+
+  private void uploadImageFiles(Map<String, String> imageFiles, NogiBot nogiBot) {
+    for (Map.Entry<String, String> imageFile : imageFiles.entrySet()) {
+      githubClient.uploadFile(
+          nogiBot.githubOwner(),
+          nogiBot.githubRepository(),
+          imageFile.getKey(),
+          new GithubCreateOrUpdateContentRequest(
+              "이미지 파일 업로드",
+              imageFile.getValue(),
+              new GithubCommitter(
+                  nogiBot.githubOwner(),
+                  nogiBot.githubEmail()
+              )
+          ),
+          nogiBot.githubToken()
+      );
+    }
+  }
+
 
   private List<GithubCreateTreeRequest.TreeEntry> createTreeEntries(
       Map<String, String> files,

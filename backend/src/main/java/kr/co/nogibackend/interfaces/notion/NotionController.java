@@ -12,13 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/*
-  Package Name : kr.co.nogibackend.interfaces.user
-  File Name    : LoginController
-  Author       : won taek oh
-  Created Date : 25. 2. 14.
-  Description  :
- */
 @Slf4j
 @RestController
 @RequestMapping("/notion")
