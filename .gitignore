@@ -9,3 +9,7 @@
 *.sw?
 
 *.tsbuildinfo
+
+frontend/localhost-key.pem
+frontend/localhost.pem
+backend/src/main/resources/keystore.p12
