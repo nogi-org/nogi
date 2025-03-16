@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router';
 import SSystemChecking from '@/shared/common/SSystemChecking.vue';
 
-const SYSTEM_CHECKING = false;
+const SYSTEM_CHECKING = true;
 </script>
 
 <template>
