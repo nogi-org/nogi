@@ -21,7 +21,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.util.StringUtils;
 
 @Table(
-		name = "tb_user"
+    name = "tb_user"
 )
 @Getter
 @Entity
@@ -33,22 +33,23 @@ import org.springframework.util.StringUtils;
 @SQLDelete(sql = "UPDATE tb_user SET deleted = true, deleted_on = CURRENT_TIMESTAMP WHERE id = ?")
 public class User extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@Enumerated(EnumType.STRING)
-	private Role role;
-	private String notionAccessToken;// TODO 컬럼명 notionAccessToken 으로 변경
-	private String notionPageId; // notionDatabase 가 있는 page 의 id
-	@Column(nullable = true, length = 255, unique = true)
-	private String notionDatabaseId;
-	private String githubAuthToken;
-	private String githubRepository;
-	private String githubDefaultBranch;
-	private String githubEmail;
-	private String githubOwner;
-	@Builder.Default
-	private Boolean isNotificationAllowed = true;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+  @Enumerated(EnumType.STRING)
+  private Role role;
+  private String notionAccessToken;// TODO 컬럼명 notionAccessToken 으로 변경
+  private String notionPageId; // notionDatabase 가 있는 page 의 id
+  @Column(nullable = true, length = 255, unique = true)
+  private String notionDatabaseId;
+  private Long githubId;// github user 의 고유 값
+  private String githubAuthToken;
+  private String githubRepository;
+  private String githubDefaultBranch;
+  private String githubEmail;
+  private String githubOwner;
+  @Builder.Default
+  private Boolean isNotificationAllowed = true;
 
 
 	public User update(UserUpdateCommand command) {

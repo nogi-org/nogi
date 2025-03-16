@@ -4,6 +4,7 @@ import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
 import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
 
 public record GithubUserResult(
+    Long id,
     String email,
     String owner
 ) {
@@ -13,6 +14,7 @@ public record GithubUserResult(
       GithubUserEmailInfo userEmailInfo
   ) {
     return new GithubUserResult(
+        userInfo.id(),
         userEmailInfo.email(),
         userInfo.login()
     );

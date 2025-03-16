@@ -203,23 +203,26 @@ public class UserService {
   }
 
   @Transactional
-  public UserSinUpOrUpdateResult signUpOrUpdateUser(UserUpdateCommand command) {
+  public UserSinUpOrUpdateResult signUpOrUpdateUser(Long githubId, UserUpdateCommand command) {
     AtomicBoolean isSinUp = new AtomicBoolean(false);
-    User user = userRepository.findByGithubOwner(command.getGithubOwner())
+    User user = userRepository.findByGithubId(githubId)
         .map(existingUser -> {
-          existingUser.update(command);
+          // access token update
+          existingUser.update(
+              UserUpdateCommand.builder()
+                  .githubAuthToken(command.getGithubAuthToken())
+                  .build()
+          );
           isSinUp.set(false);
           return existingUser;
         })
         .orElseGet(() -> {
+          // create new user
           User newUser =
               User.builder()
                   .role(Role.USER)
-                  .notionAccessToken(command.getNotionAccessToken())
-                  .notionDatabaseId(command.getNotionDatabaseId())
+                  .githubId(githubId)
                   .githubAuthToken(command.getGithubAuthToken())
-                  .githubRepository(command.getGithubRepository())
-                  .githubDefaultBranch(command.getGithubDefaultBranch())
                   .githubEmail(command.getGithubEmail())
                   .githubOwner(command.getGithubOwner())
                   .isNotificationAllowed(true)

@@ -50,13 +50,13 @@ public class UserQueryRepository {
     );
   }
 
-  public Optional<User> findByGithubOwner(String owner) {
+  public Optional<User> findByGithubId(Long githubId) {
     QUser qUser = QUser.user;
 
     return Optional.ofNullable(
         queryFactory.selectFrom(qUser)
             .where(
-                qUser.githubOwner.eq(owner)
+                qUser.githubId.eq(githubId)
             )
             .fetchOne()
     );

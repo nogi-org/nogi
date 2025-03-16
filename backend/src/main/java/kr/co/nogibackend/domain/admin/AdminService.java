@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import kr.co.nogibackend.domain.admin.dto.response.UserInfoResponse;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
@@ -52,6 +53,10 @@ public class AdminService {
 		result.put("success", success);
 		result.put("fail", fail);
 		return result;
+	}
+
+	public List<UserInfoResponse> getUserInfo() {
+		return UserInfoResponse.from(userRepository.findAll());
 	}
 
 }

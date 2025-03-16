@@ -66,6 +66,7 @@ public class UserFacade {
       // 4. user 정보 저장하기
       UserSinUpOrUpdateResult sinUpOrUpdateResult =
           userService.signUpOrUpdateUser(
+              githubUserResult.id(),
               UserUpdateCommand.fromGithubLogin(githubUserResult, githubAccessToken)
           );
 
@@ -141,7 +142,7 @@ public class UserFacade {
     // 1. user 정보 가져오기
     UserResult userResult = userService.findUserByIdForFacade(command.getId());
 
-    // 2. Repository 생성 또는 업데이트
+    // 2. github 에 실제로 repo 가 존재하는지 확인하고 없으면 생성
     handleRepositoryCreationOrUpdate(command, userResult);
 
     // 3. DB 에 user 정보 업데이트
@@ -162,7 +163,9 @@ public class UserFacade {
 
     // GitHub 에서 삭제된 상태일 때 새롭게 생성
     if (isDeletedOnGithub) {
-      createRepositoryAndAddCollaborator(command, userResult);
+      String defaultBranch = createRepositoryAndAddCollaborator(command, userResult);
+      // update 하기 위해 default branch 를 저장
+      command.setGithubDefaultBranch(defaultBranch);
     }
   }
 
@@ -180,12 +183,11 @@ public class UserFacade {
     );
   }
 
-  private void createRepositoryAndAddCollaborator(UserUpdateCommand command,
+  private String createRepositoryAndAddCollaborator(UserUpdateCommand command,
       UserResult userResult) {
     GithubRepoInfo githubRepoInfo = githubService.createRepository(
         command.getGithubRepository(), userResult.githubAuthToken()
     );
-    command.setGithubDefaultBranch(githubRepoInfo.defaultBranch());
 
     UserResult nogiBot = userService.findNogiBot()
         .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
@@ -196,6 +198,7 @@ public class UserFacade {
             nogiBot.githubOwner(), userResult.githubAuthToken()
         )
     );
+    return githubRepoInfo.defaultBranch();
   }
 
   public void validateRepositoryName(

@@ -6,11 +6,9 @@
     <div class="animate-rocket text-6xl">🚀</div>
 
     <h1 class="text-4xl md:text-5xl font-extrabold mt-6 text-center">
-      다음 버전에서 새로운 기능을 만나보세요! 🎉
+      다음 버전에서 더욱 강력한 기능으로 찾아뵙겠습니다!🎉
     </h1>
-    <p class="mt-4 text-lg text-center max-w-2xl">
-      더욱 편리하고 강력한 기능으로 돌아옵니다. 기대해주세요!
-    </p>
+    <p class="mt-4 text-lg text-center max-w-2xl">기대해주세요!</p>
 
     <!-- 새로운 기능 목록 -->
     <!--    <div-->

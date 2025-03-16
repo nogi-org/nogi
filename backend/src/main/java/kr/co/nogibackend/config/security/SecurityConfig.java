@@ -37,8 +37,9 @@ public class SecurityConfig {
 		// ADMIN 권한 설정
 		Map<HttpMethod, List<String>> ADMIN_URL =
 				Map.ofEntries(
+						Map.entry(HttpMethod.GET, List.of("/admin/**")),
 						Map.entry(HttpMethod.POST, List.of("/guides")),
-						Map.entry(HttpMethod.PUT, List.of("/guides", "/admin/notion-page-id")),
+						Map.entry(HttpMethod.PUT, List.of("/guides", "/admin/**")),
 						Map.entry(HttpMethod.DELETE, List.of("/guides"))
 				);
 

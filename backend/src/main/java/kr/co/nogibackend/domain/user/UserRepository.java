@@ -5,19 +5,22 @@ import java.util.Optional;
 
 public interface UserRepository {
 
-  List<User> findAllUserByIds(Long... userIds);
+	List<User> findAllUserByIds(Long... userIds);
 
-  List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageIds);
+	List<NogiHistory> findAllNogiHistoryByNotionPageIds(List<String> notionPageIds);
 
-  NogiHistory saveNogiHistory(NogiHistory build);
+	NogiHistory saveNogiHistory(NogiHistory build);
 
-  List<User> findAllUser();
+	List<User> findAllUser();
 
-  Optional<User> findNogiBot();
+	Optional<User> findNogiBot();
 
-  Optional<User> findByGithubOwner(String githubOwner);
+	Optional<User> findByGithubId(Long githubId);
 
-  User saveUser(User user);
+	User saveUser(User user);
 
-  Optional<User> findById(Long id);
+	Optional<User> findById(Long id);
+
+	List<User> findAll();
+
 }
