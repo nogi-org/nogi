@@ -7,6 +7,6 @@ import lombok.Setter;
 @Setter
 public class NotionTableCellTextContent {
 
-	private String content;
-	private String link;
+  private String content;
+  private NotionLinkPreviewContent link;
 }
