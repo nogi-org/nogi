@@ -155,6 +155,7 @@ public class UserFacade {
       return;
     }
 
+    // 삭제 여부 확인
     boolean isDeletedOnGithub = isRepositoryDeletedOnGithub(
         userResult.githubOwner(),
         newRepo,
@@ -163,10 +164,28 @@ public class UserFacade {
 
     // GitHub 에서 삭제된 상태일 때 새롭게 생성
     if (isDeletedOnGithub) {
-      String defaultBranch = createRepositoryAndAddCollaborator(command, userResult);
-      // update 하기 위해 default branch 를 저장
-      command.setGithubDefaultBranch(defaultBranch);
+      githubService.createRepository(
+          command.getGithubRepository(), userResult.githubAuthToken()
+      );
     }
+
+    // nogiBot 을 collaborator 로 추가
+    UserResult nogiBot = userService.findNogiBot()
+        .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
+    githubService.addCollaborator(
+        new GithubAddCollaboratorCommand(
+            userResult.githubOwner(), command.getGithubRepository(),
+            nogiBot.githubOwner(), userResult.githubAuthToken()
+        )
+    );
+
+    // github repo 정보를 조회 default branch 가져오기 위함
+    GithubRepoInfo repositoryInfo = githubService.getRepositoryInfo(
+        userResult.githubOwner(),
+        command.getGithubRepository(),
+        userResult.githubAuthToken()
+    );
+    command.setGithubDefaultBranch(repositoryInfo.defaultBranch());
   }
 
   private boolean isRepositoryDeletedOnGithub(
@@ -181,24 +200,6 @@ public class UserFacade {
             githubAuthToken
         )
     );
-  }
-
-  private String createRepositoryAndAddCollaborator(UserUpdateCommand command,
-      UserResult userResult) {
-    GithubRepoInfo githubRepoInfo = githubService.createRepository(
-        command.getGithubRepository(), userResult.githubAuthToken()
-    );
-
-    UserResult nogiBot = userService.findNogiBot()
-        .orElseThrow(() -> new GlobalException(F_NOT_FOUND_USER));
-
-    githubService.addCollaborator(
-        new GithubAddCollaboratorCommand(
-            userResult.githubOwner(), command.getGithubRepository(),
-            nogiBot.githubOwner(), userResult.githubAuthToken()
-        )
-    );
-    return githubRepoInfo.defaultBranch();
   }
 
   public void validateRepositoryName(

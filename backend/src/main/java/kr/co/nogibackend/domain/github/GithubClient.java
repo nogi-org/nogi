@@ -110,4 +110,6 @@ public interface GithubClient {
       GithubCreateOrUpdateContentRequest request,
       String token
   );
+
+  GithubRepoInfo getOwnerRepositoryInfo(String s, String githubRepository, String s1);
 }
