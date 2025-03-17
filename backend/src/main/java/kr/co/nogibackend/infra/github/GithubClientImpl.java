@@ -152,4 +152,9 @@ public class GithubClientImpl implements GithubClient {
   ) {
     githubFeignClient.uploadFile(owner, repo, path, request, token);
   }
+
+  @Override
+  public GithubRepoInfo getOwnerRepositoryInfo(String owner, String repoName, String token) {
+    return githubFeignClient.getOwnerRepositoryInfo(owner, repoName, token);
+  }
 }
