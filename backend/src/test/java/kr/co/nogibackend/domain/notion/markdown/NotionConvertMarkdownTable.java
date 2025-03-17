@@ -15,53 +15,59 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class NotionConvertMarkdownTable {
 
-  final String textCellContent = "{\n"
-      + "                            \"type\": \"text\",\n"
-      + "                            \"text\": {\n"
-      + "                                \"content\": \"1\",\n"
-      + "                                \"link\": null\n"
-      + "                            },\n"
-      + "                            \"plain_text\": \"superpil\",\n"
-      + "                            \"href\": null\n"
-      + "                        }";
+	final String textCellContent = "{\n"
+			+ "                            \"type\": \"text\",\n"
+			+ "                            \"text\": {\n"
+			+ "                                \"content\": \"1\",\n"
+			+ "                                \"link\": null\n"
+			+ "                            },\n"
+			+ "                            \"plain_text\": \"superpil\",\n"
+			+ "                            \"href\": null\n"
+			+ "                        }";
 
-  final String linkCellContent = "{\n"
-      + "                            \"type\": \"text\",\n"
-      + "                            \"text\": {\n"
-      + "                                \"content\": \"https://naver.com\",\n"
-      + "                                \"link\": {\n"
-      + "                                    \"url\": \"https://naver.com/\"\n"
-      + "                                }\n"
-      + "                            },\n"
-      + "                            \"plain_text\": \"https://naver.com\",\n"
-      + "                            \"href\": \"https://naver.com/\"\n"
-      + "                        }";
+	final String linkCellContent = "{\n"
+			+ "                            \"type\": \"text\",\n"
+			+ "                            \"text\": {\n"
+			+ "                                \"content\": \"https://naver.com\",\n"
+			+ "                                \"link\": {\n"
+			+ "                                    \"url\": \"https://naver.com/\"\n"
+			+ "                                }\n"
+			+ "                            },\n"
+			+ "                            \"plain_text\": \"https://naver.com\",\n"
+			+ "                            \"href\": \"https://naver.com/\"\n"
+			+ "                        }";
 
-  @InjectMocks
-  private NotionService notionService;
+	@InjectMocks
+	private NotionService notionService;
 
-  @Test
-  void convertMarkdownTable() throws JsonProcessingException {
-    // cell
-    ObjectMapper objectMapper = new ObjectMapper();
-    NotionTableRowCellsContent cell1 =
-        objectMapper.readValue(textCellContent, NotionTableRowCellsContent.class);
-    NotionTableRowCellsContent cell2 =
-        objectMapper.readValue(linkCellContent, NotionTableRowCellsContent.class);
-    NotionTableRowCellsContent cell3 =
-        objectMapper.readValue(linkCellContent, NotionTableRowCellsContent.class);
+	@Test
+	void convertMarkdownTable() throws JsonProcessingException {
+		// cell
+		ObjectMapper objectMapper = new ObjectMapper();
+		NotionTableRowCellsContent cell1 =
+				objectMapper.readValue(textCellContent, NotionTableRowCellsContent.class);
+		NotionTableRowCellsContent cell2 =
+				objectMapper.readValue(linkCellContent, NotionTableRowCellsContent.class);
+		NotionTableRowCellsContent cell3 =
+				objectMapper.readValue(linkCellContent, NotionTableRowCellsContent.class);
 
-    // row
-    NotionTableRowContent row = new NotionTableRowContent();
-    row.setCells(List.of(cell1, cell2, cell3));
+		// row
+		NotionTableRowContent row1 = new NotionTableRowContent();
+		row1.setCells(List.of(cell1, cell2, cell3));
 
-    // rows
-    NotionBlockInfo rows = new NotionBlockInfo();
-    rows.setTable_row(row);
+		NotionTableRowContent row2 = new NotionTableRowContent();
+		row2.setCells(List.of(cell3, cell2, cell1));
 
-    // when
-    String markdown = notionService.convertMarkdownByTable(List.of(rows));
-    System.out.println(markdown);
-  }
+		// rows
+		NotionBlockInfo rows1 = new NotionBlockInfo();
+		rows1.setTable_row(row1);
+
+		NotionBlockInfo rows2 = new NotionBlockInfo();
+		rows2.setTable_row(row2);
+
+		// when
+		String markdown = notionService.convertMarkdownByTable(List.of(rows1, rows2));
+		System.out.println(markdown);
+	}
 
 }
