@@ -17,6 +17,8 @@ public class NotionInfo<T> {
   private boolean has_more;
   private String type;
   private Object block;
+  private String developer_survey;
+  private String request_id;
 
   public static <T> NotionInfo<T> empty() {
     NotionInfo<T> response = new NotionInfo<>();

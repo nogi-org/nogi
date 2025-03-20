@@ -12,5 +12,6 @@ public class NotionParentProperty {
   private String type;
   private String database_id;
   private String page_id;
+  private String block_id;
 
 }

@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 public class NotionTableRowCellsContent {
 
-	private String type;
-	private String plain_text;
-	private String href;
-	private NotionTableCellTextContent text;
-	private NotionAnnotationsContent annotations;
+  private String type;
+  private NotionTableCellTextContent text;
+  private NotionAnnotationsContent annotations;
+  private String plain_text;
+  private String href;
 
 }
