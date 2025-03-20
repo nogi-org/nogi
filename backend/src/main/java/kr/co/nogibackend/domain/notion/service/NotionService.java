@@ -1,6 +1,6 @@
-package kr.co.nogibackend.domain.notion;
+package kr.co.nogibackend.domain.notion.service;
 
-import static kr.co.nogibackend.domain.notion.constant.NotionPropertyValue.STATUS_COMPLETED;
+import static kr.co.nogibackend.domain.notion.dto.constant.NotionPropertyValue.STATUS_COMPLETED;
 import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
 import java.net.URI;
@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.config.exception.GlobalException;
+import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
@@ -19,13 +20,14 @@ import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
-import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
-import kr.co.nogibackend.domain.notion.dto.response.NotionConnectionResponse;
 import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionGetAccessResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
+import kr.co.nogibackend.domain.notion.helper.NotionRequestMaker;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
+import kr.co.nogibackend.interfaces.notion.dto.request.NotionGetAccessTokenRequest;
+import kr.co.nogibackend.interfaces.notion.dto.response.NotionConnectionResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
