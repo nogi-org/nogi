@@ -11,17 +11,21 @@ import kr.co.nogibackend.interfaces.notion.dto.request.NotionGetAccessTokenReque
 
 public interface NotionClient {
 
-	NotionInfo<NotionPageInfo> getPagesFromDatabase(String BotToken, String databaseId,
-			Map<String, Object> request);
+  NotionInfo<NotionPageInfo> getPagesFromDatabase
+      (String BotToken, String databaseId, Map<String, Object> request);
 
-	NotionInfo<NotionBlockInfo> getBlocksFromPage(String BotToken, String pageId, String startCursor);
+  NotionInfo<NotionBlockInfo> getBlocksFromParent
+      (String BotToken, String pageId, String startCursor);
 
-	byte[] getBlockImage(URI baseUri);
+  NotionInfo<NotionBlockInfo> getBlocksFromParent
+      (String BotToken, String pageId);
 
-	NotionPageInfo updatePageStatus
-			(String BotToken, String pageId, Map<String, Object> request);
+  byte[] getBlockImage(URI baseUri);
 
-	NotionDatabaseInfo getDatabase(String BotToken, String databaseId);
+  NotionPageInfo updatePageStatus
+      (String BotToken, String pageId, Map<String, Object> request);
 
-	NotionGetAccessInfo getAccessToken(String basicToken, NotionGetAccessTokenRequest request);
+  NotionDatabaseInfo getDatabase(String BotToken, String databaseId);
+
+  NotionGetAccessInfo getAccessToken(String basicToken, NotionGetAccessTokenRequest request);
 }

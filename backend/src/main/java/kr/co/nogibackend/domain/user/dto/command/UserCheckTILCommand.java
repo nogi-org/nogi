@@ -1,6 +1,6 @@
 package kr.co.nogibackend.domain.user.dto.command;
 
-import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
 
 public record UserCheckTILCommand(
     Long userId,// 유저 ID
@@ -10,13 +10,13 @@ public record UserCheckTILCommand(
 ) {
 
   public static UserCheckTILCommand from(
-      NotionStartTILResult notionStartTILResult
+      CompletedPageMarkdownResult completedPageMarkdownResult
   ) {
     return new UserCheckTILCommand(
-        notionStartTILResult.userId(),
-        notionStartTILResult.notionPageId(),
-        notionStartTILResult.category(),
-        notionStartTILResult.title()
+        completedPageMarkdownResult.userId(),
+        completedPageMarkdownResult.notionPageId(),
+        completedPageMarkdownResult.category(),
+        completedPageMarkdownResult.title()
     );
   }
 }

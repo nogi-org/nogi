@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/guides")
 @RequiredArgsConstructor
-public class GuideController {
+public class GuideCommandController {
 
   private final GuideService guideService;
 
@@ -29,11 +28,6 @@ public class GuideController {
   public ResponseEntity<?> registerGuide(@Validated @RequestBody GuideRegisterRequest request,
       Auth auth) {
     return Response.success(guideService.registerGuide(request.toCommand()));
-  }
-
-  @GetMapping
-  public ResponseEntity<?> getGuides() {
-    return Response.success(guideService.getGuides());
   }
 
   @PutMapping

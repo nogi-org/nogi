@@ -4,7 +4,7 @@ import java.util.List;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 
-public record NotionStartTILResult(
+public record CompletedPageMarkdownResult(
     Long userId,// 유저 ID
     String notionPageId,// 노션 페이지 ID
     String category,// 디렉터리 하위 구조
@@ -16,7 +16,7 @@ public record NotionStartTILResult(
 ) {
 
   // custom
-  public NotionStartTILResult(
+  public CompletedPageMarkdownResult(
       Long userId
       , NotionPageInfo page
       , NotionBlockConversionInfo encoding

@@ -25,91 +25,103 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class NotionClientImpl implements NotionClient {
 
-	private final NotionFeignClient notionFeignClient;
-	private final NotionImageFeignClient notionImageFeignClient;
+  private final NotionFeignClient notionFeignClient;
+  private final NotionImageFeignClient notionImageFeignClient;
 
-	@Override
-	public NotionInfo<NotionPageInfo> getPagesFromDatabase(
-			String BotToken,
-			String databaseId,
-			Map<String, Object> request
-	) {
-		try {
-			return
-					notionFeignClient
-							.getPagesFromDatabase(BotToken, databaseId, request)
-							.getBody();
-		} catch (Exception error) {
-			throw new GlobalException(F_GET_NOTION_PAGE);
-		}
-	}
+  @Override
+  public NotionInfo<NotionPageInfo> getPagesFromDatabase(
+      String BotToken,
+      String databaseId,
+      Map<String, Object> request
+  ) {
+    try {
+      return
+          notionFeignClient
+              .getPagesFromDatabase(BotToken, databaseId, request)
+              .getBody();
+    } catch (Exception error) {
+      throw new GlobalException(F_GET_NOTION_PAGE);
+    }
+  }
 
-	@Override
-	public NotionInfo<NotionBlockInfo> getBlocksFromPage(
-			String BotToken,
-			String pageId,
-			String startCursor
-	) {
-		try {
-			NotionInfo<NotionBlockInfo> body = notionFeignClient
-					.getBlocksFromPage(BotToken, pageId, startCursor)
-					.getBody();
-			return body;
-//      return
-//          notionFeignClient
-//              .getBlocksFromPage(BotToken, pageId, startCursor)
-//              .getBody();
-		} catch (Exception error) {
-			log.error("Notion Page Or Block Get Fail : {}", error.getMessage());
-			throw new GlobalException(F_GET_NOTION_BLOCK);
-		}
-	}
+  @Override
+  public NotionInfo<NotionBlockInfo> getBlocksFromParent(
+      String accessToken
+      , String parentBlockId
+      , String startCursor
+  ) {
+    return this.callBlocksFromParentClient(accessToken, parentBlockId, startCursor);
+  }
 
-	@Override
-	public byte[] getBlockImage(URI baseUri) {
-		try {
-			return notionImageFeignClient.getBlockImage(baseUri);
-		} catch (Exception error) {
-			throw new GlobalException(F_GET_BLOCK_IMAGE);
-		}
-	}
+  @Override
+  public NotionInfo<NotionBlockInfo> getBlocksFromParent(
+      String accessToken,
+      String parentBlockId
+  ) {
+    return this.callBlocksFromParentClient(accessToken, parentBlockId, null);
+  }
 
-	@Override
-	public NotionPageInfo updatePageStatus(
-			String BotToken
-			, String pageId
-			, Map<String, Object> request
-	) {
-		try {
-			return
-					notionFeignClient
-							.updatePageStatus(BotToken, pageId, request)
-							.getBody();
-		} catch (Exception error) {
-			throw new GlobalException(F_UPDATE_TIL_STATUS);
-		}
+  private NotionInfo<NotionBlockInfo> callBlocksFromParentClient(
+      String accessToken
+      , String parentBlockId
+      , String startCursor
+  ) {
+    try {
+      return
+          notionFeignClient
+              .getBlocksFromParent(accessToken, parentBlockId, startCursor)
+              .getBody();
+    } catch (Exception error) {
+      log.error("Notion Get Blocks API Fail : {}", error.getMessage());
+      throw new GlobalException(F_GET_NOTION_BLOCK);
+    }
+  }
 
-	}
+  @Override
+  public byte[] getBlockImage(URI baseUri) {
+    try {
+      return notionImageFeignClient.getBlockImage(baseUri);
+    } catch (Exception error) {
+      throw new GlobalException(F_GET_BLOCK_IMAGE);
+    }
+  }
 
-	@Override
-	public NotionDatabaseInfo getDatabase(
-			String BotToken
-			, String databaseId
-	) {
-		try {
-			return
-					notionFeignClient.getDatabase(BotToken, databaseId).getBody();
-		} catch (Exception error) {
-			throw new GlobalException(F_GET_NOTION_DATABASE);
-		}
-	}
+  @Override
+  public NotionPageInfo updatePageStatus(
+      String BotToken
+      , String pageId
+      , Map<String, Object> request
+  ) {
+    try {
+      return
+          notionFeignClient
+              .updatePageStatus(BotToken, pageId, request)
+              .getBody();
+    } catch (Exception error) {
+      throw new GlobalException(F_UPDATE_TIL_STATUS);
+    }
 
-	@Override
-	public NotionGetAccessInfo getAccessToken(
-			String basicToken,
-			NotionGetAccessTokenRequest request
-	) {
-		return notionFeignClient.getAccessToken(basicToken, request).getBody();
-	}
+  }
+
+  @Override
+  public NotionDatabaseInfo getDatabase(
+      String BotToken
+      , String databaseId
+  ) {
+    try {
+      return
+          notionFeignClient.getDatabase(BotToken, databaseId).getBody();
+    } catch (Exception error) {
+      throw new GlobalException(F_GET_NOTION_DATABASE);
+    }
+  }
+
+  @Override
+  public NotionGetAccessInfo getAccessToken(
+      String basicToken,
+      NotionGetAccessTokenRequest request
+  ) {
+    return notionFeignClient.getAccessToken(basicToken, request).getBody();
+  }
 
 }

@@ -6,18 +6,18 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class NotionStartTILCommand {
+public class CompletedPageMarkdownCommand {
 
   private Long userId;
   private String githubOwner;
   private String notionBotToken;
   private String notionDatabaseId;
 
-  public static NotionStartTILCommand from(
+  public static CompletedPageMarkdownCommand from(
       UserResult userResult
   ) {
     return
-        NotionStartTILCommand
+        CompletedPageMarkdownCommand
             .builder()
             .userId(userResult.id())
             .githubOwner(userResult.githubOwner())

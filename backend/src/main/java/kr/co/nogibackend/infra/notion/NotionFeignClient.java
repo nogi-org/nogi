@@ -22,38 +22,38 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "NotionClient", url = "https://api.notion.com/v1", configuration = NotionFeignClientConfig.class)
 public interface NotionFeignClient {
 
-	@PostMapping("/databases/{databaseId}/query")
-	ResponseEntity<NotionInfo<NotionPageInfo>> getPagesFromDatabase(
-			@RequestHeader("Authorization") String token,
-			@PathVariable(value = "databaseId") String databaseId,
-			Map<String, Object> request
-	);
+  @PostMapping("/databases/{databaseId}/query")
+  ResponseEntity<NotionInfo<NotionPageInfo>> getPagesFromDatabase(
+      @RequestHeader("Authorization") String token,
+      @PathVariable(value = "databaseId") String databaseId,
+      Map<String, Object> request
+  );
 
-	@GetMapping("/blocks/{pageId}/children?page_size=100")
-	ResponseEntity<NotionInfo<NotionBlockInfo>> getBlocksFromPage(
-			@RequestHeader("Authorization") String token,
-			@PathVariable(value = "pageId") String pageId,
-			@RequestParam(value = "start_cursor", required = false) String startCursor
-	);
+  @GetMapping("/blocks/{parentBlockId}/children?page_size=100")
+  ResponseEntity<NotionInfo<NotionBlockInfo>> getBlocksFromParent(
+      @RequestHeader("Authorization") String token,
+      @PathVariable(value = "parentBlockId") String parentBlockId,
+      @RequestParam(value = "start_cursor", required = false) String startCursor
+  );
 
-	@RequestMapping(method = RequestMethod.PATCH, value = "/pages/{pageId}")
-	ResponseEntity<NotionPageInfo> updatePageStatus(
-			@RequestHeader("Authorization") String token,
-			@PathVariable(value = "pageId") String pageId,
-			@RequestBody Map<String, Object> request
-	);
+  @RequestMapping(method = RequestMethod.PATCH, value = "/pages/{pageId}")
+  ResponseEntity<NotionPageInfo> updatePageStatus(
+      @RequestHeader("Authorization") String token,
+      @PathVariable(value = "pageId") String pageId,
+      @RequestBody Map<String, Object> request
+  );
 
 
-	@RequestMapping(method = RequestMethod.GET, value = "/databases/{databaseId}")
-	ResponseEntity<NotionDatabaseInfo> getDatabase(
-			@RequestHeader("Authorization") String token,
-			@PathVariable(value = "databaseId") String databaseId
-	);
+  @RequestMapping(method = RequestMethod.GET, value = "/databases/{databaseId}")
+  ResponseEntity<NotionDatabaseInfo> getDatabase(
+      @RequestHeader("Authorization") String token,
+      @PathVariable(value = "databaseId") String databaseId
+  );
 
-	@RequestMapping(method = RequestMethod.POST, value = "/oauth/token")
-	ResponseEntity<NotionGetAccessInfo> getAccessToken(
-			@RequestHeader("Authorization") String token,
-			@RequestBody NotionGetAccessTokenRequest request
-	);
+  @RequestMapping(method = RequestMethod.POST, value = "/oauth/token")
+  ResponseEntity<NotionGetAccessInfo> getAccessToken(
+      @RequestHeader("Authorization") String token,
+      @RequestBody NotionGetAccessTokenRequest request
+  );
 
 }

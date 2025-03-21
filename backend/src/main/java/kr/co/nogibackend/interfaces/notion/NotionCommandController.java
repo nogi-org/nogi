@@ -1,7 +1,7 @@
 package kr.co.nogibackend.interfaces.notion;
 
 import kr.co.nogibackend.config.security.Auth;
-import kr.co.nogibackend.domain.notion.service.NotionService;
+import kr.co.nogibackend.domain.notion.service.NotionConnectionService;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/notion")
 @RequiredArgsConstructor
-public class NotionController {
+public class NotionCommandController {
 
-	private final NotionService notionService;
+  private final NotionConnectionService notionConnectionService;
 
-	@PostMapping("connection-test")
-	public ResponseEntity<?> onConnectionTest(Auth auth) {
-		return Response.success(notionService.onConnectionTest(auth.getUserId()));
-	}
+  @PostMapping("connection-test")
+  public ResponseEntity<?> onConnectionTest(Auth auth) {
+    return Response.success(notionConnectionService.onConnectionTest(auth.getUserId()));
+  }
 
   /*
   todo: 노션페이지에 공지사항 남기기
