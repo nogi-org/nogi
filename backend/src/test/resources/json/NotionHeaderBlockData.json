@@ -1,0 +1,130 @@
+[
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "heading",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "heading1",
+        "href": null
+      }
+    ],
+    "is_toggleable": false,
+    "color": "default"
+  },
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "shift\nenter",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "shift\nenter",
+        "href": null
+      }
+    ],
+    "is_toggleable": false,
+    "color": "default"
+  },
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "shift\n",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "shift\n",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "enter style",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": true,
+          "color": "default"
+        },
+        "plain_text": "enter style",
+        "href": null
+      }
+    ],
+    "is_toggleable": false,
+    "color": "default"
+  },
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "shift",
+          "link": {
+            "url": "https://nogi.co.kr/"
+          }
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "shift",
+        "href": "https://nogi.co.kr/"
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "\n",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "\n",
+        "href": null
+      }
+    ],
+    "is_toggleable": false,
+    "color": "default"
+  }
+]

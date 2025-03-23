@@ -22,12 +22,14 @@ public class NotionImageContent {
 	private String type;
 	private NotionFileProperty file;
 	private List<NotionRichTextContent> caption;
+	// notion 조회 후 주입 받지않음, 마크다운 전처리에서 값 할당
+	private String base64;
 
-	public String createCaption() {
-		return this.caption.isEmpty()
-				? "IMAGE"
-				: NotionRichTextContent.mergePlainText(this.caption, true);
-	}
+//	public String createCaption() {
+//		return this.caption.isEmpty()
+//				? "IMAGE"
+//				: NotionRichTextContent.mergePlainText(this.caption, true);
+//	}
 
 	public URI createURL() {
 		try {

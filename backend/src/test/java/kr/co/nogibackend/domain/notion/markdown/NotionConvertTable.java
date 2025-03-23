@@ -4,7 +4,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class NotionConvertMarkdownTable {
+public class NotionConvertTable {
 
 //  final String textCellContent = "{\n"
 //      + "                            \"type\": \"text\",\n"

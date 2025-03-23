@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 public class NotionTableRowContent {
 
-	private List<NotionTableRowCellsContent> cells;
+	private List<List<NotionTableRowCellsContent>> cells;
 
 }
