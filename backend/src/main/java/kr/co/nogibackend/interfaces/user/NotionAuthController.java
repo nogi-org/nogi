@@ -6,12 +6,11 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
-import kr.co.nogibackend.application.user.UserFacade;
+import kr.co.nogibackend.application.user.UserLoginFacade;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand.NotionLogin;
 import kr.co.nogibackend.config.security.Auth;
 import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByNotionInfo;
-import kr.co.nogibackend.infra.notion.NotionFeignClient;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NotionAuthController {
 
-  private final UserFacade userFacade;
+  private final UserLoginFacade userLoginFacade;
   private final JwtProvider jwtProvider;
-  private final NotionFeignClient notionFeignClient;
 
   @Value("${notion.client.id}")
   private String notionClientId;
@@ -101,7 +99,7 @@ public class NotionAuthController {
 
     Long userId = jwtProvider.getUserInfoFromToken(token).getUserId();
 
-    UserLoginByNotionInfo userLoginByNotionInfo = userFacade.loginByNotion(
+    UserLoginByNotionInfo userLoginByNotionInfo = userLoginFacade.loginByNotion(
         new NotionLogin(userId, notionClientId, notionClientSecret, notionRedirectUri, code)
     );
 

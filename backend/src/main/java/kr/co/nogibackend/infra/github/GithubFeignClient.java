@@ -20,11 +20,9 @@ import kr.co.nogibackend.domain.github.dto.request.GithubCreateOrUpdateContentRe
 import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
-import kr.co.nogibackend.domain.github.dto.request.GithubUpdateRepoRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -74,14 +72,6 @@ public interface GithubFeignClient {
   @PostMapping("/user/repos")
   GithubRepoInfo createUserRepository(
       @RequestBody GithubRepoRequest request,
-      @RequestHeader("Authorization") String token
-  );
-
-  @PatchMapping(value = "/repos/{owner}/{repo}")
-  GithubRepoInfo updateRepository(
-      @PathVariable("owner") String owner,
-      @PathVariable("repo") String repo,
-      @RequestBody GithubUpdateRepoRequest request,
       @RequestHeader("Authorization") String token
   );
 

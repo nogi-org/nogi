@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import kr.co.nogibackend.application.user.UserFacade;
+import kr.co.nogibackend.application.user.UserLoginFacade;
 import kr.co.nogibackend.application.user.dto.UserFacadeCommand;
 import kr.co.nogibackend.domain.user.dto.info.UserLoginByGithubInfo;
 import kr.co.nogibackend.response.service.Response;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class GithubAuthController {
 
-  private final UserFacade userFacade;
+  private final UserLoginFacade userLoginFacade;
 
   @Value("${github.client.id}")
   private String githubClientId;
@@ -57,7 +57,7 @@ public class GithubAuthController {
   ) throws IOException {
     UserFacadeCommand.GithubLogin userFacadeCommand =
         new UserFacadeCommand.GithubLogin(githubClientId, githubClientSecret, code);
-    UserLoginByGithubInfo userLoginByGithubInfo = userFacade.loginByGithub(userFacadeCommand);
+    UserLoginByGithubInfo userLoginByGithubInfo = userLoginFacade.loginByGithub(userFacadeCommand);
 
     String redirectUrl = String.format(
         "%s?isRequireNotionInfo=%s&isRequireGithubInfo=%s&userId=%s&role=%s&isSuccess=%s&message=%s&type=GITHUB",
