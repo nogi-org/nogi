@@ -2,8 +2,10 @@ package kr.co.nogibackend.domain.notion.service;
 
 import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
+import java.util.Optional;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.NotionClient;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.helper.NotionDataProvider;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
@@ -41,14 +43,15 @@ public class NotionConnectionService {
     }
 
     // notion database id 가 없는 경우 page id 로 조회 후 체크
+    // 처음 회원가입 후 노션 데이터베이서 id가 없을 수 있음.
     if (user.isEmptyNotionDatabaseId()) {
-      try {
-        notionDataProvider
-            .getNotionDatabaseInfo(user.getNotionAccessToken(), user.getNotionPageId());
-        return new NotionConnectionResponse(true, "연결 확인되었어요.");
-      } catch (Exception error) {
-        return new NotionConnectionResponse(false, "Notion 페이지에서 Database를 조회할 수 없어요.");
-      }
+      Optional<NotionBlockInfo> database =
+          notionDataProvider
+              .getNotionDatabaseByPageId(user.getNotionAccessToken(), user.getNotionPageId());
+      
+      return database.isPresent()
+          ? new NotionConnectionResponse(true, "연결 확인되었어요.")
+          : new NotionConnectionResponse(false, "Notion 페이지에서 Database를 조회할 수 없어요.");
     }
 
     // notion database id 가 있는 경우 access token 으로 조회 후 체크

@@ -4,342 +4,379 @@ import static kr.co.nogibackend.response.code.NotionResponseCode.F_PROCESS_MARKD
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.dto.content.NotionCodeContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionHeadingContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionImageContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionParagraphContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowCellsContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTextContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTodoContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class NotionMarkdownConverter {
 
-	@Value("${github.resources-base-path}")
-	public String RESOURCES_BASE_PATH;
+  @Value("${github.resources-base-path}")
+  public String RESOURCES_BASE_PATH;
 
-	/**
-	 * <h1>마크다운 변환</h1>
-	 * <ul>
-	 *   <li>줄바꿈 경우: 띄어쓰기 두번 + \n 으로 처리</li>
-	 * </ul>
-	 */
-	public NotionBlockConversionInfo convert(
-			List<NotionBlockInfo> blocks
-			, String githubOwner // 전처리로 빼기
-	) {
-		StringBuilder markdown = new StringBuilder();
-		List<CompletedPageMarkdownResult.ImageOfNotionBlock> images = new ArrayList<>();
-		try {
-			for (NotionBlockInfo block : blocks) {
-				switch (block.getType()) {
-					case "heading_1":
-						markdown.append(this.buildHeading1(block.getHeading_1()));
-						break;
+  /**
+   * <h1>마크다운 변환</h1>
+   */
+  public NotionBlockConversionInfo convert(
+      List<NotionBlockInfo> blocks
+      , String githubOwner
+  ) {
+    StringBuilder markdown = new StringBuilder();
+    List<CompletedPageMarkdownResult.ImageOfNotionBlock> images = new ArrayList<>();
+    try {
+      for (NotionBlockInfo block : blocks) {
+        switch (block.getType()) {
+          case "heading_1":
+            markdown.append(this.buildHeading1(block.getHeading_1()));
+            break;
 
-					case "heading_2":
-						markdown.append(this.buildHeading2(block.getHeading_2()));
-						break;
+          case "heading_2":
+            markdown.append(this.buildHeading2(block.getHeading_2()));
+            break;
 
-					case "heading_3":
-						markdown.append(this.buildHeading3(block.getHeading_3()));
-						break;
+          case "heading_3":
+            markdown.append(this.buildHeading3(block.getHeading_3()));
+            break;
 
-					case "paragraph":
-						markdown.append(this.buildParagraph(block.getParagraph()));
-						break;
+          case "paragraph":
+            markdown.append(this.buildParagraph(block.getParagraph()));
+            break;
 
-					case "code":
-						markdown.append(this.buildCode(block.getCode()));
-						break;
+          case "code":
+            markdown.append(this.buildCode(block.getCode()));
+            break;
 
-					case "divider":
-						markdown.append("---").append("  \n");
-						break;
+          case "divider":
+            markdown.append("---").append("  \n");
+            break;
 
-					case "to_do":
-						markdown.append(this.buildTodo(block.getTo_do()));
-						break;
+          case "to_do":
+            markdown.append(this.buildTodo(block.getTo_do()));
+            break;
 
-					// todo: 하위 자식 요소 가져와서 처리
-//					case "bulleted_list_item":
-//						markDown
-//								.append("* ")
-//								.append(
-//										NotionRichTextContent.mergePlainText(
-//												block.getBulleted_list_item().getRich_text(),
-//												true))
-//								.append("  \n");
-//						break;
+          case "image":
+            markdown.append(this.buildImageMarkdown(block.getImage(), githubOwner));
+            images = this.buildImagesBase64(block.getImage());
+            break;
 
-//					case "numbered_list_item":
-//						markDown
-//								.append("1. ")
-//								.append(
-//										NotionRichTextContent.mergePlainText(
-//												block.getNumbered_list_item().getRich_text(), true)
-//								)
-//								.append("  \n");
-//						break;
+          case "bulleted_list_item":
+            markdown.append(this.buildListItem(block.getBulleted_list_item(), false));
+            break;
 
-//
-//					case "image":
-//						// 이미지명 생성
-//						String fileName = block.getImage().createFileName();
-//
-//						// 마크 다운에 들어갈 이미지 경로 생성
-//						String path =
-//								block.getImage().createImagePath(RESOURCES_BASE_PATH, githubOwner, fileName);
-//
-//						// 캡션 생성
-//						String caption = block.getImage().createCaption();
-//
-//						markDown
-//								.append("![")
-//								.append(caption)
-//								.append("](")
-//								.append(path)
-//								.append(")")
-//								.append("  \n");
-//
-//						// 이미지 데이터
-//						ImageOfNotionBlock image =
-//								new ImageOfNotionBlock(block.getImage().getBase64(), fileName, path);
-//						images.add(image);
-//						break;
-//
-//					case "table":
-//						break;
+          case "numbered_list_item":
+            markdown.append(this.buildListItem(block.getNumbered_list_item(), true));
+            break;
 
-					default:
-						markdown.append("  \n");
-				}
-			}
-			return new NotionBlockConversionInfo(markdown.toString(), images);
-		} catch (Exception error) {
-			throw new GlobalException(F_PROCESS_MARKDOWN);
-		}
-	}
+          case "table":
+            markdown.append(this.buildTable(block.getTable()));
+            break;
 
-	/**
-	 * <h1>TODO 변환기</h1>
-	 */
-	public String buildTodo(NotionTodoContent todo) {
-		StringBuilder markdown = new StringBuilder();
-		String checkBox = todo.isChecked() ? "- [x] " : "- [ ] ";
-		markdown
-				.append(checkBox)
-				.append(this.mergeRichText(todo.getRich_text()))
-				.append("  \n");
-		return markdown.toString();
-	}
+          default:
+            markdown.append("  \n");
+        }
+      }
+      return new NotionBlockConversionInfo(markdown.toString(), images);
+    } catch (Exception error) {
+      log.error("Markdown Convert Error : {}", error.getMessage());
+      throw new GlobalException(F_PROCESS_MARKDOWN);
+    }
+  }
 
-	/**
-	 * <h1>Heading 변환기</h1>
-	 */
-	public String buildHeading(int prefixCount, NotionHeadingContent header) {
-		StringBuilder markdown = new StringBuilder();
-		String prefix = this.buildHeadingPrefix(prefixCount);
+  /**
+   * todo: 토글
+   */
+//  public String buildToggle() {
+//    StringBuilder markdown = new StringBuilder();
+//    return markdown.toString();
+//  }
 
-		for (NotionRichTextContent richText : header.getRich_text()) {
-			this.escapeSymbol(richText);
-			this.buildAnnotationsContent(richText);
-			this.buildLink(richText);
-		}
+  /**
+   * todo
+   * <h1>Table 변환기</h1>
+   */
+  public String buildTable(NotionTableContent table) {
+    StringBuilder markdown = new StringBuilder();
 
-		markdown
-				.append(prefix)
-				.append(" ")
-				.append(this.mergeRichText(header.getRich_text()))
-				.append("  \n");
+    List<NotionTableRowContent> rows = table.getRows();
 
-		return markdown.toString();
-	}
+    if (rows == null || rows.isEmpty()) {
+      return ""; // 테이블에 행이 없으면 빈 문자열 반환
+    }
 
-	/**
-	 * <h1>paragraph 변환기</h1>
-	 */
-	public String buildParagraph(NotionParagraphContent paragraph) {
-		StringBuilder markdown = new StringBuilder();
+    boolean hasColumnHeader = table.isHas_column_header();
 
-		if (paragraph.getRich_text().isEmpty()) {
-			markdown.append("  \n");
-			return markdown.toString();
-		}
+    // 1. 헤더 출력
+    if (rows.get(0).getCells() != null) {
+      List<List<NotionTableRowCellsContent>> headerCells = rows.get(0).getCells();
+      for (List<NotionTableRowCellsContent> cellGroup : headerCells) {
+        String cellText =
+            cellGroup
+                .stream()
+                .map(NotionTableRowCellsContent::getPlain_text)
+                .collect(Collectors.joining());
+        markdown
+            .append("|")
+            .append(cellText)
+            .append("  \n");
+      }
+      markdown.append("|\n");
 
-		for (NotionRichTextContent richText : paragraph.getRich_text()) {
-			this.escapeSymbol(richText);
-			this.buildAnnotationsContent(richText);
-			this.buildLink(richText);
-		}
+      // 2. 구분선 출력
+      markdown
+          .append("|:---".repeat(headerCells.size()))
+          .append("|\n");
+    }
 
-		markdown
-				.append(this.splitText(paragraph.getRich_text()))
-				.append("  \n");
-		return markdown.toString();
-	}
+    // 3. 본문 출력
+    int startIndex = hasColumnHeader ? 1 : 0;
+    for (int i = startIndex; i < rows.size(); i++) {
+      List<List<NotionTableRowCellsContent>> rowCells = rows.get(i).getCells();
+      for (List<NotionTableRowCellsContent> cellGroup : rowCells) {
+        String cellText = cellGroup.stream()
+            .map(NotionTableRowCellsContent::getPlain_text)
+            .collect(Collectors.joining());
+        markdown.append("| ").append(cellText).append("  \n");
+      }
+      markdown.append("|\n");
+    }
 
-	/**
-	 * <h1>Code 변환기</h1>
-	 */
-	public String buildCode(NotionCodeContent code) {
-		StringBuilder markdown = new StringBuilder();
-		markdown
-				.append("```")
-				.append(code.getLanguage())
-				.append("  \n");
+    return markdown.toString();
+  }
 
-		for (NotionRichTextContent richTest : code.getRich_text()) {
-			markdown
-					.append(richTest.getText().getContent())
-					.append("  \n");
-		}
+  /**
+   * <h1>List(글머리, 번호) 마크다운 변환기</h1>
+   */
+  public String buildListItem(NotionListItemContent listItem, boolean isNumberList) {
+    return buildListItem(listItem, isNumberList, 0);
+  }
 
-		markdown
-				.append("```")
-				.append("  \n");
-		return markdown.toString();
-	}
+  private String buildListItem(NotionListItemContent listItem, boolean isNumberList, int depth) {
+    StringBuilder markdown = new StringBuilder();
 
-	private String buildHeadingPrefix(int prefixCount) {
-		return "#".repeat(Math.max(0, prefixCount));
-	}
+    // depth에 따라 들여쓰기 (스페이스 3칸씩)
+    String indent = "   ".repeat(depth);
+    String prefix = isNumberList ? "1. " : "* ";
 
-	private String buildHeading1(NotionHeadingContent header) {
-		return this.buildHeading(1, header);
-	}
+    markdown
+        .append(indent)
+        .append(prefix)
+        .append(NotionRichTextContent.mergeRichText(listItem.getRich_text()))
+        .append("  \n");
 
-	private String buildHeading2(NotionHeadingContent header) {
-		return this.buildHeading(2, header);
-	}
+    // 자식 항목 처리
+    if (listItem.getChildren() != null && !listItem.getChildren().isEmpty()) {
+      for (NotionListItemContent child : listItem.getChildren()) {
+        markdown.append(this.buildListItem(child, isNumberList, depth + 1));
+      }
+    }
 
-	private String buildHeading3(NotionHeadingContent header) {
-		return this.buildHeading(3, header);
-	}
+    return markdown.toString();
+  }
 
-	/**
-	 * <h1>링크 만들기</h1>
-	 * <ul>
-	 *   <li>[링크텍스트](URL)</li>
-	 * </ul>
-	 */
-	private void buildLink(NotionRichTextContent richText) {
-		if (richText.emptyText() || richText.emptyLink()) {
-			return;
-		}
-		StringBuilder link = new StringBuilder();
-		link
-				.append("[")
-				.append(richText.getText().getContent())
-				.append("]")
-				.append("(")
-				.append(richText.getText().getLink().getUrl())
-				.append(")");
-		richText.getText().setContent(link.toString());
-	}
+  /**
+   * <h1>Image 마크다운 변환기</h1>
+   */
+  public String buildImageMarkdown(NotionImageContent image, String githubOwner) {
+    StringBuilder markDown = new StringBuilder();
 
-	/**
-	 * <h1>notion block에서 shift + enter 한 경우 처리</h1>
-	 * <ul>
-	 *   <li>notion block에서 shift + enter 한 경우 기본적으로 \n가 포함되어 한줄로 인식되어, \n을 제거하고 한줄로 표시</li>
-	 *   <li>notion block에서 shift + enter 하고 글자 굵기, 기울기 와 같이 스타일을 넣는 경우 rich_text에 각각 배열 원소로 취급됨</li>
-	 * </ul>
-	 */
-	private String mergeRichText(List<NotionRichTextContent> texts) {
-		StringBuilder strb = new StringBuilder();
+    // 마크 다운에 들어갈 이미지 경로 생성
+    String path = image.createImagePath(RESOURCES_BASE_PATH, githubOwner);
 
-		for (NotionRichTextContent text : texts) {
-			String str =
-					text.getText().getContent().replaceAll("\\r?\\n", " ");
-			strb.append(str);
-		}
-		return strb.toString();
-	}
+    // 캡션 생성
+    String caption = image.createCaption();
 
-	private String splitText(List<NotionRichTextContent> texts) {
-		StringBuilder strb = new StringBuilder();
+    markDown
+        .append("![")
+        .append(caption)
+        .append("](")
+        .append(path)
+        .append(")")
+        .append("  \n");
 
-		for (NotionRichTextContent text : texts) {
-			String str =
-					text.getText().getContent().replaceAll("\\r?\\n", "  \n");
-			strb.append(str);
-		}
-		return strb.toString();
-	}
+    return markDown.toString();
+  }
 
-	private void buildAnnotationsContent(NotionRichTextContent richText) {
-		if (richText.emptyText()) {
-			return;
-		}
-		StringBuilder text = new StringBuilder();
+  /**
+   * <h1>Image 데이터 변환기</h1>
+   */
+  public List<CompletedPageMarkdownResult.ImageOfNotionBlock> buildImagesBase64(
+      NotionImageContent image
+  ) {
+    List<CompletedPageMarkdownResult.ImageOfNotionBlock> images = new ArrayList<>();
+    images.add(image.buildImageOfNotionBlock());
+    return images;
+  }
 
-		if (richText.getAnnotations().isBold()) {
-			text.append("**").append(richText.getText().getContent()).append("**");
-		}
+  /**
+   * <h1>TODO 변환기</h1>
+   */
+  public String buildTodo(NotionTodoContent todo) {
+    StringBuilder markdown = new StringBuilder();
+    String checkBox = todo.isChecked() ? "- [x] " : "- [ ] ";
+    markdown
+        .append(checkBox)
+        .append(NotionRichTextContent.mergeRichText(todo.getRich_text()))
+        .append("  \n");
+    return markdown.toString();
+  }
 
-		if (richText.getAnnotations().isItalic()) {
-			text.append("_").append(richText.getText().getContent()).append("_");
-		}
+  /**
+   * <h1>Heading 변환기</h1>
+   */
+  public String buildHeading(int prefixCount, NotionHeadingContent header) {
+    StringBuilder markdown = new StringBuilder();
+    String prefix = this.buildHeadingPrefix(prefixCount);
 
-		if (richText.getAnnotations().isStrikethrough()) {
-			text.append("~~").append(richText.getText().getContent()).append("~~");
-		}
+    for (NotionRichTextContent richText : header.getRich_text()) {
+      this.escapeSymbol(richText);
+      this.buildAnnotationsContent(richText);
+      this.buildLink(richText);
+    }
 
-		if (richText.getAnnotations().isCode()) {
-			text.append("```").append(richText.getText().getContent()).append("```");
-		}
+    markdown
+        .append(prefix)
+        .append(" ")
+        .append(NotionRichTextContent.mergeRichText(header.getRich_text()))
+        .append("  \n");
 
-		if (text.toString().isEmpty()) {
-			return;
-		}
+    return markdown.toString();
+  }
 
-		richText.getText().setContent(text.toString());
-	}
+  /**
+   * <h1>paragraph 변환기</h1>
+   */
+  public String buildParagraph(NotionParagraphContent paragraph) {
+    StringBuilder markdown = new StringBuilder();
 
+    if (paragraph.getRich_text().isEmpty()) {
+      markdown.append("  \n");
+      return markdown.toString();
+    }
 
-	private void escapeSymbol(NotionRichTextContent richText) {
-		if (richText == null) {
-			return;
-		}
-		NotionTextContent text = richText.getText();
-		text.setContent(text.getContent().replaceAll("(?<!\\\\)\\*\\*", "\\\\*\\\\*"));
-		text.setContent(text.getContent().replaceAll("(?<!\\\\)~~", "\\\\~\\\\~"));
-	}
+    for (NotionRichTextContent richText : paragraph.getRich_text()) {
+      this.escapeSymbol(richText);
+      this.buildAnnotationsContent(richText);
+      this.buildLink(richText);
+    }
 
-//	public String convertMarkdownByTable(List<NotionBlockInfo> rows) {
-//		StringBuilder str = new StringBuilder();
-//
-//		// 헤더 추가 (예제: 첫 번째 행을 기준으로 생성)
-//		if (!rows.isEmpty()) {
-//			rows.get(0).getTable_row().getCells().forEach(cell -> {
-//				str.append("| ").append(cell.getPlain_text()).append(" ");
-//			});
-//			str.append("|\n");
-//
-//			// 구분선 추가
-//			rows.get(0).getTable_row().getCells().forEach(cell -> {
-//				str.append("|:---");
-//			});
-//			str.append("|\n");
-//		}
-//
-//		// 헤더 제외하고 본문
-//		for (int i = 1; i < rows.size(); i++) {
-//			rows.get(i).getTable_row().getCells().forEach(cell -> {
-//				str.append("| ").append(cell.getPlain_text()).append(" ");
-//			});
-//			str.append("|\n");
-//		}
-//
-//		return str.toString();
-//	}
+    markdown
+        .append(NotionRichTextContent.splitRichText(paragraph.getRich_text()))
+        .append("  \n");
+    return markdown.toString();
+  }
 
+  /**
+   * <h1>Code 변환기</h1>
+   */
+  public String buildCode(NotionCodeContent code) {
+    StringBuilder markdown = new StringBuilder();
+    markdown
+        .append("```")
+        .append(code.getLanguage())
+        .append("  \n");
+
+    for (NotionRichTextContent richTest : code.getRich_text()) {
+      markdown
+          .append(richTest.getText().getContent())
+          .append("  \n");
+    }
+
+    markdown
+        .append("```")
+        .append("  \n");
+    return markdown.toString();
+  }
+
+  private String buildHeadingPrefix(int prefixCount) {
+    return "#".repeat(Math.max(0, prefixCount));
+  }
+
+  private String buildHeading1(NotionHeadingContent header) {
+    return this.buildHeading(1, header);
+  }
+
+  private String buildHeading2(NotionHeadingContent header) {
+    return this.buildHeading(2, header);
+  }
+
+  private String buildHeading3(NotionHeadingContent header) {
+    return this.buildHeading(3, header);
+  }
+
+  /**
+   * <h1>링크 만들기</h1>
+   * <ul>
+   *   <li>[링크텍스트](URL)</li>
+   * </ul>
+   */
+  private void buildLink(NotionRichTextContent richText) {
+    if (richText.emptyText() || richText.emptyLink()) {
+      return;
+    }
+    String link = "["
+        + richText.getText().getContent()
+        + "]"
+        + "("
+        + richText.getText().getLink().getUrl()
+        + ")";
+    richText.getText().setContent(link);
+  }
+
+  private void buildAnnotationsContent(NotionRichTextContent richText) {
+    if (richText.emptyText()) {
+      return;
+    }
+    StringBuilder text = new StringBuilder();
+
+    if (richText.getAnnotations().isBold()) {
+      text.append("**").append(richText.getText().getContent()).append("**");
+    }
+
+    if (richText.getAnnotations().isItalic()) {
+      text.append("_").append(richText.getText().getContent()).append("_");
+    }
+
+    if (richText.getAnnotations().isStrikethrough()) {
+      text.append("~~").append(richText.getText().getContent()).append("~~");
+    }
+
+    if (richText.getAnnotations().isCode()) {
+      text.append("```").append(richText.getText().getContent()).append("```");
+    }
+
+    if (text.toString().isEmpty()) {
+      return;
+    }
+
+    richText.getText().setContent(text.toString());
+  }
+
+  private void escapeSymbol(NotionRichTextContent richText) {
+    if (richText == null) {
+      return;
+    }
+    NotionTextContent text = richText.getText();
+    text.setContent(text.getContent().replaceAll("(?<!\\\\)\\*\\*", "\\\\*\\\\*"));
+    text.setContent(text.getContent().replaceAll("(?<!\\\\)~~", "\\\\~\\\\~"));
+  }
 
 }
