@@ -1,6 +1,8 @@
 package kr.co.nogibackend.domain.notion.dto.info;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import kr.co.nogibackend.domain.notion.dto.content.NotionBookmarkContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionCalloutContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionChildDatabaseContent;
@@ -15,6 +17,7 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionPDFContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionParagraphContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionQuoteContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableOfContents;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
@@ -24,6 +27,9 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionVideoContent;
 import kr.co.nogibackend.domain.notion.dto.property.NotionCreatedByProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionLastEditedByProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult.ImageOfNotionBlock;
+import kr.co.nogibackend.domain.notion.dto.result.NotionBlockToMarkdownResult;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -70,5 +76,8 @@ public class NotionBlockInfo {
   private NotionTableContent table;
   private NotionTableRowContent table_row;
   private NotionTableOfContents table_of_contents;
+
+  public NotionBlockToMarkdownResult convert(String githubOwner) {
+
 
 }

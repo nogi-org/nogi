@@ -14,9 +14,11 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTodoContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionToggleBlocksContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
+import kr.co.nogibackend.domain.notion.dto.result.NotionBlockToMarkdownResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,60 +39,16 @@ public class NotionMarkdownConverter {
       List<NotionBlockInfo> blocks
       , String githubOwner
   ) {
-    StringBuilder markdown = new StringBuilder();
-    List<CompletedPageMarkdownResult.ImageOfNotionBlock> images = new ArrayList<>();
     try {
+      StringBuilder markdown = new StringBuilder();
+      List<CompletedPageMarkdownResult.ImageOfNotionBlock> images = new ArrayList<>();
+
       for (NotionBlockInfo block : blocks) {
-        switch (block.getType()) {
-          case "heading_1":
-            markdown.append(this.buildHeading1(block.getHeading_1()));
-            break;
-
-          case "heading_2":
-            markdown.append(this.buildHeading2(block.getHeading_2()));
-            break;
-
-          case "heading_3":
-            markdown.append(this.buildHeading3(block.getHeading_3()));
-            break;
-
-          case "paragraph":
-            markdown.append(this.buildParagraph(block.getParagraph()));
-            break;
-
-          case "code":
-            markdown.append(this.buildCode(block.getCode()));
-            break;
-
-          case "divider":
-            markdown.append("---").append("  \n");
-            break;
-
-          case "to_do":
-            markdown.append(this.buildTodo(block.getTo_do()));
-            break;
-
-          case "image":
-            markdown.append(this.buildImageMarkdown(block.getImage(), githubOwner));
-            images = this.buildImagesBase64(block.getImage());
-            break;
-
-          case "bulleted_list_item":
-            markdown.append(this.buildListItem(block.getBulleted_list_item(), false));
-            break;
-
-          case "numbered_list_item":
-            markdown.append(this.buildListItem(block.getNumbered_list_item(), true));
-            break;
-
-          case "table":
-            markdown.append(this.buildTable(block.getTable()));
-            break;
-
-          default:
-            markdown.append("  \n");
-        }
+        NotionBlockToMarkdownResult result = this.buildBlock(block, githubOwner);
+        markdown.append(result.markdown());
+        images.addAll(result.images());
       }
+
       return new NotionBlockConversionInfo(markdown.toString(), images);
     } catch (Exception error) {
       log.error("Markdown Convert Error : {}", error.getMessage());
@@ -99,12 +57,98 @@ public class NotionMarkdownConverter {
   }
 
   /**
-   * todo: 토글
+   * <h1>블럭별 마크다운 생성</h1>
    */
-//  public String buildToggle() {
-//    StringBuilder markdown = new StringBuilder();
-//    return markdown.toString();
-//  }
+  public NotionBlockToMarkdownResult buildBlock(NotionBlockInfo block, String githubOwner) {
+    StringBuilder markdown = new StringBuilder();
+    List<CompletedPageMarkdownResult.ImageOfNotionBlock> images = new ArrayList<>();
+
+    switch (block.getType()) {
+      case "heading_1":
+        return new NotionBlockToMarkdownResult(
+            this.buildHeading1(block.getHeading_1()),
+            images
+        );
+
+      case "heading_2":
+        markdown.append(this.buildHeading2(block.getHeading_2()));
+        break;
+
+      case "heading_3":
+        markdown.append(this.buildHeading3(block.getHeading_3()));
+        break;
+
+      case "paragraph":
+        markdown.append(this.buildParagraph(block.getParagraph()));
+        break;
+
+      case "code":
+        markdown.append(this.buildCode(block.getCode()));
+        break;
+
+      case "divider":
+        markdown.append("---").append("  \n");
+        break;
+
+      case "to_do":
+        markdown.append(this.buildTodo(block.getTo_do()));
+        break;
+
+      case "image":
+        markdown.append(this.buildImageMarkdown(block.getImage(), githubOwner));
+        images = this.buildImagesBase64(block.getImage());
+        break;
+
+      case "bulleted_list_item":
+        markdown.append(this.buildListItem(block.getBulleted_list_item(), false));
+        break;
+
+      case "numbered_list_item":
+        markdown.append(this.buildListItem(block.getNumbered_list_item(), true));
+        break;
+
+      case "table":
+        markdown.append(this.buildTable(block.getTable()));
+        break;
+
+      case "toggle":
+        markdown.append(this.buildToggle(block.getToggle()));
+        break;
+
+      default:
+        markdown.append("  \n");
+    }
+
+    return new NotionBlockToMarkdownResult(markdown.toString(), images);
+  }
+
+  /**
+   * <h1>Toggle 변환기</h1>
+   */
+  public String buildToggle(NotionToggleBlocksContent toggle) {
+    StringBuilder markdown = new StringBuilder();
+
+    // 토글버튼 summary 생성
+    markdown
+        .append("<details>")
+        .append("<summary>");
+
+    for (NotionRichTextContent richText : toggle.getRich_text()) {
+      richText.convertEscapeSymbol();
+      richText.convertAnnotationsContent();
+      richText.convertLineBreakToBrInTextContent();
+      markdown.append(richText.getText().getContent());
+    }
+
+    markdown.append("</summary>");
+
+    // 내용 생성
+    for (NotionBlockInfo children : toggle.getChildren()) {
+    }
+
+    markdown.append("</details>");
+    return markdown.toString();
+  }
 
   /**
    * <h1>Table 변환기</h1>
@@ -220,6 +264,7 @@ public class NotionMarkdownConverter {
 
   /**
    * <h1>Image 데이터 변환기</h1>
+   * todo: 여기에 리스트를 넣어야겠네;;;
    */
   public List<CompletedPageMarkdownResult.ImageOfNotionBlock> buildImagesBase64(
       NotionImageContent image
