@@ -240,6 +240,91 @@
         },
         "plain_text": "링크",
         "href": "https://nogi.co.kr/"
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "**특수기호가 있음**",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "**특수기호가 있음**",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "**특수기호가 있고 취소선 추가**",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": true,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "**특수기호가 있고 취소선 추가**",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "밑줄",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": true,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "밑줄",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "취소선및밑줄",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": true,
+          "underline": true,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "취소선및밑줄",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "코드및굵기",
+          "link": null
+        },
+        "annotations": {
+          "bold": true,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": true,
+          "color": "default"
+        },
+        "plain_text": "코드및굵기",
+        "href": null
       }
     ],
     "color": "default"

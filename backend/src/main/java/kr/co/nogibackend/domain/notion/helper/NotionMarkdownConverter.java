@@ -4,7 +4,6 @@ import static kr.co.nogibackend.response.code.NotionResponseCode.F_PROCESS_MARKD
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.dto.content.NotionCodeContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionHeadingContent;
@@ -13,9 +12,7 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionParagraphContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
-import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowCellsContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
-import kr.co.nogibackend.domain.notion.dto.content.NotionTextContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTodoContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockConversionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
@@ -110,53 +107,53 @@ public class NotionMarkdownConverter {
 //  }
 
   /**
-   * todo
    * <h1>Table 변환기</h1>
+   * <ul>
+   *   <li>Table 데이터구조는 Test/resource/json/NotionTableBlockData.json 에서 확인 가능</li>
+   *   <li>노션 cell에서 줄바꿈 + 스타일(굵기, 기울기 등) 넣으면 content가 여러개로 받아짐</li>
+   * </ul>
    */
   public String buildTable(NotionTableContent table) {
     StringBuilder markdown = new StringBuilder();
 
-    List<NotionTableRowContent> rows = table.getRows();
+    for (int i = 0; i < table.getRows().size(); i++) {
 
-    if (rows == null || rows.isEmpty()) {
-      return ""; // 테이블에 행이 없으면 빈 문자열 반환
-    }
+      NotionTableRowContent row = table.getRows().get(i);
+      List<List<NotionRichTextContent>> cells = row.getCells();
 
-    boolean hasColumnHeader = table.isHas_column_header();
+      // 각 row 내부 cell 작업
+      for (List<NotionRichTextContent> cell : cells) {
+        StringBuilder sumContent = new StringBuilder();
 
-    // 1. 헤더 출력
-    if (rows.get(0).getCells() != null) {
-      List<List<NotionTableRowCellsContent>> headerCells = rows.get(0).getCells();
-      for (List<NotionTableRowCellsContent> cellGroup : headerCells) {
-        String cellText =
-            cellGroup
-                .stream()
-                .map(NotionTableRowCellsContent::getPlain_text)
-                .collect(Collectors.joining());
+        // content 모두 합치기, 스타일 적용
+        for (NotionRichTextContent content : cell) {
+          content.convertEscapeSymbol();
+          content.convertAnnotationsContent();
+          content.convertLink();
+          // shift + enter 경우 줄바꿈 처리
+          content.convertLineBreakToBrInTextContent();
+          sumContent
+              .append(content.getText().getContent())
+              .append("<br>");
+        }
+
         markdown
             .append("|")
-            .append(cellText)
-            .append("  \n");
+            .append(sumContent);
       }
-      markdown.append("|\n");
 
-      // 2. 구분선 출력
       markdown
-          .append("|:---".repeat(headerCells.size()))
-          .append("|\n");
-    }
+          .append("|")
+          .append("  \n");
 
-    // 3. 본문 출력
-    int startIndex = hasColumnHeader ? 1 : 0;
-    for (int i = startIndex; i < rows.size(); i++) {
-      List<List<NotionTableRowCellsContent>> rowCells = rows.get(i).getCells();
-      for (List<NotionTableRowCellsContent> cellGroup : rowCells) {
-        String cellText = cellGroup.stream()
-            .map(NotionTableRowCellsContent::getPlain_text)
-            .collect(Collectors.joining());
-        markdown.append("| ").append(cellText).append("  \n");
+      // header 경우 테이블 구분선 추가
+      if (i == 0) {
+        markdown
+            .append("|:---".repeat(cells.size()))
+            .append("|")
+            .append("\n");
       }
-      markdown.append("|\n");
+
     }
 
     return markdown.toString();
@@ -175,6 +172,12 @@ public class NotionMarkdownConverter {
     // depth에 따라 들여쓰기 (스페이스 3칸씩)
     String indent = "   ".repeat(depth);
     String prefix = isNumberList ? "1. " : "* ";
+
+    for (NotionRichTextContent richText : listItem.getRich_text()) {
+      richText.convertEscapeSymbol();
+      richText.convertAnnotationsContent();
+      richText.convertLink();
+    }
 
     markdown
         .append(indent)
@@ -247,9 +250,9 @@ public class NotionMarkdownConverter {
     String prefix = this.buildHeadingPrefix(prefixCount);
 
     for (NotionRichTextContent richText : header.getRich_text()) {
-      this.escapeSymbol(richText);
-      this.buildAnnotationsContent(richText);
-      this.buildLink(richText);
+      richText.convertEscapeSymbol();
+      richText.convertAnnotationsContent();
+      richText.convertLink();
     }
 
     markdown
@@ -267,15 +270,16 @@ public class NotionMarkdownConverter {
   public String buildParagraph(NotionParagraphContent paragraph) {
     StringBuilder markdown = new StringBuilder();
 
+    // 빈 블럭 처리
     if (paragraph.getRich_text().isEmpty()) {
       markdown.append("  \n");
       return markdown.toString();
     }
 
     for (NotionRichTextContent richText : paragraph.getRich_text()) {
-      this.escapeSymbol(richText);
-      this.buildAnnotationsContent(richText);
-      this.buildLink(richText);
+      richText.convertEscapeSymbol();
+      richText.convertAnnotationsContent();
+      richText.convertLink();
     }
 
     markdown
@@ -320,63 +324,6 @@ public class NotionMarkdownConverter {
 
   private String buildHeading3(NotionHeadingContent header) {
     return this.buildHeading(3, header);
-  }
-
-  /**
-   * <h1>링크 만들기</h1>
-   * <ul>
-   *   <li>[링크텍스트](URL)</li>
-   * </ul>
-   */
-  private void buildLink(NotionRichTextContent richText) {
-    if (richText.emptyText() || richText.emptyLink()) {
-      return;
-    }
-    String link = "["
-        + richText.getText().getContent()
-        + "]"
-        + "("
-        + richText.getText().getLink().getUrl()
-        + ")";
-    richText.getText().setContent(link);
-  }
-
-  private void buildAnnotationsContent(NotionRichTextContent richText) {
-    if (richText.emptyText()) {
-      return;
-    }
-    StringBuilder text = new StringBuilder();
-
-    if (richText.getAnnotations().isBold()) {
-      text.append("**").append(richText.getText().getContent()).append("**");
-    }
-
-    if (richText.getAnnotations().isItalic()) {
-      text.append("_").append(richText.getText().getContent()).append("_");
-    }
-
-    if (richText.getAnnotations().isStrikethrough()) {
-      text.append("~~").append(richText.getText().getContent()).append("~~");
-    }
-
-    if (richText.getAnnotations().isCode()) {
-      text.append("```").append(richText.getText().getContent()).append("```");
-    }
-
-    if (text.toString().isEmpty()) {
-      return;
-    }
-
-    richText.getText().setContent(text.toString());
-  }
-
-  private void escapeSymbol(NotionRichTextContent richText) {
-    if (richText == null) {
-      return;
-    }
-    NotionTextContent text = richText.getText();
-    text.setContent(text.getContent().replaceAll("(?<!\\\\)\\*\\*", "\\\\*\\\\*"));
-    text.setContent(text.getContent().replaceAll("(?<!\\\\)~~", "\\\\~\\\\~"));
   }
 
 }

@@ -8,5 +8,5 @@ import lombok.Setter;
 public class NotionTableCellTextContent {
 
   private String content;
-  private NotionLinkPreviewContent link;
+  private NotionLinkContent link;
 }

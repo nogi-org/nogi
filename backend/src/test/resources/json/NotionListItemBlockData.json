@@ -148,7 +148,7 @@
           "link": null
         },
         "annotations": {
-          "bold": false,
+          "bold": true,
           "italic": false,
           "strikethrough": false,
           "underline": false,
@@ -173,7 +173,7 @@
               "bold": false,
               "italic": false,
               "strikethrough": false,
-              "underline": false,
+              "underline": true,
               "code": false,
               "color": "default"
             },
@@ -196,7 +196,7 @@
                   "italic": false,
                   "strikethrough": false,
                   "underline": false,
-                  "code": false,
+                  "code": true,
                   "color": "default"
                 },
                 "plain_text": "숫자있는 리스트1-1",

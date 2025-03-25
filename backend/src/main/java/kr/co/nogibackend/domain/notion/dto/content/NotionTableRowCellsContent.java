@@ -9,7 +9,7 @@ import lombok.Setter;
 public class NotionTableRowCellsContent {
 
   private String type;
-  private NotionTableCellTextContent text;
+  private NotionTextContent text;
   private NotionAnnotationsContent annotations;
   private String plain_text;
   private String href;
