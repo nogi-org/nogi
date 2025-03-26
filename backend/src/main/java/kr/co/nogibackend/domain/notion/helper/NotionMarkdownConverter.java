@@ -120,7 +120,6 @@ public class NotionMarkdownConverter {
 	/**
 	 * <h1>Toggle 변환기</h1>
 	 */
-	// todo: 양식이 안맞음
 	public String buildToggle(
 			NotionToggleBlocksContent toggle
 			, String githubOwner
@@ -131,20 +130,20 @@ public class NotionMarkdownConverter {
 		// 토글버튼 summary 생성
 		markdown
 				.append("<details>")
-				.append("  \n")
-				.append("  ")
 				.append("<summary>");
 
 		for (NotionRichTextContent richText : toggle.getRich_text()) {
 			richText.convertEscapeSymbol();
 			richText.convertAnnotationsContent();
-			richText.convertLineBreakToBrInTextContent();
+			richText.splitToggleContentInText();
 			markdown.append(richText.getText().getContent());
 		}
 
 		markdown
 				.append("</summary>")
-				.append("  \n");
+				.append("  \n")
+				.append("  \n")
+				.append("  ");
 
 		// 토글버튼 내용 생성
 		if (toggle.hasChildren()) {
@@ -182,7 +181,7 @@ public class NotionMarkdownConverter {
 					content.convertAnnotationsContent();
 					content.convertLink();
 					// shift + enter 경우 줄바꿈 처리
-					content.convertLineBreakToBrInTextContent();
+					content.splitToggleContentInText();
 					sumContent
 							.append(content.getText().getContent())
 							.append("<br>");
@@ -233,7 +232,7 @@ public class NotionMarkdownConverter {
 		markdown
 				.append(indent)
 				.append(prefix)
-				.append(NotionRichTextContent.mergeRichText(listItem.getRich_text()))
+				.append(NotionRichTextContent.mergeRichTexts(listItem.getRich_text()))
 				.append("  \n");
 
 		// 자식 항목 처리
@@ -288,7 +287,7 @@ public class NotionMarkdownConverter {
 		String checkBox = todo.isChecked() ? "- [x] " : "- [ ] ";
 		markdown
 				.append(checkBox)
-				.append(NotionRichTextContent.mergeRichText(todo.getRich_text()))
+				.append(NotionRichTextContent.mergeRichTexts(todo.getRich_text()))
 				.append("  \n");
 		return markdown.toString();
 	}
@@ -309,7 +308,7 @@ public class NotionMarkdownConverter {
 		markdown
 				.append(prefix)
 				.append(" ")
-				.append(NotionRichTextContent.mergeRichText(header.getRich_text()))
+				.append(NotionRichTextContent.mergeRichTexts(header.getRich_text()))
 				.append("  \n");
 
 		return markdown.toString();
@@ -334,7 +333,7 @@ public class NotionMarkdownConverter {
 		}
 
 		markdown
-				.append(NotionRichTextContent.splitRichText(paragraph.getRich_text()))
+				.append(NotionRichTextContent.splitRichTexts(paragraph.getRich_text()))
 				.append("  \n");
 		return markdown.toString();
 	}
