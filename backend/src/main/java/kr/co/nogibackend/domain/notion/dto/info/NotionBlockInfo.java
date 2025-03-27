@@ -45,6 +45,7 @@ public class NotionBlockInfo {
   public final static String NUMBERED_LIST = "numbered_list_item";
   public final static String TABLE = "table";
   public final static String TOGGLE = "toggle";
+  public final static String QUOTE = "quote";
 
   // common
   private String object;

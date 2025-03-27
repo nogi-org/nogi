@@ -9,6 +9,7 @@ import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.HEADING3;
 import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.IMAGE;
 import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.NUMBERED_LIST;
 import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.PARAGRAPH;
+import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.QUOTE;
 import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.TABLE;
 import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.TODO;
 import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.TOGGLE;
@@ -22,6 +23,7 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionHeadingContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionImageContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionParagraphContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionQuoteContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionRichTextContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
@@ -121,11 +123,22 @@ public class NotionMarkdownConverter {
           markdown.append(this.buildToggle(block.getToggle(), githubOwner, images));
           break;
 
+        case QUOTE:
+          markdown.append(this.buildQuote(block.getQuote()));
+          break;
+
         default:
           markdown.append("  \n");
       }
     }
     return new NotionBlockConversionInfo(markdown.toString(), images);
+  }
+
+  /**
+   * <h1>Quote 변환기</h1>
+   */
+  public String buildQuote(NotionQuoteContent quote) {
+    return "> " + NotionRichTextContent.splitRichTexts(quote.getRich_text()) + "  \n  \n";
   }
 
   /**
