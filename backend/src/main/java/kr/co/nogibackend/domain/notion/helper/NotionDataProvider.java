@@ -31,7 +31,6 @@ public class NotionDataProvider {
 
   private final NotionClient notionClient;
 
-  // todo: switch에 case 값들 상수로 빼기
   public void preprocessMarkdown(
       NotionInfo<NotionBlockInfo> blocks
       , String notionAccessToken
