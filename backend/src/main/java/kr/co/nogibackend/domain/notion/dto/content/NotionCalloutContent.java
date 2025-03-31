@@ -2,12 +2,12 @@ package kr.co.nogibackend.domain.notion.dto.content;
 
 import java.util.List;
 import kr.co.nogibackend.domain.notion.dto.property.NotionEmojiProperty;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
+@Builder
 @ToString
 public class NotionCalloutContent {
 

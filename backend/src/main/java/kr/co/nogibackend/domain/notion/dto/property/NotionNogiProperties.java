@@ -7,8 +7,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 /*
@@ -16,7 +16,7 @@ reference:
 https://developers.notion.com/reference/property-object#date
  */
 @Getter
-@Setter
+@Builder
 @ToString
 public class NotionNogiProperties {
 
@@ -62,7 +62,11 @@ public class NotionNogiProperties {
     // 커밋 날짜가 없을 경우
     if (this.getNogiCommitDate().getDate() == null) {
       String utc_iso = this.convertToUTC_ISO(LocalDateTime.now(koreaZone));
-      this.nogiCommitDate.setDate(new NotionDateProperty(utc_iso));
+      this.nogiCommitDate =
+          NotionNogiCommitDateProperty
+              .builder()
+              .date(new NotionDateProperty(utc_iso))
+              .build();
       return;
     }
 

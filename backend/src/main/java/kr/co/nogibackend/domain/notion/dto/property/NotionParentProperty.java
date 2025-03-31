@@ -1,12 +1,10 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
 @Getter
-@Setter
-@ToString
+@Builder
 public class NotionParentProperty {
 
   private String type;

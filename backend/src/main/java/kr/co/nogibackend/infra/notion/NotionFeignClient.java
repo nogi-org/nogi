@@ -2,6 +2,7 @@ package kr.co.nogibackend.infra.notion;
 
 import java.util.Map;
 import kr.co.nogibackend.config.openfeign.NotionFeignClientConfig;
+import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
@@ -43,7 +44,6 @@ public interface NotionFeignClient {
       @RequestBody Map<String, Object> request
   );
 
-
   @RequestMapping(method = RequestMethod.GET, value = "/databases/{databaseId}")
   ResponseEntity<NotionDatabaseInfo> getDatabase(
       @RequestHeader("Authorization") String token,
@@ -54,6 +54,12 @@ public interface NotionFeignClient {
   ResponseEntity<NotionGetAccessInfo> getAccessToken(
       @RequestHeader("Authorization") String token,
       @RequestBody NotionGetAccessTokenRequest request
+  );
+
+  @RequestMapping(method = RequestMethod.POST, value = "/pages")
+  ResponseEntity<NotionPageInfo> createPage(
+      @RequestHeader("Authorization") String token,
+      @RequestBody NotionCreateNoticeRequest request
   );
 
 }

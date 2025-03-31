@@ -1,14 +1,12 @@
 package kr.co.nogibackend.domain.admin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import kr.co.nogibackend.domain.admin.dto.response.UserInfoResponse;
-import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
+import kr.co.nogibackend.domain.admin.dto.command.NotionNoticeCreateCommand;
+import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
+import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
-import kr.co.nogibackend.infra.notion.NotionClientImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,43 +18,33 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminNoticeService {
 
   private final UserRepository userRepository;
-  private final NotionClientImpl notionClientImpl;
+  private final NotionClient notionClient;
 
-  // todo: 리팩토링 필요!
   @Transactional
-  public Map<String, List<String>> updateNotionPageId() {
-
+  public Map<String, List<String>> createNotice(NotionNoticeCreateCommand command) {
     List<User> users =
-        userRepository.findAllUser();
-
-    List<User> filterUsers =
-        users
+        userRepository
+            .findAllUser()
             .stream()
-            .filter(user -> user.hasNotionDatabaseId() && user.hasNotionAccessToken())
+            .filter(user -> user.hasNotionAccessToken() && user.hasNotionDatabaseId())
             .toList();
+    /*
+    2. 공지사항 db저장
+     */
 
-    Map<String, List<String>> result = new HashMap<>();
-    List<String> success = new ArrayList<>();
-    List<String> fail = new ArrayList<>();
-
-    for (User user : filterUsers) {
-      try {
-        NotionDatabaseInfo database =
-            notionClientImpl.getDatabase(user.getNotionAccessToken(), user.getNotionDatabaseId());
-        user.updateNotionPageId(database.getParent().getPage_id());
-        success.add(user.getGithubOwner());
-      } catch (Exception e) {
-        fail.add(user.getGithubOwner());
-      }
+    // 신규 노션 공지사항 등록
+    for (User user : users) {
+      NotionCreateNoticeRequest request =
+          new NotionCreateNoticeRequest()
+              .of(
+                  user.getNotionDatabaseId(),
+                  command.title(),
+                  command.createContent()
+              );
+      notionClient.createPage(user.getNotionAccessToken(), request);
     }
 
-    result.put("success", success);
-    result.put("fail", fail);
-    return result;
-  }
-
-  public List<UserInfoResponse> getUserInfo() {
-    return UserInfoResponse.from(userRepository.findAll());
+    return null;
   }
 
 }

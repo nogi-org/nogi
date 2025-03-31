@@ -24,12 +24,12 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionVideoContent;
 import kr.co.nogibackend.domain.notion.dto.property.NotionCreatedByProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionLastEditedByProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
+@Builder
 @ToString
 public class NotionBlockInfo {
 
@@ -46,6 +46,7 @@ public class NotionBlockInfo {
   public final static String TABLE = "table";
   public final static String TOGGLE = "toggle";
   public final static String QUOTE = "quote";
+  public final static String CALL_OUT = "callout";
 
   // common
   private String object;

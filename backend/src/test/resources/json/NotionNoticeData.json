@@ -1,0 +1,70 @@
+[
+  {
+    "parent": {
+      "database_id": "1b9a9cc810568164be32e085536fe17d"
+    },
+    "icon": {
+      "emoji": "📢"
+    },
+    "properties": {
+      "nogiTitle": {
+        "title": [
+          {
+            "type": "text",
+            "text": {
+              "content": "Demo Superpil Page1"
+            }
+          }
+        ]
+      },
+      "nogiStatus": {
+        "select": {
+          "name": "운영",
+          "color": "red"
+        }
+      },
+      "nogiCategory": {
+        "multi_select": [
+          {
+            "name": "공지",
+            "color": "blue"
+          }
+        ]
+      },
+      "nogiCommitDate": {
+        "date": {
+          "start": "2025-03-31"
+        }
+      }
+    },
+    "children": [
+      {
+        "object": "block",
+        "type": "callout",
+        "callout": {
+          "icon": {
+            "type": "emoji",
+            "emoji": "💡"
+          },
+          "rich_text": [
+            {
+              "type": "text",
+              "text": {
+                "content": "여기를 클릭하세요",
+                "link": {
+                  "url": "https://example.com"
+                }
+              }
+            },
+            {
+              "type": "text",
+              "text": {
+                "content": " - 참고 자료입니다."
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+]

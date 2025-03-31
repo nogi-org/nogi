@@ -25,8 +25,10 @@ public class GuideCommandController {
 
   // todo: userId 등록 필요, 지금 하드코딩 되어잇음
   @PostMapping
-  public ResponseEntity<?> registerGuide(@Validated @RequestBody GuideRegisterRequest request,
-      Auth auth) {
+  public ResponseEntity<?> registerGuide(
+      @Validated @RequestBody GuideRegisterRequest request
+      , Auth auth
+  ) {
     return Response.success(guideService.registerGuide(request.toCommand()));
   }
 

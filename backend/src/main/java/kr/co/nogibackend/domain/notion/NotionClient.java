@@ -2,6 +2,7 @@ package kr.co.nogibackend.domain.notion;
 
 import java.net.URI;
 import java.util.Map;
+import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
@@ -28,4 +29,7 @@ public interface NotionClient {
   NotionDatabaseInfo getDatabase(String BotToken, String databaseId);
 
   NotionGetAccessInfo getAccessToken(String basicToken, NotionGetAccessTokenRequest request);
+
+  NotionPageInfo createPage(String basicToken, NotionCreateNoticeRequest request);
+
 }

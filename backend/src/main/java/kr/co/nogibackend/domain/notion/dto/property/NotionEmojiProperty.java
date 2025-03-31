@@ -1,10 +1,10 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
+@Builder
 public class NotionEmojiProperty {
 
   private String type;

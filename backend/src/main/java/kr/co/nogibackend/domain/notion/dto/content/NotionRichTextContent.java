@@ -1,12 +1,12 @@
 package kr.co.nogibackend.domain.notion.dto.content;
 
 import java.util.List;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
+@Builder
 @ToString
 public class NotionRichTextContent {
 
@@ -46,8 +46,11 @@ public class NotionRichTextContent {
    * <h1>notion block에서 shift + enter 한 경우 처리</h1>
    */
   public void splitContentInTextToBr() {
-    this.getText()
-        .setContent(this.getText().getContent().replaceAll("\\r?\\n", "<br>"));
+    this.text =
+        NotionTextContent
+            .builder()
+            .content(this.getText().getContent().replaceAll("\\r?\\n", "<br>"))
+            .build();
   }
 
   /**
@@ -57,8 +60,18 @@ public class NotionRichTextContent {
     if (this.text == null) {
       return;
     }
-    this.text.setContent(this.text.getContent().replaceAll("(?<!\\\\)\\*\\*", "\\\\*\\\\*"));
-    this.text.setContent(this.text.getContent().replaceAll("(?<!\\\\)~~", "\\\\~\\\\~"));
+
+    this.text =
+        NotionTextContent
+            .builder()
+            .content(this.text.getContent().replaceAll("(?<!\\\\)\\*\\*", "\\\\*\\\\*"))
+            .build();
+
+    this.text =
+        NotionTextContent
+            .builder()
+            .content(this.text.getContent().replaceAll("(?<!\\\\)~~", "\\\\~\\\\~"))
+            .build();
   }
 
   /**
@@ -73,23 +86,38 @@ public class NotionRichTextContent {
     }
 
     if (this.annotations.isCode()) {
-      this.text.setContent("`" + this.text.getContent() + "`");
+      NotionTextContent
+          .builder()
+          .content("`" + this.text.getContent() + "`")
+          .build();
     }
 
     if (this.annotations.isBold()) {
-      this.text.setContent("**" + this.text.getContent() + "**");
+      NotionTextContent
+          .builder()
+          .content("**" + this.text.getContent() + "**")
+          .build();
     }
 
     if (this.annotations.isItalic()) {
-      this.text.setContent("_" + this.text.getContent() + "_");
+      NotionTextContent
+          .builder()
+          .content("_" + this.text.getContent() + "_")
+          .build();
     }
 
     if (this.annotations.isStrikethrough()) {
-      this.text.setContent("~~" + this.text.getContent() + "~~");
+      NotionTextContent
+          .builder()
+          .content("~~" + this.text.getContent() + "~~")
+          .build();
     }
 
     if (this.annotations.isUnderline()) {
-      this.text.setContent("<ins>" + this.text.getContent() + "</ins>");
+      NotionTextContent
+          .builder()
+          .content("<ins>" + this.text.getContent() + "</ins>")
+          .build();
     }
   }
 
@@ -110,7 +138,11 @@ public class NotionRichTextContent {
         + this.text.getLink().getUrl()
         + ")";
 
-    this.text.setContent(link);
+    this.text =
+        NotionTextContent
+            .builder()
+            .content(link)
+            .build();
   }
 
 }
