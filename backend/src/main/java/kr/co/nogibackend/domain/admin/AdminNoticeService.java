@@ -28,22 +28,28 @@ public class AdminNoticeService {
             .stream()
             .filter(user -> user.hasNotionAccessToken() && user.hasNotionDatabaseId())
             .toList();
-    /*
-    2. 공지사항 db저장
-     */
+
+    // todo: 공지사항 db저장
 
     // 신규 노션 공지사항 등록
     for (User user : users) {
       NotionCreateNoticeRequest request =
-          new NotionCreateNoticeRequest()
-              .of(
-                  user.getNotionDatabaseId(),
-                  command.title(),
-                  command.createContent()
-              );
-      notionClient.createPage(user.getNotionAccessToken(), request);
-    }
+          NotionCreateNoticeRequest.ofNotice(
+              user.getNotionDatabaseId()
+              , command.title()
+              , command.createContent()
+          );
 
+      // todo:
+      notionClient.createPage(user.getNotionAccessToken(), request);
+
+      /*
+      1. 특정 공지사항을 어떤 유저가 받았는지 히스토리 필요
+      * 유저 -> 유저_공지사항 <- 공지사항
+       */
+
+      // todo: 유저_공지사항 db저장(덤프 save 필요)
+    }
     return null;
   }
 

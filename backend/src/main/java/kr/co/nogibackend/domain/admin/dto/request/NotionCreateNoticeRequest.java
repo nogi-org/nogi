@@ -6,6 +6,7 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionTextContent;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.property.NotionDateProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionEmojiProperty;
+import kr.co.nogibackend.domain.notion.dto.property.NotionEmojiProperty.EMOJI_TYPE;
 import kr.co.nogibackend.domain.notion.dto.property.NotionMultiSelectProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionNogiCategoryProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionNogiCommitDateProperty;
@@ -13,6 +14,7 @@ import kr.co.nogibackend.domain.notion.dto.property.NotionNogiProperties;
 import kr.co.nogibackend.domain.notion.dto.property.NotionNogiStatusProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionNogiTitleProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
+import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty.PARENT_TYPE;
 import kr.co.nogibackend.domain.notion.dto.property.NotionStatusProperty;
 import kr.co.nogibackend.util.DateUtils;
 
@@ -23,14 +25,14 @@ public record NotionCreateNoticeRequest(
     List<NotionBlockInfo> children
 ) {
 
-  public NotionCreateNoticeRequest of(
+  public static NotionCreateNoticeRequest ofNotice(
       String databaseId,
       String title,
       List<NotionBlockInfo> content
   ) {
     return new NotionCreateNoticeRequest(
-        buildParent(databaseId),
-        buildIcon(),
+        NotionParentProperty.buildParent(PARENT_TYPE.DATABASE, databaseId),
+        NotionEmojiProperty.buildEmoji(EMOJI_TYPE.EMOJI, "\uD83D\uDCE2"),
         buildProperties(title),
         content
     );
@@ -92,13 +94,6 @@ public record NotionCreateNoticeRequest(
                     .build()
             )
             .build();
-  }
-
-  private NotionParentProperty buildParent(String databaseId) {
-    return NotionParentProperty
-        .builder()
-        .database_id(databaseId)
-        .build();
   }
 
   private NotionEmojiProperty buildIcon() {
