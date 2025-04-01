@@ -9,7 +9,17 @@ import lombok.ToString;
 @ToString
 public class NotionStatusProperty {
 
-  private String id;
-  private String name;
-  private String color;
+	private String id;
+	private String name;
+	private String color;
+
+	public static NotionStatusProperty buildColorName(String name, String color) {
+		return
+				NotionStatusProperty
+						.builder()
+						.name(name)
+						.color(color)
+						.build();
+	}
+
 }

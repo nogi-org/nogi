@@ -11,7 +11,15 @@ https://developers.notion.com/reference/rich-text#text
 @Builder
 public class NotionTextContent {
 
-  private String content;
-  private NotionLinkContent link;
+	private String content;
+	private NotionLinkContent link;
+
+	public static NotionTextContent buildContent(String content) {
+		return
+				NotionTextContent
+						.builder()
+						.content(content)
+						.build();
+	}
 
 }

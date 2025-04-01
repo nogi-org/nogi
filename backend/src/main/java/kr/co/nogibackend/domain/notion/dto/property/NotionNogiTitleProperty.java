@@ -11,6 +11,21 @@ import lombok.ToString;
 @ToString
 public class NotionNogiTitleProperty extends NotionNogiCommonProperty {
 
-  private List<NotionRichTextContent> title;
+	private List<NotionRichTextContent> title;
+
+	public static NotionNogiTitleProperty buildTitles(List<String> titles) {
+
+		List<NotionRichTextContent> richTexts =
+				titles
+						.stream()
+						.map(NotionRichTextContent::buildText)
+						.toList();
+
+		return
+				NotionNogiTitleProperty
+						.builder()
+						.title(richTexts)
+						.build();
+	}
 
 }

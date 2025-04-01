@@ -9,8 +9,17 @@ import lombok.ToString;
 @ToString
 public class NotionMultiSelectProperty {
 
-  private String id;
-  private String name;
-  private String color;
+	private String id;
+	private String name;
+	private String color;
+
+	public static NotionMultiSelectProperty buildColorName(String name, String color) {
+		return
+				NotionMultiSelectProperty
+						.builder()
+						.name(name)
+						.color(color)
+						.build();
+	}
 
 }
