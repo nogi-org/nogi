@@ -1,4 +1,4 @@
-package kr.co.nogibackend.domain.admin;
+package kr.co.nogibackend.domain.admin.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;

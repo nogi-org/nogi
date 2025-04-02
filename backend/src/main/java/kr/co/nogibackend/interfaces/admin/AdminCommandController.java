@@ -1,7 +1,7 @@
 package kr.co.nogibackend.interfaces.admin;
 
-import kr.co.nogibackend.domain.admin.AdminService;
 import kr.co.nogibackend.domain.admin.dto.response.NotionPageIdUpdateResponse;
+import kr.co.nogibackend.domain.admin.service.AdminService;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminCommandController {
 
-  private final AdminService adminService;
+	private final AdminService adminService;
 
-  @PutMapping("/notion-page-id")
-  public ResponseEntity<?> updateNotionPageId() {
-    return Response.success(NotionPageIdUpdateResponse.from(adminService.updateNotionPageId()));
-  }
+	@PutMapping("/notion-page-id")
+	public ResponseEntity<?> updateNotionPageId() {
+		return Response.success(NotionPageIdUpdateResponse.from(adminService.updateNotionPageId()));
+	}
 
 }

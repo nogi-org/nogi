@@ -1,6 +1,6 @@
 package kr.co.nogibackend.interfaces.admin;
 
-import kr.co.nogibackend.domain.admin.AdminService;
+import kr.co.nogibackend.domain.admin.service.AdminService;
 import kr.co.nogibackend.response.service.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminGetController {
 
-  private final AdminService adminService;
+	private final AdminService adminService;
 
-  @GetMapping("/user-info")
-  public ResponseEntity<?> getUserInfo() {
-    return Response.success(adminService.getUserInfo());
-  }
+	@GetMapping("/user-info")
+	public ResponseEntity<?> getUserInfo() {
+		return Response.success(adminService.getUserInfo());
+	}
 
 }

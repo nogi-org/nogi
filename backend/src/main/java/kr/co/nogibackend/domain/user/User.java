@@ -38,7 +38,7 @@ public class User extends BaseEntity {
 	private Long id;
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	private String notionAccessToken;// TODO 컬럼명 notionAccessToken 으로 변경
+	private String notionAccessToken;
 	private String notionPageId; // notionDatabase 가 있는 page 의 id
 	@Column(nullable = true, length = 255, unique = true)
 	private String notionDatabaseId;

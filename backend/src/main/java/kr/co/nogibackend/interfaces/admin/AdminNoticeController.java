@@ -1,6 +1,6 @@
 package kr.co.nogibackend.interfaces.admin;
 
-import kr.co.nogibackend.domain.admin.AdminNoticeService;
+import kr.co.nogibackend.domain.notice.service.NoticeCreateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AdminNoticeController {
 
-  private final AdminNoticeService adminNoticeService;
+	private final NoticeCreateService noticeCreateService;
 
-  @PostMapping("/notice")
-  public ResponseEntity<?> createNotice() {
-    // return Response.success(NotionPageIdUpdateResponse.from(adminNoticeService.createNotice()));
-    return null;
-  }
+	@PostMapping("/notice")
+	public ResponseEntity<?> createNotice() {
+		// return Response.success(NotionPageIdUpdateResponse.from(adminNoticeService.createNotice()));
+		return null;
+	}
 
 }

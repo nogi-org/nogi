@@ -1,10 +1,12 @@
-package kr.co.nogibackend.domain.admin;
+package kr.co.nogibackend.domain.notice.service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import kr.co.nogibackend.domain.admin.dto.command.NotionNoticeCreateCommand;
 import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
+import kr.co.nogibackend.domain.notice.entity.Notice;
+import kr.co.nogibackend.domain.notice.repository.NoticeCreateRepository;
 import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
@@ -16,11 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class AdminNoticeService {
+public class NoticeCreateService {
 
 	private final UserRepository userRepository;
+	private final NoticeCreateRepository noticeCreateRepository;
 	private final NotionClient notionClient;
 
+	// todo: 시큐리티 적용하기
 	@Transactional
 	public Map<String, List<String>> createNotice(NotionNoticeCreateCommand command) {
 		List<User> users =
@@ -30,7 +34,8 @@ public class AdminNoticeService {
 						.filter(user -> user.hasNotionAccessToken() && user.hasNotionDatabaseId())
 						.toList();
 
-		// todo: 공지사항 db저장
+		// todo: 메소드 이름 변경
+		this.createNotice(command);
 
 		// 신규 노션 공지사항 등록
 		List<User> successUser = new ArrayList<>();
@@ -61,6 +66,11 @@ public class AdminNoticeService {
 
 		// todo: 응답을 어덯게 해주는게 좋을지 생각해보기
 		return null;
+	}
+
+	private Notice create() {
+		return
+				noticeCreateRepository.create();
 	}
 
 }
