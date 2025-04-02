@@ -23,7 +23,7 @@ public record NotionCreateNoticeRequest(
 		return new NotionCreateNoticeRequest(
 				NotionParentProperty.buildParent(PARENT_TYPE.DATABASE, databaseId),
 				NotionEmojiProperty.buildEmoji(EMOJI_TYPE.EMOJI, "\uD83D\uDCE2"),
-				NotionNogiProperties.buildNotice(title),
+				NotionNogiProperties.buildCreateNotice(title),
 				content
 		);
 	}

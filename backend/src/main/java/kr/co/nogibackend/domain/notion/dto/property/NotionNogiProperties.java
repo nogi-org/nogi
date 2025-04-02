@@ -9,7 +9,6 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
-import kr.co.nogibackend.util.DateUtils;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -31,38 +30,23 @@ public class NotionNogiProperties {
 	private NotionNogiTitleProperty nogiTitle;
 	private NotionNogiCommitMessageProperty nogiCommitMessage;
 
-	public static NotionNogiProperties buildNotice(String title) {
+	public static NotionNogiProperties buildCreateNotice(String title) {
+		NotionNogiTitleProperty titles =
+				NotionNogiTitleProperty.buildTitles(List.of(title));
+		NotionNogiStatusProperty status =
+				NotionNogiStatusProperty.buildColorStatus("운영", NotionColor.RED);
+		NotionNogiCategoryProperty category =
+				NotionNogiCategoryProperty.buildColorMultiSelect("공지", NotionColor.BLUE);
+		NotionNogiCommitDateProperty commitDate =
+				NotionNogiCommitDateProperty.buildTodayDateAsYYYYMMDDString();
+
 		return
 				NotionNogiProperties
 						.builder()
-						.nogiTitle(NotionNogiTitleProperty.buildTitles(List.of(title)))
-						.nogiStatus(
-								NotionNogiStatusProperty
-										.builder()
-										.select(NotionStatusProperty.buildColorName("운영", NotionColor.RED.getName()))
-										.build()
-						)
-						.nogiCategory(
-                NotionNogiCategoryProperty.buildMultiSelect(List<Map<String, >>);
-
-
-
-								NotionNogiCategoryProperty
-										.builder()
-										.multi_select(
-												List.of(
-														NotionMultiSelectProperty.buildColorName("공지",
-																NotionColor.BLUE.getName())
-												)
-										)
-										.build()
-						)
-						.nogiCommitDate(
-								NotionNogiCommitDateProperty
-										.builder()
-										.date(new NotionDateProperty(DateUtils.getTodayDateAsYYYYMMDDString()))
-										.build()
-						)
+						.nogiTitle(titles)
+						.nogiStatus(status)
+						.nogiCategory(category)
+						.nogiCommitDate(commitDate)
 						.build();
 	}
 

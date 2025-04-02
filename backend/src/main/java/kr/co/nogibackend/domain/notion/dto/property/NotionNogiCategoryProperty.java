@@ -11,12 +11,19 @@ import lombok.ToString;
 @ToString
 public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
 
-  private List<NotionMultiSelectProperty> multi_select;
+	private List<NotionMultiSelectProperty> multi_select;
 
-  public static List<NotionMultiSelectProperty> buildColorMultiSelect(List<> ) {
-
-    NotionMultiSelectProperty.buildColorName("공지", NotionColor.BLUE.getName());
-    return
-  }
+	public static NotionNogiCategoryProperty buildColorMultiSelect(
+			String name
+			, NotionColor color
+	) {
+		NotionMultiSelectProperty multiSelect =
+				NotionMultiSelectProperty.buildColorName(name, color.getName());
+		return
+				NotionNogiCategoryProperty
+						.builder()
+						.multi_select(List.of(multiSelect))
+						.build();
+	}
 
 }
