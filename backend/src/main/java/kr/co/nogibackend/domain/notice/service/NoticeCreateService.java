@@ -8,6 +8,7 @@ import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notice.entity.Notice;
 import kr.co.nogibackend.domain.notice.repository.NoticeCreateRepository;
 import kr.co.nogibackend.domain.notion.NotionClient;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,36 +28,10 @@ public class NoticeCreateService {
 	// todo: 시큐리티 적용하기
 	@Transactional
 	public Map<String, List<String>> createNotice(NotionNoticeCreateCommand command) {
-		List<User> users =
-				userRepository
-						.findAllUser()
-						.stream()
-						.filter(user -> user.hasNotionAccessToken() && user.hasNotionDatabaseId())
-						.toList();
+		List<User> users = this.getUsersFilterNotionTokenAndNotionDatabaseId();
+		Notice notice = this.saveNewNotice(command);
+		this.createNewNoticeToNotion(users, notice);
 
-		// todo: 메소드 이름 변경
-		this.createNotice(command);
-
-		// 신규 노션 공지사항 등록
-		List<User> successUser = new ArrayList<>();
-		List<User> failUser = new ArrayList<>();
-		for (User user : users) {
-			try {
-				NotionCreateNoticeRequest request =
-						NotionCreateNoticeRequest.ofNotice(
-								user.getNotionDatabaseId()
-								, command.title()
-								, command.createContent()
-						);
-
-				notionClient.createPage(user.getNotionAccessToken(), request);
-				successUser.add(user);
-
-				// todo: 유저_공지사항 db저장(덤프 save 필요)
-			} catch (Exception error) {
-				failUser.add(user);
-			}
-		}
 
     /*
       1. 특정 공지사항을 어떤 유저가 받았는지 히스토리 필요
@@ -68,9 +43,40 @@ public class NoticeCreateService {
 		return null;
 	}
 
-	private Notice create() {
+	private void createNewNoticeToNotion(List<User> users, Notice notice) {
+		List<User> success = new ArrayList<>();
+		List<User> fail = new ArrayList<>();
+		List<NotionBlockInfo> content = notice.createContent();
+
+		for (User user : users) {
+			try {
+				NotionCreateNoticeRequest request =
+						NotionCreateNoticeRequest.ofNotice(
+								user.getNotionDatabaseId()
+								, notice.getTitle()
+								, content
+						);
+
+				notionClient.createPage(user.getNotionAccessToken(), request);
+				success.add(user);
+			} catch (Exception error) {
+				log.info("[NoticeCreateService] createNewNoticeToNotion - Error : {} ", error.getMessage());
+				fail.add(user);
+			}
+		}
+	}
+
+	private List<User> getUsersFilterNotionTokenAndNotionDatabaseId() {
 		return
-				noticeCreateRepository.create();
+				userRepository
+						.findAllUser()
+						.stream()
+						.filter(user -> user.hasNotionAccessToken() && user.hasNotionDatabaseId())
+						.toList();
+	}
+
+	private Notice saveNewNotice(NotionNoticeCreateCommand command) {
+		return noticeCreateRepository.create(command.buildNotice());
 	}
 
 }
