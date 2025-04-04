@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notice.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,7 +21,7 @@ import org.hibernate.envers.Audited;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Table(
-		name = "tb_notice_user"
+    name = "tb_notice_user"
 )
 @Getter
 @Entity
@@ -32,16 +33,19 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SQLDelete(sql = "UPDATE tb_notice_user SET deleted = true, deleted_on = CURRENT_TIMESTAMP WHERE id = ?")
 public class NoticeUser extends BaseEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "notice_id")
-	private Notice notice;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "notice_id")
+  private Notice notice;
+
+  @Column(nullable = false)
+  private boolean isSuccess;
 
 }

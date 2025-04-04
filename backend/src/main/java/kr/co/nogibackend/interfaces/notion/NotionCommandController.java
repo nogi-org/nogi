@@ -23,9 +23,4 @@ public class NotionCommandController {
     return Response.success(notionConnectionService.onConnectionTest(auth.getUserId()));
   }
 
-  /*
-  todo: 노션페이지에 공지사항 남기기
-  노션 연결 테스트를 활용해서 노션 페이지ID를 가져와야함. 노션은 연결 되어있지만 페이지ID가 다를 수 잇음
-   */
-
 }

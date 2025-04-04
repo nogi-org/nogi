@@ -15,7 +15,7 @@ public enum UserResponseCode implements ResponseCode {
   F_DUPLICATION_NICKNAME(HttpStatus.BAD_REQUEST, "USER-4", "닉네임 중복입니다."),
   F_MANUAL(HttpStatus.BAD_REQUEST, "USER-5", "수동실행 중 문제가 발생했어요."),
   F_NOT_FOUND_NOGI_BOT(HttpStatus.BAD_REQUEST, "USER-6", "NogiBot을 찾을 수 없어요."),
-  ;
+  F_REQUIRE_NOTION_INFO(HttpStatus.BAD_REQUEST, "USER-7", "유저에 필수 Notion정보가 없어요.");
 
   public final HttpStatus status;
   public final String code;
