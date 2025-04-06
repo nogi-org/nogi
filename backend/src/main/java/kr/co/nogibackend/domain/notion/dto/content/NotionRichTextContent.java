@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.content;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,10 +11,19 @@ import lombok.ToString;
 @ToString
 public class NotionRichTextContent {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String type;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionTextContent text;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionAnnotationsContent annotations;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String plain_text;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String href;
 
 
@@ -26,6 +36,14 @@ public class NotionRichTextContent {
 						.build();
 	}
 
+	public static NotionRichTextContent buildLinkText(String text, String url) {
+		return
+				NotionRichTextContent
+						.builder()
+						.type("text")
+						.text(NotionTextContent.buildLinkContent(text, url))
+						.build();
+	}
 
 	public static String mergeRichTexts(List<NotionRichTextContent> texts) {
 		return NotionRichTextContent.mergeOrSplitRichTexts(texts, true);

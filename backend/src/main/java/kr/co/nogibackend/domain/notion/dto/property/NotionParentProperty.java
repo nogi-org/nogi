@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,8 +9,14 @@ import lombok.Getter;
 public class NotionParentProperty {
 
 	private String type;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String database_id;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String page_id;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String block_id;
 
 	public static NotionParentProperty buildParent(
@@ -28,7 +35,7 @@ public class NotionParentProperty {
 	}
 
 	public enum PARENT_TYPE {
-		DATABASE("database"), PAGE("page"), BLOCK("block");
+		DATABASE("database_id"), PAGE("page_id"), BLOCK("block_id");
 
 		private final String value;
 

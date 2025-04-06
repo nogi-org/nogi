@@ -40,7 +40,8 @@ out/
 .DS_Store
 
 ### cutom ###
-.env
+src/test/resources/env/*
+src/test/resources/.env
 src/main/resources/application-dev.yml
 src/main/resources/application-dev2.yml
 src/main/resources/application-prod.yml

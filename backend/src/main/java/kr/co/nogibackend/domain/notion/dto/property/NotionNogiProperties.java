@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,10 +25,20 @@ public class NotionNogiProperties {
 
 	private final ZoneId koreaZone = ZoneId.of("Asia/Seoul");
 	private final ZoneId utcZone = ZoneId.of("UTC");
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionNogiCategoryProperty nogiCategory;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionNogiCommitDateProperty nogiCommitDate;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionNogiStatusProperty nogiStatus;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionNogiTitleProperty nogiTitle;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private NotionNogiCommitMessageProperty nogiCommitMessage;
 
 	public static NotionNogiProperties buildCreateNotice(String title) {
@@ -59,15 +70,6 @@ public class NotionNogiProperties {
 						.map(NotionMultiSelectProperty::getName)
 						.collect(Collectors.joining("/"));
 	}
-
-  /*
-  todo: 필요없는 경우 삭제
-  마크다운 파일의 상대 경로를 생성
-   */
-	// public String createRelativePath() {
-	//   int count = nogiCategory.getMulti_select().size();
-	//   return "../".repeat(count);
-	// }
 
 	/*
 	github 에 UTC_ISO 날짜 포맷으로 커밋할 수 있다.

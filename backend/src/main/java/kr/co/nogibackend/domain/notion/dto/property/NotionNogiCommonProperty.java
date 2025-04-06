@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -13,7 +14,10 @@ https://developers.notion.com/reference/property-object#date
 @ToString
 public class NotionNogiCommonProperty {
 
-  private String id;
-  private String type;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String id = "sfsd_superpil";
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String type;
 
 }

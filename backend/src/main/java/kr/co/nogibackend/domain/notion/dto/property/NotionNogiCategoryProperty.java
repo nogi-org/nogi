@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
 import lombok.Builder;
@@ -11,6 +12,7 @@ import lombok.ToString;
 @ToString
 public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private List<NotionMultiSelectProperty> multi_select;
 
 	public static NotionNogiCategoryProperty buildColorMultiSelect(
