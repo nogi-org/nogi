@@ -1,5 +1,7 @@
 package kr.co.nogibackend.domain.notice;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -7,7 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import kr.co.nogibackend.application.notice.dto.NoticePublishCommand;
 import kr.co.nogibackend.domain.notice.entity.Notice;
+import kr.co.nogibackend.domain.notice.service.NoticeCreateService;
 import kr.co.nogibackend.domain.notion.dto.result.PublishNewNoticeResult;
 import kr.co.nogibackend.domain.notion.helper.NotionDataInjector;
 import kr.co.nogibackend.domain.user.User;
@@ -24,6 +28,10 @@ public class NoticePublish {
 
 	@Autowired
 	private NotionDataInjector notionDataInjector;
+
+	@Autowired
+	private NoticeCreateService noticeCreateService;
+
 	private static User testUser;
 
 	// todo: 공통으로 빼기
@@ -70,5 +78,14 @@ public class NoticePublish {
 
 	}
 
+	@Test
+	@DisplayName("공지사항 DB 저장")
+	void test2() {
+		NoticePublishCommand command =
+				new NoticePublishCommand("테스트1", "https://nogi.co.kr", "내용1");
+		Notice notice = noticeCreateService.create(command);
+		assertThat(notice.getTitle()).isEqualTo("테스트1");
+		assertThat(notice.getTitle()).isNotNull();
+	}
 
 }
