@@ -127,7 +127,7 @@ public class NotionClientImpl implements NotionClient {
   }
 
   @Override
-  public NotionPageInfo createPage(
+  public NotionInfo<NotionPageInfo> createPage(
       String basicToken,
       NotionCreateNoticeRequest request
   ) {

@@ -10,22 +10,22 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private List<NotionMultiSelectProperty> multi_select;
+  private List<NotionMultiSelectProperty> multi_select;
 
-	public static NotionNogiCategoryProperty buildColorMultiSelect(
-			String name
-			, NotionColor color
-	) {
-		NotionMultiSelectProperty multiSelect =
-				NotionMultiSelectProperty.buildColorName(name, color.getName());
-		return
-				NotionNogiCategoryProperty
-						.builder()
-						.multi_select(List.of(multiSelect))
-						.build();
-	}
+  public static NotionNogiCategoryProperty buildColorMultiSelect(
+      String name
+      , NotionColor color
+  ) {
+    NotionMultiSelectProperty multiSelect =
+        NotionMultiSelectProperty.buildColorName(name, color.getName());
+    return
+        NotionNogiCategoryProperty
+            .builder()
+            .multi_select(List.of(multiSelect))
+            .build();
+  }
 
 }

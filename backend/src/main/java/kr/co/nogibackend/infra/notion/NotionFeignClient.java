@@ -57,7 +57,7 @@ public interface NotionFeignClient {
   );
 
   @RequestMapping(method = RequestMethod.POST, value = "/pages")
-  ResponseEntity<NotionPageInfo> createPage(
+  ResponseEntity<NotionInfo<NotionPageInfo>> createPage(
       @RequestHeader("Authorization") String token,
       @RequestBody NotionCreateNoticeRequest request
   );

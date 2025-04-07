@@ -12,12 +12,10 @@ https://developers.notion.com/reference/property-object#date
 @Getter
 @Setter
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionNogiCommonProperty {
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String id = "sfsd_superpil";
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String type;
+  private String id;
+  private String type;
 
 }

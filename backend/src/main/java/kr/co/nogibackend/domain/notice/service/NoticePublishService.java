@@ -28,13 +28,13 @@ public class NoticePublishService {
 
   @Transactional
   public NoticePublishResponse publish(NoticePublishCommand command) {
+    // todo: 공지사항 생성 서비스 분리가 필요할 듯(페사드 패턴으로 수정), uri만들떄 서버에서 만들어서 주기
     Notice notice = noticeCreateRepository.create(command.buildNotice());
     List<User> users = userRepository.findAllUser();
     List<PublishNewNoticeResult> results = notionDataInjector.publishNewNotice(users, notice);
     List<NoticeUser> histories = noticeDataSaver.saveHistories(results, notice);
     return NoticePublishResponse.ofs(users.size(), histories);
   }
-
 
   /*
   [request]

@@ -8,24 +8,20 @@ import lombok.ToString;
 @Getter
 @Builder
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionMultiSelectProperty {
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String id;
+  private String id;
+  private String name;
+  private String color;
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String name;
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String color;
-
-	public static NotionMultiSelectProperty buildColorName(String name, String color) {
-		return
-				NotionMultiSelectProperty
-						.builder()
-						.name(name)
-						.color(color)
-						.build();
-	}
+  public static NotionMultiSelectProperty buildColorName(String name, String color) {
+    return
+        NotionMultiSelectProperty
+            .builder()
+            .name(name)
+            .color(color)
+            .build();
+  }
 
 }

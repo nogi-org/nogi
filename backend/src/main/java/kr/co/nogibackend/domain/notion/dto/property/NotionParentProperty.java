@@ -6,42 +6,37 @@ import lombok.Getter;
 
 @Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionParentProperty {
 
-	private String type;
+  private String type;
+  private String database_id;
+  private String page_id;
+  private String block_id;
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String database_id;
+  public static NotionParentProperty buildParent(
+      PARENT_TYPE type
+      , String id
+  ) {
+    NotionParentPropertyBuilder property = NotionParentProperty.builder();
+    if (type.equals(PARENT_TYPE.DATABASE)) {
+      property.type(type.value).database_id(id);
+    } else if (type.equals(PARENT_TYPE.PAGE)) {
+      property.type(type.value).page_id(id);
+    } else if (type.equals(PARENT_TYPE.BLOCK)) {
+      property.type(type.value).page_id(id);
+    }
+    return property.build();
+  }
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String page_id;
+  public enum PARENT_TYPE {
+    DATABASE("database_id"), PAGE("page_id"), BLOCK("block_id");
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String block_id;
+    private final String value;
 
-	public static NotionParentProperty buildParent(
-			PARENT_TYPE type
-			, String id
-	) {
-		NotionParentPropertyBuilder property = NotionParentProperty.builder();
-		if (type.equals(PARENT_TYPE.DATABASE)) {
-			property.type(type.value).database_id(id);
-		} else if (type.equals(PARENT_TYPE.PAGE)) {
-			property.type(type.value).page_id(id);
-		} else if (type.equals(PARENT_TYPE.BLOCK)) {
-			property.type(type.value).page_id(id);
-		}
-		return property.build();
-	}
-
-	public enum PARENT_TYPE {
-		DATABASE("database_id"), PAGE("page_id"), BLOCK("block_id");
-
-		private final String value;
-
-		PARENT_TYPE(String value) {
-			this.value = value;
-		}
-	}
+    PARENT_TYPE(String value) {
+      this.value = value;
+    }
+  }
 
 }

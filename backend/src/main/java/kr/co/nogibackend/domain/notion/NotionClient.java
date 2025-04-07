@@ -30,6 +30,6 @@ public interface NotionClient {
 
   NotionGetAccessInfo getAccessToken(String basicToken, NotionGetAccessTokenRequest request);
 
-  NotionPageInfo createPage(String basicToken, NotionCreateNoticeRequest request);
+  NotionInfo<NotionPageInfo> createPage(String basicToken, NotionCreateNoticeRequest request);
 
 }

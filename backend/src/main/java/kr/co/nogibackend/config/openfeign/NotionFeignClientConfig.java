@@ -1,15 +1,14 @@
 package kr.co.nogibackend.config.openfeign;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Logger;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import kr.co.nogibackend.util.HttpRequestUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 
 @Slf4j
 public class NotionFeignClientConfig implements RequestInterceptor {
-
-  private final ObjectMapper objectMapper = new ObjectMapper();
 
   @Override
   public void apply(RequestTemplate template) {
@@ -18,10 +17,8 @@ public class NotionFeignClientConfig implements RequestInterceptor {
     }
 
     template.header("Notion-Version", "2022-06-28");
-    template.header("Content-Type", "application/json");
-    var newHeaders = HttpRequestUtils.handleBearerToken(
-        template.headers());// 1ad7e38f-6917-811c-929c-fdab3e1c8b85
-
+    template.header("Content-Type", "application/json; charset=UTF-8");
+    var newHeaders = HttpRequestUtils.handleBearerToken(template.headers());
     // 기존 헤더 초기화 후 새 헤더 설정(초기화 되지 않는 문제가 있어서 초기화 후 설정)
     template.headers(null);
     template.headers(newHeaders);
@@ -32,5 +29,14 @@ public class NotionFeignClientConfig implements RequestInterceptor {
   // public Exception decode(String methodKey, Response response) {
   // 	return response.;
   // }
+  @Bean
+  public Logger feignLogger() {
+    return new CustomFeignLogger();
+  }
+
+  @Bean
+  Logger.Level feignLoggerLevel() {
+    return Logger.Level.FULL; // FULL로 해야 Body까지 출력
+  }
 
 }

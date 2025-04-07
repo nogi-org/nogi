@@ -34,9 +34,13 @@ public class NoticeDataSaver {
       return noticeUsers;
     } catch (Exception error) {
       log.error("[Notice Database Save Error] 정상 발행 유저ID: {}, 발행 실패 유저ID: {}",
-          results.stream().filter(PublishNewNoticeResult::isSuccess)
+          results
+              .stream()
+              .filter(PublishNewNoticeResult::isSuccess)
               .map(r -> r.user().getId()).toList(),
-          results.stream().filter(r -> !r.isSuccess())
+          results
+              .stream()
+              .filter(r -> !r.isSuccess())
               .map(r -> r.user().getId()).toList()
       );
       return List.of();
