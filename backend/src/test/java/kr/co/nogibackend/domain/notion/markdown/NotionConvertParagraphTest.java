@@ -16,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class NotionConvertParagraph {
+public class NotionConvertParagraphTest {
 
   static List<NotionParagraphContent> contents = new ArrayList<>();
   @InjectMocks

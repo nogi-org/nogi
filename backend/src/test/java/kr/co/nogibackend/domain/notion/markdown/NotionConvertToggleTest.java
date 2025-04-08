@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionToggleBlocksContent;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult.ImageOfNotionBlock;
 import kr.co.nogibackend.domain.notion.helper.NotionMarkdownConverter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -16,9 +17,9 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class NotionListCode {
+public class NotionConvertToggleTest {
 
-  static List<NotionListItemContent> contents = new ArrayList<>();
+  static List<NotionToggleBlocksContent> contents = new ArrayList<>();
   @InjectMocks
   private NotionMarkdownConverter notionMarkdownConverter;
 
@@ -27,9 +28,9 @@ public class NotionListCode {
     ObjectMapper mapper = new ObjectMapper();
 
     InputStream is =
-        NotionListItemContent.class
+        NotionToggleBlocksContent.class
             .getClassLoader()
-            .getResourceAsStream("json/NotionListItemBlockData.json");
+            .getResourceAsStream("json/NotionToggleBlockData.json");
 
     contents =
         mapper.readValue(is, new TypeReference<>() {
@@ -37,26 +38,11 @@ public class NotionListCode {
   }
 
   @Test
-  @DisplayName("숫자없는 리스트1에 1뎁스 자식요소 포함")
+  @DisplayName("토글버튼 마크다운")
   void convert1() {
+    List<ImageOfNotionBlock> images = new ArrayList<>();
     String markdown =
-        notionMarkdownConverter.buildListItem(contents.get(0), false);
-    System.out.println(markdown);
-  }
-
-  @Test
-  @DisplayName("숫자있는 리스트1에 1뎁스 자식요소 포함")
-  void convert2() {
-    String markdown =
-        notionMarkdownConverter.buildListItem(contents.get(1), true);
-    System.out.println(markdown);
-  }
-
-  @Test
-  @DisplayName("숫자있는 리스트1에 2뎁스 자식요소 포함")
-  void convert3() {
-    String markdown =
-        notionMarkdownConverter.buildListItem(contents.get(2), true);
+        notionMarkdownConverter.buildToggle(contents.get(0), "gitowner", images);
     System.out.println(markdown);
   }
 

@@ -14,14 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NoticePublishFacade {
 
-	private final NoticePublishService noticePublishService;
-	private final NoticeCreateService noticeCreateService;
+  private final NoticePublishService noticePublishService;
+  private final NoticeCreateService noticeCreateService;
 
-	@Transactional
-	public NoticePublishResponse publish(NoticePublishCommand command) {
-		noticeCreateService.create(command);
-		// noticePublishService.publish();
-		return null;
-	}
+  @Transactional
+  public NoticePublishResponse publish(NoticePublishCommand command) {
+    noticeCreateService.create(command);
+    return null;
+  }
+  // noticePublishService.publish();
 
 }

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
+import kr.co.nogibackend.domain.notion.dto.content.NotionCodeContent;
 import kr.co.nogibackend.domain.notion.helper.NotionMarkdownConverter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
@@ -16,9 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-public class NotionConvertTable {
+public class NotionConvertCodeTest {
 
-  static List<NotionTableContent> contents = new ArrayList<>();
+  static List<NotionCodeContent> contents = new ArrayList<>();
   @InjectMocks
   private NotionMarkdownConverter notionMarkdownConverter;
 
@@ -27,9 +27,9 @@ public class NotionConvertTable {
     ObjectMapper mapper = new ObjectMapper();
 
     InputStream is =
-        NotionTableContent.class
+        NotionCodeContent.class
             .getClassLoader()
-            .getResourceAsStream("json/NotionTableBlockData.json");
+            .getResourceAsStream("json/NotionCodeBlockData.json");
 
     contents =
         mapper.readValue(is, new TypeReference<>() {
@@ -37,18 +37,10 @@ public class NotionConvertTable {
   }
 
   @Test
-  @DisplayName("단순 테이블")
+  @DisplayName("코드")
   void convert1() {
     String markdown =
-        notionMarkdownConverter.buildTable(contents.get(0));
-    System.out.println(markdown);
-  }
-
-  @Test
-  @DisplayName("스타일 추가 테이블")
-  void convert2() {
-    String markdown =
-        notionMarkdownConverter.buildTable(contents.get(1));
+        notionMarkdownConverter.buildCode(contents.get(0));
     System.out.println(markdown);
   }
 
