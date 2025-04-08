@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class NoticeCreateQueryRepository {
 
-	private final JPAQueryFactory queryFactory;
-
+  private final JPAQueryFactory query;
 }
