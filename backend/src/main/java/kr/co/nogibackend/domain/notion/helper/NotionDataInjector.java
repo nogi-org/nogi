@@ -7,7 +7,6 @@ import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notice.entity.Notice;
 import kr.co.nogibackend.domain.notion.NotionClient;
-import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.result.PublishNewNoticeResult;
 import kr.co.nogibackend.domain.user.User;
 import lombok.RequiredArgsConstructor;
@@ -42,21 +41,14 @@ public class NotionDataInjector {
    */
   public List<PublishNewNoticeResult> publishNewNotice(List<User> users, Notice notice) {
     List<PublishNewNoticeResult> results = new ArrayList<>();
-    List<NotionBlockInfo> content = notice.buildContentCallOutBlock();
 
     for (User user : users) {
       boolean isSuccess = true;
 
       try {
         user.validateHasNotionTokenOrDatabaseId();
-
         NotionCreateNoticeRequest request =
-            NotionCreateNoticeRequest.ofNotice(
-                user.getNotionDatabaseId()
-                , notice.getTitle()
-                , content
-            );
-
+            notice.buildNewPublishToNotion(user.getNotionDatabaseId());
         notionClient.createPage(user.getNotionAccessToken(), request);
       } catch (Exception error) {
         isSuccess = false;

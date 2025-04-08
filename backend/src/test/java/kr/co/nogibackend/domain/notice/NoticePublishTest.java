@@ -1,6 +1,7 @@
 package kr.co.nogibackend.domain.notice;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,7 +51,7 @@ public class NoticePublishTest {
   }
 
   @Test
-  @DisplayName("노션에 공지사항 정상 발행")
+  @DisplayName("노션에 공지사항 발행")
   void test1() {
     User user =
         User
@@ -62,7 +63,7 @@ public class NoticePublishTest {
     Notice notice =
         Notice
             .builder()
-            .title("공지사항 테스트" + new Date())
+            .title("공지사항 테스트 리팩토링 중..." + new Date())
             .content("텟텟")
             .url("https://nogi.co.kr")
             .build();
@@ -71,13 +72,13 @@ public class NoticePublishTest {
         notionDataInjector.publishNewNotice(List.of(user), notice);
 
     results.forEach(result -> {
-      System.out.println(result.isSuccess());
+      assertTrue(result.isSuccess());
     });
 
   }
 
   @Test
-  @DisplayName("공지사항 DB 저장")
+  @DisplayName("공지사항 저장")
   void test2() {
     NoticePublishCommand command =
         new NoticePublishCommand("테스트1", "https://nogi.co.kr", "내용1");

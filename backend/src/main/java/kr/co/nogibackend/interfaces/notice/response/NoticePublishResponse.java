@@ -8,7 +8,7 @@ public record NoticePublishResponse(
     List<NoticePublishResultResponse> result
 ) {
 
-  public static NoticePublishResponse ofs(int userSize, List<NoticeUser> noticeUsers) {
+  public static NoticePublishResponse ofs(List<NoticeUser> noticeUsers) {
     List<NoticePublishResultResponse> result =
         noticeUsers
             .stream()
@@ -20,7 +20,7 @@ public record NoticePublishResponse(
                 )
             )
             .toList();
-    return new NoticePublishResponse(userSize, result);
+    return new NoticePublishResponse(noticeUsers.size(), result);
   }
 
   public record NoticePublishResultResponse(

@@ -36,7 +36,7 @@ public class NotionNogiProperties {
   private NotionNogiTitleProperty nogiTitle;
   private NotionNogiCommitMessageProperty nogiCommitMessage;
 
-  public static NotionNogiProperties buildCreateNotice(String title) {
+  public static NotionNogiProperties buildNewNotice(String title) {
     NotionNogiTitleProperty titles =
         NotionNogiTitleProperty.buildTitles(List.of(title));
     NotionNogiStatusProperty status =
