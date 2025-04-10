@@ -1,4 +1,4 @@
-package kr.co.nogibackend.domain.notion.dto.result;
+package kr.co.nogibackend.domain.notice.dto.result;
 
 import kr.co.nogibackend.domain.user.User;
 

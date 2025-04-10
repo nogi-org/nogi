@@ -2,11 +2,11 @@ package kr.co.nogibackend.domain.notice.service;
 
 import java.util.List;
 import kr.co.nogibackend.application.notice.dto.NoticePublishCommand;
+import kr.co.nogibackend.domain.notice.dto.result.PublishNewNoticeResult;
 import kr.co.nogibackend.domain.notice.entity.Notice;
 import kr.co.nogibackend.domain.notice.entity.NoticeUser;
 import kr.co.nogibackend.domain.notice.repository.NoticeCreateRepository;
 import kr.co.nogibackend.domain.notice.repository.NoticeUserCreateRepository;
-import kr.co.nogibackend.domain.notion.dto.result.PublishNewNoticeResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

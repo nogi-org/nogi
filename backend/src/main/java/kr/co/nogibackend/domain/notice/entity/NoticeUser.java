@@ -48,4 +48,8 @@ public class NoticeUser extends BaseEntity {
   @Column(nullable = false)
   private boolean isSuccess;
 
+  public void updateIsSuccess(boolean isSuccess) {
+    this.isSuccess = isSuccess;
+  }
+
 }

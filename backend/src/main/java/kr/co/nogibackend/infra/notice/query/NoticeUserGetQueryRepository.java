@@ -5,6 +5,7 @@ import static kr.co.nogibackend.domain.notice.entity.QNoticeUser.noticeUser;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
+import kr.co.nogibackend.domain.notice.dto.condition.NoticeUserSearchConditions;
 import kr.co.nogibackend.domain.notice.entity.NoticeUser;
 import kr.co.nogibackend.interfaces.notice.request.NoticeRecipientsRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +20,23 @@ public class NoticeUserGetQueryRepository {
 
   private final JPAQueryFactory query;
 
+  public List<NoticeUser> searchByConditions(NoticeUserSearchConditions conditions) {
+    return query
+        .select(noticeUser)
+        .from(noticeUser)
+        .join(noticeUser.notice).fetchJoin()
+        .join(noticeUser.user).fetchJoin()
+        .where(
+            // todo: 다이나믹으로 빼기
+            noticeUser.notice.id.eq(conditions.noticeId())
+            , noticeUser.isSuccess.eq(conditions.isSuccess())
+        )
+        .fetch();
+  }
+
   public Page<NoticeUser> findRecipientsPage(
       Long noticeId
+      // todo: conditions로 이름 바꾸기
       , NoticeRecipientsRequest request
       , Pageable pageable
   ) {

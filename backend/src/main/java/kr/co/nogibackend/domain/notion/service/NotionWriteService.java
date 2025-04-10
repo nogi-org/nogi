@@ -47,9 +47,9 @@ public class NotionWriteService {
   public Optional<NotionEndTILResult> updateStatusByResult(NotionEndTILCommand command) {
     // 1️⃣ TIL 커밋 성공/실패 여부를 기반으로 상태 업데이트
     boolean isUpdateResult =
-        notionDataInjector.updateTILResultStatus(command.isSuccess(), command.notionBotToken(),
-            command.notionPageId(),
-            command.userId());
+        notionDataInjector.updateTILResultStatus(
+            command.isSuccess(), command.notionBotToken(), command.notionPageId(), command.userId()
+        );
 
     // 2️⃣ Notion 페이지 ID, 사용자 ID를 이용해 상태 변경
     return

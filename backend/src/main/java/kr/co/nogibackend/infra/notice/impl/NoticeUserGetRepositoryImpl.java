@@ -1,5 +1,7 @@
 package kr.co.nogibackend.infra.notice.impl;
 
+import java.util.List;
+import kr.co.nogibackend.domain.notice.dto.condition.NoticeUserSearchConditions;
 import kr.co.nogibackend.domain.notice.entity.NoticeUser;
 import kr.co.nogibackend.domain.notice.repository.NoticeUserGetRepository;
 import kr.co.nogibackend.infra.notice.query.NoticeUserGetQueryRepository;
@@ -23,4 +25,10 @@ public class NoticeUserGetRepositoryImpl implements NoticeUserGetRepository {
   ) {
     return noticeUserGetQueryRepository.findRecipientsPage(noticeId, request, pageable);
   }
+
+  @Override
+  public List<NoticeUser> searchByConditions(NoticeUserSearchConditions conditions) {
+    return noticeUserGetQueryRepository.searchByConditions(conditions);
+  }
+
 }
