@@ -1,6 +1,7 @@
 package kr.co.nogibackend.domain.notice.service;
 
 import java.util.List;
+import kr.co.nogibackend.domain.notice.dto.condition.NoticeUserSearchConditions;
 import kr.co.nogibackend.domain.notice.dto.result.PublishNewNoticeResult;
 import kr.co.nogibackend.domain.notice.entity.Notice;
 import kr.co.nogibackend.domain.notice.entity.NoticeUser;
@@ -28,12 +29,11 @@ public class NoticePublishService {
     return notionDataInjector.publishNewNotice(users, notice);
   }
 
-  // todo: isSuccess가 false인 유저만 가져와야함
-  // todo: 쿼리 메소드 새로 따기
   @Transactional
   public List<PublishNewNoticeResult> rePublish(Long noticeId) {
     List<NoticeUser> noticeUsers =
-        noticeUserGetRepository.searchByConditions(noticeId, false);
+        noticeUserGetRepository
+            .searchByConditions(new NoticeUserSearchConditions(noticeId, false));
 
     if (noticeUsers.isEmpty()) {
       return List.of();
@@ -45,12 +45,16 @@ public class NoticePublishService {
     List<PublishNewNoticeResult> publishResults =
         notionDataInjector.publishNewNotice(users, notice);
 
-    this.updateRePublishResult();
+    this.updateRePublishResult(noticeUsers, publishResults);
     return publishResults;
   }
 
-  private void updateRePublishResult() {
-    publishResults.forEach(result -> {
+  // todo: helper로 빼는게 좋지 않을까?
+  private void updateRePublishResult(
+      List<NoticeUser> noticeUsers
+      , List<PublishNewNoticeResult> results
+  ) {
+    results.forEach(result -> {
       Long userId = result.user().getId();
       noticeUsers.forEach(noticeUser -> {
         if (noticeUser.getUser().getId().equals(userId)) {

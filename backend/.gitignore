@@ -45,6 +45,7 @@ src/test/resources/.env
 src/main/resources/application-dev.yml
 src/main/resources/application-dev2.yml
 src/main/resources/application-prod.yml
+src/main/resources/application-test.yml
 src/test/resources/application-test.yml
 LOG_DIR_IS_UNDEFINED
 spy.log

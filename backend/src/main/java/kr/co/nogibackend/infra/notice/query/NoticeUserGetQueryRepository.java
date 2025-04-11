@@ -20,19 +20,39 @@ public class NoticeUserGetQueryRepository {
 
   private final JPAQueryFactory query;
 
+  /**
+   * <h1>단순 복수 조회, 복수 조건</h1>
+   */
   public List<NoticeUser> searchByConditions(NoticeUserSearchConditions conditions) {
-    return query
-        .select(noticeUser)
-        .from(noticeUser)
-        .join(noticeUser.notice).fetchJoin()
-        .join(noticeUser.user).fetchJoin()
-        .where(
-            // todo: 다이나믹으로 빼기
-            noticeUser.notice.id.eq(conditions.noticeId())
-            , noticeUser.isSuccess.eq(conditions.isSuccess())
-        )
-        .fetch();
+    return
+        query
+            .select(noticeUser)
+            .from(noticeUser)
+            .join(noticeUser.notice).fetchJoin()
+            .join(noticeUser.user).fetchJoin()
+            .where(
+                this.eqId(conditions.noticeId())
+                , this.eqIsSuccess(conditions.isSuccess())
+            )
+            .fetch();
   }
+
+  // todo: 이거는 나중에 필요할 때 다시 사용하기
+//  public Optional<NoticeUser> findByConditions(NoticeUserFindConditions conditions) {
+//    return
+//        Optional.of(
+//            query
+//                .select(noticeUser)
+//                .from(noticeUser)
+//                .join(noticeUser.notice).fetchJoin()
+//                .join(noticeUser.user).fetchJoin()
+//                .where(
+//                    this.eqId(conditions.noticeId())
+//                    , this.eqIsSuccess(conditions.isSuccess())
+//                )
+//                .fetchOne()
+//        );
+//  }
 
   public Page<NoticeUser> findRecipientsPage(
       Long noticeId
@@ -68,6 +88,10 @@ public class NoticeUserGetQueryRepository {
             .fetchOne();
 
     return new PageImpl<>(content, pageable, total);
+  }
+
+  private BooleanExpression eqId(Long id) {
+    return id == null ? null : noticeUser.id.eq(id);
   }
 
   private BooleanExpression eqIsSuccess(Boolean isSuccess) {
