@@ -9,7 +9,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import java.util.List;
 import kr.co.nogibackend.domain.BaseEntity;
+import kr.co.nogibackend.domain.notice.dto.result.PublishNewNoticeResult;
 import kr.co.nogibackend.domain.user.User;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -48,8 +50,13 @@ public class NoticeUser extends BaseEntity {
   @Column(nullable = false)
   private boolean isSuccess;
 
-  public void updateIsSuccess(boolean isSuccess) {
-    this.isSuccess = isSuccess;
+  public void updateIsSuccess(List<PublishNewNoticeResult> results) {
+    Long userId = this.user.getId();
+    results.forEach(result -> {
+      if (result.user().getId().equals(userId)) {
+        this.isSuccess = result.isSuccess();
+      }
+    });
   }
 
 }

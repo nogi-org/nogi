@@ -42,26 +42,11 @@ public class NoticePublishService {
     Notice notice = noticeUsers.get(0).getNotice();
     List<User> users = noticeUsers.stream().map(NoticeUser::getUser).toList();
 
-    List<PublishNewNoticeResult> publishResults =
+    List<PublishNewNoticeResult> results =
         notionDataInjector.publishNewNotice(users, notice);
 
-    this.updateRePublishResult(noticeUsers, publishResults);
-    return publishResults;
-  }
-
-  // todo: helper로 빼는게 좋지 않을까?
-  private void updateRePublishResult(
-      List<NoticeUser> noticeUsers
-      , List<PublishNewNoticeResult> results
-  ) {
-    results.forEach(result -> {
-      Long userId = result.user().getId();
-      noticeUsers.forEach(noticeUser -> {
-        if (noticeUser.getUser().getId().equals(userId)) {
-          noticeUser.updateIsSuccess(result.isSuccess());
-        }
-      });
-    });
+    noticeUsers.forEach(noticeUser -> noticeUser.updateIsSuccess(results));
+    return results;
   }
 
 }
