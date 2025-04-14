@@ -14,7 +14,7 @@ const action = () => {
 <template>
   <div>
     <button
-      class="bg-action text-xs px-2.5 py-1 rounded-md sm:text-sm"
+      class="bg-action px-3 py-2 rounded-md text-white text-xs"
       @click="action"
     >
       {{ name }}

@@ -151,6 +151,16 @@ export class AuthManager {
     return response;
   }
 
+  isAdmin() {
+    const auth = this.#authStore.getAuth().value;
+    return auth.role === AuthManager.ROLE.ADMIN;
+  }
+
+  isUser() {
+    const auth = this.#authStore.getAuth().value;
+    return auth.role === AuthManager.ROLE.USER;
+  }
+
   #noticeLogin(isRequireInfo) {
     const message = isRequireInfo
       ? '환영합니다!👏\n원활한 서비스 이용을 위해 GitHub Repository 정보를 입력해주세요.'

@@ -4,8 +4,11 @@ import { NoticeManager } from '@/manager/notice/NoticeManager.js';
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
 import SPagination from '@/shared/common/SPagination.vue';
 import { toYMD } from '../../utils/dateFormat.js';
+import SActionButton from '@/shared/buttons/SActionButton.vue';
+import { AuthManager } from '@/manager/auth/AuthManager.js';
 
 const notice = new NoticeManager();
+const auth = new AuthManager();
 
 onMounted(async () => {
   await notice.loadNotices();
@@ -23,6 +26,12 @@ const onChangePage = async (pageNo) => {
 <template>
   <div>
     <CSettingTitle :title="`공지사항 (${notice.getPagination().total})`" />
+    <SActionButton
+      v-if="auth.isAdmin()"
+      name="신규발행"
+      class="flex justify-end py-3"
+      @action="notice.goToPublishPage()"
+    />
     <div class="relative overflow-x-auto rounded-md">
       <table class="w-full text-sm text-left text-neutral">
         <thead class="text-xs bg-main font-noto_sans_m">

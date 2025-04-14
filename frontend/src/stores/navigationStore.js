@@ -101,6 +101,15 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           component: () => import('@/views/notice/NoticePage.vue')
         },
         {
+          path: '/notice/publish',
+          name: 'noticePublishPage',
+          meta: {
+            requiresLogin: true,
+            requiresRole: AuthManager.ROLE.ADMIN
+          },
+          component: () => import('@/views/notice/noticePublishPage.vue')
+        },
+        {
           path: '/my-page',
           name: 'myPage',
           meta: {
