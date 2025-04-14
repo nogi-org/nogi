@@ -23,7 +23,7 @@
     <!--  페이지  -->
     <span v-for="index in pageRange" :key="index">
       <button
-        class="text-xs text-main bg-violet-100 py-2 px-3 rounded-md font-noto_sans_m sm:text-sm"
+        class="text-xs text-white bg-main py-2 px-3 rounded-md font-noto_sans_m sm:text-sm"
         v-if="pageNo === index"
       >
         {{ index }}
