@@ -37,7 +37,7 @@ public class SecurityConfig {
     // ADMIN 권한 설정
     Map<HttpMethod, List<String>> ADMIN_URL =
         Map.ofEntries(
-            Map.entry(HttpMethod.GET, List.of("/admin/**")),
+            Map.entry(HttpMethod.GET, List.of("/admin/**", "/notice/{noticeId}/recipients")),
             Map.entry(HttpMethod.POST, List.of("/guides", "/notice/publish", "/notice/re-publish")),
             Map.entry(HttpMethod.PUT, List.of("/guides", "/admin/**")),
             Map.entry(HttpMethod.DELETE, List.of("/guides"))
