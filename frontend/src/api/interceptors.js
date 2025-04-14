@@ -53,6 +53,7 @@ async function handleInterceptorCommonError(response) {
       break;
     case ApiResponse.USER_3: // 403
       await router.push({ name: 'home' });
+      useAuthStore().deleteAuth();
       notifyStore.onActive(response);
       spinnerStore.off();
       break;
