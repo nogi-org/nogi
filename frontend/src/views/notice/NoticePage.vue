@@ -4,16 +4,18 @@ import { NoticeManager } from '@/manager/notice/NoticeManager.js';
 import { useRoute } from 'vue-router';
 import SPagination from '@/shared/common/SPagination.vue';
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
-import { toYMD } from '../../utils/dateFormat.js';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
+import { toYMD } from '../../utils/dateFormat.js';
 
 const notice = new NoticeManager();
-// const router = useRouter();
 const route = useRoute();
 const auth = new AuthManager();
+
 onMounted(() => {
   notice.loadNotice(route.params.noticeId);
-  notice.loadNoticeRecipients(route.params.noticeId);
+  if (auth.isAdmin()) {
+    notice.loadNoticeRecipients(route.params.noticeId);
+  }
 });
 
 const onChangePage = (pageNo) => {

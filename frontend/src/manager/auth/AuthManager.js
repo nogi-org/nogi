@@ -153,12 +153,12 @@ export class AuthManager {
 
   isAdmin() {
     const auth = this.#authStore.getAuth().value;
-    return auth.role === AuthManager.ROLE.ADMIN;
+    return auth !== null && auth.role === AuthManager.ROLE.ADMIN;
   }
 
   isUser() {
     const auth = this.#authStore.getAuth().value;
-    return auth.role === AuthManager.ROLE.USER;
+    return auth !== null && auth.role === AuthManager.ROLE.USER;
   }
 
   #noticeLogin(isRequireInfo) {
