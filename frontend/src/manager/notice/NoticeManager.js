@@ -3,11 +3,21 @@ import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import {
   getNoticeApi,
   getNoticeRecipientsApi,
-  getNoticesApi
+  getNoticesApi,
+  noticePublishApi
 } from '@/api/notice/notice.js';
 import { useRouter } from 'vue-router';
+import { useNotifyStore } from '@/stores/notifyStore.js';
 
 export class NoticeManager {
+  #spinnerStore = useSpinnerStore();
+  #notifyStore = useNotifyStore();
+
+  #newNotice = ref({
+    title: '',
+    content: '',
+    url: import.meta.env.VITE_WEB_BASE_URL + '/notice'
+  });
   #notices = ref();
   #notice = ref();
   #pagination = {
@@ -22,7 +32,6 @@ export class NoticeManager {
     total: 0
   };
   #router = useRouter();
-  #spinnerStore = useSpinnerStore();
 
   async loadNotices(page) {
     this.#spinnerStore.on();
@@ -51,9 +60,36 @@ export class NoticeManager {
       size: this.#recipientsPagination.size,
       page: this.#recipientsPagination.page
     });
-    console.log('response -- > ', response);
+    console.log('response -> ', response);
     this.#recipients.value = response.content;
     this.#recipientsPagination.total = response.totalElements;
+  }
+
+  setNewNoticeContent(content) {
+    this.#newNotice.value.content = content;
+  }
+
+  isValidationPublish() {
+    if (this.#newNotice.value.content.text === '') {
+      alert('내용을 입력해주세요.');
+      return false;
+    }
+    if (this.#newNotice.value.title === '') {
+      alert('제목을 입력해주세요.');
+      return false;
+    }
+    return true;
+  }
+
+  async publish() {
+    this.#spinnerStore.on();
+    const response = await noticePublishApi({
+      ...this.#newNotice.value,
+      content: this.#newNotice.value.content.html
+    });
+    this.#notifyStore.onActive({ message: response.message });
+    this.#spinnerStore.off();
+    await this.#router.push({ name: 'noticesPage' });
   }
 
   goToPublishPage() {
@@ -74,6 +110,10 @@ export class NoticeManager {
 
   getRecipients() {
     return this.#recipients;
+  }
+
+  getNewNotice() {
+    return this.#newNotice;
   }
 
   getRecipientsPagination() {

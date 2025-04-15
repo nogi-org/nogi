@@ -60,6 +60,23 @@ export const handleNotionDatabaseConnectionTest = (response) => {
   return response;
 };
 
+export const handleNoticePublish = (response) => {
+  switch (response.code) {
+    case ApiResponse.S_0:
+      const message = `총 ${response.result.userSize}명에게 발송되었습니다.\n`;
+      const fail = response.result.result.filter(
+        (result) => result.isSuccess === false
+      ).length;
+      const success = response.result.result.filter(
+        (result) => result.isSuccess === true
+      ).length;
+      const countMessage = `성공: ${success}명 / 실패: ${fail}명`;
+      response.message = message + countMessage;
+      break;
+  }
+  return response;
+};
+
 export const handleValidationGithubRepository = (response) => {
   switch (response.code) {
     case ApiResponse.S_0:

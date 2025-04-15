@@ -5,7 +5,9 @@ import { useRoute } from 'vue-router';
 import SPagination from '@/shared/common/SPagination.vue';
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
-import { toYMD } from '../../utils/dateFormat.js';
+import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
+import * as dateFormat from '@/utils/dateFormat.js';
+import { toYMD } from '@/utils/dateFormat.js';
 
 const notice = new NoticeManager();
 const route = useRoute();
@@ -25,9 +27,16 @@ const onChangePage = (pageNo) => {
 
 <template>
   <div>
-    <h1>{{ notice.getNotice().value?.title }}</h1>
-    <h1>{{ notice.getNotice().value?.content }}</h1>
-    <h1>{{ toYMD(notice.getNotice().value?.createdAt) }}</h1>
+    <div class="mb-8 border-b border-b-main">
+      <h1 class="text-2xl">{{ notice.getNotice().value?.title }}</h1>
+      <p class="text-neutral text-xs text-right mb-2">
+        {{ dateFormat.toYMD(notice.getNotice().value?.createdAt) }}
+      </p>
+    </div>
+    <STextEditorContent
+      :content="notice.getNotice().value?.content"
+      class="mb-20"
+    />
 
     <!--    todo: 컴포넌트로 빼기-->
     <div v-if="auth.isAdmin()">
@@ -45,16 +54,14 @@ const onChangePage = (pageNo) => {
             <tr>
               <th
                 scope="col"
-                class="w-8/12 sm:w-9/12 md:w-10/12 px-6 py-3 rounded-tl-md rounded-bl-md"
+                class="w-8/12 px-6 py-3 rounded-tl-md rounded-bl-md"
               >
                 이름
               </th>
-              <th scope="col" class="w-4/12 sm:w-3/12 md:w-2/12 px-6 py-3">
-                결과
-              </th>
+              <th scope="col" class="w-4/12 px-6 py-3">결과</th>
               <th
                 scope="col"
-                class="w-4/12 sm:w-3/12 md:w-2/12 px-6 py-3 rounded-tr-md rounded-br-md"
+                class="w-4/12 px-6 py-3 rounded-tr-md rounded-br-md"
               >
                 날짜
               </th>
@@ -63,21 +70,27 @@ const onChangePage = (pageNo) => {
           <tbody>
             <tr
               class="cursor-pointer hover:bg-main"
-              v-for="(item, index) in notice.getNotices().value"
+              v-for="(item, index) in notice.getRecipients().value"
               :key="index"
             >
               <th
                 scope="row"
-                class="w-8/12 sm:w-9/12 md:w-10/12 px-6 py-4 rounded-tl-md rounded-bl-md"
+                class="w-8/12 px-6 py-4 rounded-tl-md rounded-bl-md"
               >
-                {{ item?.title }}
-              </th>
-              <th scope="row" class="w-8/12 sm:w-9/12 md:w-10/12 px-6 py-4">
-                {{ item?.title }}
+                {{ item?.githubOwner }}
               </th>
               <th
                 scope="row"
-                class="w-4/12 sm:w-3/12 md:w-2/12 px-6 py-4 rounded-tr-md rounded-br-md text-xs"
+                class="w-8/12 px-6 py-4"
+                :class="
+                  item?.isSuccess === true ? 'text-action' : 'text-danger'
+                "
+              >
+                {{ item?.isSuccess ? '성공' : '실패' }}
+              </th>
+              <th
+                scope="row"
+                class="w-4/12 px-6 py-4 rounded-tr-md rounded-br-md text-xs"
               >
                 {{ toYMD(item?.createdAt) }}
               </th>
