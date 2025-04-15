@@ -8,6 +8,7 @@ import kr.co.nogibackend.domain.notice.entity.NoticeUser;
 import kr.co.nogibackend.domain.notice.repository.NoticeGetRepository;
 import kr.co.nogibackend.domain.notice.repository.NoticeUserGetRepository;
 import kr.co.nogibackend.interfaces.notice.request.NoticeRecipientsRequest;
+import kr.co.nogibackend.interfaces.notice.response.NoticeGetResponse;
 import kr.co.nogibackend.interfaces.notice.response.NoticeRecipientsResponse;
 import kr.co.nogibackend.interfaces.notice.response.NoticesResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -28,13 +30,15 @@ public class NoticeGetService {
     return NoticesResponse.of(noticeGetRepository.getNotices(pageable));
   }
 
-  public Notice getNotice(Long noticeId) {
-    return
+  public NoticeGetResponse getNotice(Long noticeId) {
+    Notice notice =
         noticeGetRepository
             .findById(noticeId)
             .orElseThrow(() -> new GlobalException(F_NOT_FOUND_NOTICE));
+    return NoticeGetResponse.of(notice);
   }
 
+  @Transactional(readOnly = true)
   public Page<NoticeRecipientsResponse> getRecipients(
       Long noticeId
       , NoticeRecipientsRequest request
