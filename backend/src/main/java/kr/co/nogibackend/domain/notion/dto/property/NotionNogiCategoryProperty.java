@@ -3,13 +3,17 @@ package kr.co.nogibackend.domain.notion.dto.property;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Builder
+@Setter
 @ToString
+@NoArgsConstructor
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
 
@@ -21,11 +25,8 @@ public class NotionNogiCategoryProperty extends NotionNogiCommonProperty {
   ) {
     NotionMultiSelectProperty multiSelect =
         NotionMultiSelectProperty.buildColorName(name, color.getName());
-    return
-        NotionNogiCategoryProperty
-            .builder()
-            .multi_select(List.of(multiSelect))
-            .build();
+
+    return new NotionNogiCategoryProperty(List.of(multiSelect));
   }
 
 }

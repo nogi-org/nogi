@@ -13,13 +13,16 @@ import java.util.stream.Collectors;
 import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /*
 reference:
 https://developers.notion.com/reference/property-object#date
  */
+// todo: builder 패턴 삭제하기
 @Getter
+@Setter
 @Builder
 @ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -82,11 +85,7 @@ public class NotionNogiProperties {
     // 커밋 날짜가 없을 경우
     if (this.getNogiCommitDate().getDate() == null) {
       String utc_iso = this.convertToUTC_ISO(LocalDateTime.now(koreaZone));
-      this.nogiCommitDate =
-          NotionNogiCommitDateProperty
-              .builder()
-              .date(new NotionDateProperty(utc_iso))
-              .build();
+      this.nogiCommitDate = new NotionNogiCommitDateProperty(new NotionDateProperty(utc_iso));
       return;
     }
 

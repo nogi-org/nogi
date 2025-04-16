@@ -334,6 +334,7 @@ public class NotionMarkdownConverter {
         .append(prefix)
         .append(" ")
         .append(NotionRichTextContent.mergeRichTexts(header.getRich_text()))
+        .append("<br>")
         .append("  \n");
 
     return markdown.toString();

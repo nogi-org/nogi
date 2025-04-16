@@ -1,26 +1,27 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
 import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Builder
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class NotionNogiStatusProperty extends NotionNogiCommonProperty {
 
-	private NotionStatusProperty select;
+  private NotionStatusProperty select;
 
-	public static NotionNogiStatusProperty buildColorStatus(
-			String name
-			, NotionColor color
-	) {
-		return
-				NotionNogiStatusProperty
-						.builder()
-						.select(NotionStatusProperty.buildColorName(name, color.getName()))
-						.build();
-	}
+  public static NotionNogiStatusProperty buildColorStatus(
+      String name
+      , NotionColor color
+  ) {
+    return
+        new NotionNogiStatusProperty(NotionStatusProperty.buildColorName(name, color.getName()));
+  }
 
 }

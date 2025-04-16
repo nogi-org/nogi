@@ -3,8 +3,11 @@ package kr.co.nogibackend.domain.notion.dto.property;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
+// todo: builder 패턴 삭제하기
 @Getter
+@Setter
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionParentProperty {
