@@ -4,13 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 import kr.co.nogibackend.domain.notion.dto.property.NotionEmojiProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionEmojiProperty.EMOJI_TYPE;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
 
 @Getter
-@Builder
-@ToString
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionCalloutContent {
 
@@ -18,16 +16,15 @@ public class NotionCalloutContent {
   private NotionEmojiProperty icon;
   private String color;
 
-  public static NotionCalloutContent buildEmoji(
+  public static NotionCalloutContent of(
       List<NotionRichTextContent> richTexts
       , String emoji
   ) {
-    return
-        NotionCalloutContent
-            .builder()
-            .icon(NotionEmojiProperty.buildEmoji(EMOJI_TYPE.EMOJI, emoji))
-            .rich_text(richTexts)
-            .build();
+    NotionCalloutContent notionCalloutContent = new NotionCalloutContent();
+    notionCalloutContent.setIcon(NotionEmojiProperty.buildEmoji(EMOJI_TYPE.EMOJI, emoji));
+    notionCalloutContent.setRich_text(richTexts);
+
+    return notionCalloutContent;
   }
 
 }

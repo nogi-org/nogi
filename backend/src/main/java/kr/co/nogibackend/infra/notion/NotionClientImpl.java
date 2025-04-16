@@ -11,10 +11,10 @@ import java.util.Map;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notion.NotionClient;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
-import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import kr.co.nogibackend.interfaces.notion.dto.request.NotionGetAccessTokenRequest;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class NotionClientImpl implements NotionClient {
   private final NotionImageFeignClient notionImageFeignClient;
 
   @Override
-  public NotionInfo<NotionPageInfo> getPagesFromDatabase(
+  public NotionBaseInfo<NotionPageInfo> getPagesFromDatabase(
       String BotToken,
       String databaseId,
       Map<String, Object> request
@@ -47,7 +47,7 @@ public class NotionClientImpl implements NotionClient {
   }
 
   @Override
-  public NotionInfo<NotionBlockInfo> getBlocksFromParent(
+  public NotionBaseInfo<NotionBlockInfo> getBlocksFromParent(
       String accessToken
       , String parentBlockId
       , String startCursor
@@ -56,14 +56,14 @@ public class NotionClientImpl implements NotionClient {
   }
 
   @Override
-  public NotionInfo<NotionBlockInfo> getBlocksFromParent(
+  public NotionBaseInfo<NotionBlockInfo> getBlocksFromParent(
       String accessToken,
       String parentBlockId
   ) {
     return this.callBlocksFromParentClient(accessToken, parentBlockId, null);
   }
 
-  private NotionInfo<NotionBlockInfo> callBlocksFromParentClient(
+  private NotionBaseInfo<NotionBlockInfo> callBlocksFromParentClient(
       String accessToken
       , String parentBlockId
       , String startCursor
@@ -127,7 +127,7 @@ public class NotionClientImpl implements NotionClient {
   }
 
   @Override
-  public NotionInfo<NotionPageInfo> createPage(
+  public NotionBaseInfo<NotionPageInfo> createPage(
       String basicToken,
       NotionCreateNoticeRequest request
   ) {

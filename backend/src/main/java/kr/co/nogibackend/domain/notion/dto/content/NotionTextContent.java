@@ -1,38 +1,37 @@
 package kr.co.nogibackend.domain.notion.dto.content;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 /*
 reference:
 https://developers.notion.com/reference/rich-text#text
  */
 @Getter
-@Builder
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionTextContent {
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String content;
+  private String content;
+  private NotionLinkContent link;
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private NotionLinkContent link;
+  public static NotionTextContent buildContent(String content) {
+    NotionTextContent notionTextContent = new NotionTextContent();
+    notionTextContent.setContent(content);
 
-	public static NotionTextContent buildContent(String content) {
-		return
-				NotionTextContent
-						.builder()
-						.content(content)
-						.build();
-	}
+    return notionTextContent;
+  }
 
-	public static NotionTextContent buildLinkContent(String content, String url) {
-		return
-				NotionTextContent
-						.builder()
-						.content(content)
-						.link(NotionLinkContent.builder().url(url).build())
-						.build();
-	}
+  public static NotionTextContent buildLinkContent(String content, String url) {
+    NotionTextContent notionTextContent = new NotionTextContent();
+    notionTextContent.setContent(content);
+
+    NotionLinkContent notionLinkContent = new NotionLinkContent();
+    notionLinkContent.setUrl(url);
+    notionTextContent.setLink(notionLinkContent);
+
+    return notionTextContent;
+  }
 
 }

@@ -17,8 +17,8 @@ import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
 import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
-import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +32,7 @@ public class NotionDataProvider {
   private final NotionClient notionClient;
 
   public void preprocessMarkdown(
-      NotionInfo<NotionBlockInfo> blocks
+      NotionBaseInfo<NotionBlockInfo> blocks
       , String notionAccessToken
   ) {
     try {
@@ -85,7 +85,7 @@ public class NotionDataProvider {
     }
 
     // 자식 블럭 조회
-    NotionInfo<NotionBlockInfo> childrenBlock =
+    NotionBaseInfo<NotionBlockInfo> childrenBlock =
         this.getBlocks(accessToken, parentBlock.getId());
 
     // 자식 블럭들 마크다운 전처리
@@ -108,7 +108,7 @@ public class NotionDataProvider {
     }
 
     // 자식 블럭 조회
-    NotionInfo<NotionBlockInfo> childrenBlock =
+    NotionBaseInfo<NotionBlockInfo> childrenBlock =
         this.getBlocks(accessToken, parentBlock.getId());
 
     // 자식 블럭에서 ListItemContent 추출
@@ -141,11 +141,11 @@ public class NotionDataProvider {
   }
 
   // 노션 페이지의 블럭을 모두 불러오기(1회 최대 100개만 가져올 수 있음)
-  public NotionInfo<NotionBlockInfo> getBlocks(
+  public NotionBaseInfo<NotionBlockInfo> getBlocks(
       String notionBotToken
       , String parentBlockId
   ) {
-    NotionInfo<NotionBlockInfo> blocks =
+    NotionBaseInfo<NotionBlockInfo> blocks =
         notionClient.getBlocksFromParent(notionBotToken, parentBlockId);
 
     // hasMore 이 true 면 next_cursor 로 다음 블럭을 가져온다.
@@ -153,7 +153,7 @@ public class NotionDataProvider {
     String nextCursor = blocks.getNext_cursor();
 
     while (hasMore) {
-      NotionInfo<NotionBlockInfo> nextBlocks =
+      NotionBaseInfo<NotionBlockInfo> nextBlocks =
           notionClient.getBlocksFromParent(notionBotToken, parentBlockId, nextCursor);
       blocks.getResults().addAll(nextBlocks.getResults());
       hasMore = nextBlocks.isHas_more();

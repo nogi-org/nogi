@@ -6,24 +6,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionAnnotationsContent {
 
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private boolean bold;
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private boolean italic;
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private boolean strikethrough;
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private boolean underline;
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private boolean code;
-
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String color;
+  private boolean bold;
+  private boolean italic;
+  private boolean strikethrough;
+  private boolean underline;
+  private boolean code;
+  private String color;
 
 }

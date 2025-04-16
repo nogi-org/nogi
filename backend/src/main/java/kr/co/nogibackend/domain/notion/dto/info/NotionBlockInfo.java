@@ -25,13 +25,11 @@ import kr.co.nogibackend.domain.notion.dto.content.NotionVideoContent;
 import kr.co.nogibackend.domain.notion.dto.property.NotionCreatedByProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionLastEditedByProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
 
 @Getter
-@Builder
-@ToString
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionBlockInfo {
 
