@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 import kr.co.nogibackend.config.exception.GlobalException;
 import kr.co.nogibackend.domain.notion.dto.property.NotionFileProperty;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult.ImageOfNotionBlock;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -22,11 +23,15 @@ public class NotionImageContent {
 	private String type;
 	private NotionFileProperty file;
 	private List<NotionRichTextContent> caption;
+	// notion 조회 후 주입 받지않음, 마크다운 전처리에서 값 할당
+	private String base64;
+	// 마크다운 처리 시 할당
+	private String path;
 
 	public String createCaption() {
 		return this.caption.isEmpty()
 				? "IMAGE"
-				: NotionRichTextContent.mergePlainText(this.caption, true);
+				: NotionRichTextContent.mergeRichTexts(this.caption);
 	}
 
 	public URI createURL() {
@@ -43,8 +48,14 @@ public class NotionImageContent {
 	}
 
 	// 관리자 깃허브 계정(nogi bot) 리소스 저장소에 유저별로 이미지 업로드함.
-	public String createImagePath(String RESOURCES_BASE_PATH, String githubOwner, String fileName) {
-		return RESOURCES_BASE_PATH + githubOwner + "/images/" + fileName;
+	public String createImagePath(String RESOURCES_BASE_PATH, String githubOwner) {
+		String path = RESOURCES_BASE_PATH + githubOwner + "/images/" + this.createFileName();
+		this.path = path;
+		return path;
+	}
+
+	public ImageOfNotionBlock buildImageOfNotionBlock() {
+		return new ImageOfNotionBlock(this.base64, this.createFileName(), this.path);
 	}
 
 	// url 에서 파일 이름 파싱해서 가져오기

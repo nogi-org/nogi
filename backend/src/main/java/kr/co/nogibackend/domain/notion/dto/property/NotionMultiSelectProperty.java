@@ -1,16 +1,27 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
+@Builder
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionMultiSelectProperty {
 
   private String id;
   private String name;
   private String color;
+
+  public static NotionMultiSelectProperty buildColorName(String name, String color) {
+    return
+        NotionMultiSelectProperty
+            .builder()
+            .name(name)
+            .color(color)
+            .build();
+  }
 
 }

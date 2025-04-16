@@ -17,13 +17,23 @@ const navigationStore = useNavigationStore();
 const navigations = ref([]);
 
 onMounted(() => {
-  navigations.value = navigationStore.getHeaderNavigations(router);
+  setHeaderNavigations();
   navigationStore.onActiveHeaderNavigation(navigations, route);
 });
 
 watch(route, () => {
   navigationStore.onActiveHeaderNavigation(navigations, route);
 });
+
+watch(authInfo, (newValue) => {
+  if (newValue == null) {
+    setHeaderNavigations();
+  }
+});
+
+const setHeaderNavigations = () => {
+  navigations.value = navigationStore.getHeaderNavigations(router);
+};
 
 const logOut = async () => {
   const response = await auth.onLogout();

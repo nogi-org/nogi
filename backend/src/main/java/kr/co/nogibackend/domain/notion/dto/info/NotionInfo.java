@@ -1,6 +1,5 @@
 package kr.co.nogibackend.domain.notion.dto.info;
 
-import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,12 +16,7 @@ public class NotionInfo<T> {
   private boolean has_more;
   private String type;
   private Object block;
-
-  public static <T> NotionInfo<T> empty() {
-    NotionInfo<T> response = new NotionInfo<>();
-    response.setResults(new ArrayList<>());
-    response.setHas_more(false);
-    return response;
-  }
+  private String developer_survey;
+  private String request_id;
 
 }

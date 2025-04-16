@@ -14,11 +14,12 @@ import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.command.GithubCommitCommand;
 import kr.co.nogibackend.domain.github.dto.command.GithubNotifyCommand;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
-import kr.co.nogibackend.domain.notion.NotionService;
+import kr.co.nogibackend.domain.notion.dto.command.CompletedPageMarkdownCommand;
 import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
-import kr.co.nogibackend.domain.notion.dto.command.NotionStartTILCommand;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
 import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
-import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
+import kr.co.nogibackend.domain.notion.service.NotionReadService;
+import kr.co.nogibackend.domain.notion.service.NotionWriteService;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.domain.user.dto.command.UserCheckTILCommand;
 import kr.co.nogibackend.domain.user.dto.command.UserStoreNogiHistoryCommand;
@@ -35,9 +36,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NogiFacade {
 
-  private final NotionService notionService;
   private final UserService userService;
   private final GithubService githubService;
+  private final NotionReadService notionReadService;
+  private final NotionWriteService notionWriteService;
 
   // 자동 실행
   public void onAuto() {
@@ -91,28 +93,30 @@ public class NogiFacade {
         return;
       }
 
-      // 2️⃣ Notion TIL 페이지 조회 후 Markdown 변환 📝
-      List<NotionStartTILResult> notionStartTILResults =
-          notionService.startTIL(NotionStartTILCommand.from(user));
-      logStartTilResults(notionStartTILResults);
+      // 2️⃣ Notion 작성완료 페이지 조회 후 Markdown 변환 📝
+      List<CompletedPageMarkdownResult> completedPageMarkdownResults =
+          notionReadService.convertCompletedPageToMarkdown(CompletedPageMarkdownCommand.from(user));
+      logStartTilResults(completedPageMarkdownResults);
 
       // 3️⃣ TIL 생성 또는 수정 체크 🔍
       List<UserCheckTILCommand> userCheckTILCommands =
-          notionStartTILResults.stream().map(UserCheckTILCommand::from).toList();
+          completedPageMarkdownResults.stream().map(UserCheckTILCommand::from).toList();
       List<UserCheckTILResult> userCheckTILResults = userService.checkTIL(userCheckTILCommands);
 
       // 4️⃣ Markdown을 GitHub에 커밋 🚀
       UserResult nogiBotResult = userService.findNogiBot()
           .orElseThrow(() -> new GlobalException(F_NOT_FOUND_NOGI_BOT));
       List<GithubCommitCommand> githubCommitCommands =
-          GithubCommitCommand.of(notionStartTILResults, userCheckTILResults, nogiBotResult);
+          GithubCommitCommand.of(completedPageMarkdownResults, userCheckTILResults,
+              nogiBotResult);
       List<GithubCommitResult> githubCommitResults = githubService.commitToGithub(
           githubCommitCommands);
 
       // 5️⃣ 커밋 성공/실패를 Notion 상태값 변경 📌
       List<NotionEndTILCommand> notionEndTILCommands =
           githubCommitResults.stream().map(NotionEndTILCommand::from).toList();
-      List<NotionEndTILResult> notionEndTILResults = notionService.endTIL(notionEndTILCommands);
+      List<NotionEndTILResult> notionEndTILResults = notionWriteService.updateStatusByResult(
+          notionEndTILCommands);
 
       // 6️⃣ NogiHistory 저장 또는 수정 🏷️
       List<UserStoreNogiHistoryCommand> userStoreNogiHistoryCommands =
@@ -142,7 +146,7 @@ public class NogiFacade {
     String notionDatabaseId = null;
     // 1. notion database id 조회
     try {
-      notionDatabaseId = notionService.getNotionDatabaseInfo(
+      notionDatabaseId = notionReadService.getNotionDatabaseInfo(
           user.notionAccessToken(),
           user.notionPageId()
       );
@@ -166,10 +170,11 @@ public class NogiFacade {
   }
 
 
-  private void logStartTilResults(List<NotionStartTILResult> notionStartTILResults) {
-    if (!notionStartTILResults.isEmpty()) {
+  private void logStartTilResults(
+      List<CompletedPageMarkdownResult> completedPageMarkdownResults) {
+    if (!completedPageMarkdownResults.isEmpty()) {
       log.info("After Notion StartTIL:\n{}",
-          notionStartTILResults.stream()
+          completedPageMarkdownResults.stream()
               .map(result -> String.format(
                   " - userId: %d, category: %s, title: %s, notionPageId: %s",
                   result.userId(), result.category(), result.title(), result.notionPageId()))

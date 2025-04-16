@@ -1,12 +1,17 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.stream.Collectors;
+import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,20 +20,47 @@ import lombok.ToString;
 reference:
 https://developers.notion.com/reference/property-object#date
  */
+// todo: builder 패턴 삭제하기
 @Getter
 @Setter
+@Builder
 @ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionNogiProperties {
 
+  @JsonIgnore
   private final ZoneId koreaZone = ZoneId.of("Asia/Seoul");
+  @JsonIgnore
   private final ZoneId utcZone = ZoneId.of("UTC");
+
   private NotionNogiCategoryProperty nogiCategory;
   private NotionNogiCommitDateProperty nogiCommitDate;
   private NotionNogiStatusProperty nogiStatus;
   private NotionNogiTitleProperty nogiTitle;
   private NotionNogiCommitMessageProperty nogiCommitMessage;
 
+  public static NotionNogiProperties buildNewNotice(String title) {
+    NotionNogiTitleProperty titles =
+        NotionNogiTitleProperty.buildTitles(List.of(title));
+    NotionNogiStatusProperty status =
+        NotionNogiStatusProperty.buildColorStatus("운영", NotionColor.RED);
+    NotionNogiCategoryProperty category =
+        NotionNogiCategoryProperty.buildColorMultiSelect("공지", NotionColor.BLUE);
+    NotionNogiCommitDateProperty commitDate =
+        NotionNogiCommitDateProperty.buildTodayDateAsYYYYMMDDString();
+
+    return
+        NotionNogiProperties
+            .builder()
+            .nogiTitle(titles)
+            .nogiStatus(status)
+            .nogiCategory(category)
+            .nogiCommitDate(commitDate)
+            .build();
+  }
+
   // 카테고리가 깃헙의 디렉토리 경로로 사용됨(ex: java/문법)
+  @JsonIgnore
   public String getCategoryPath() {
     return
         nogiCategory
@@ -37,15 +69,6 @@ public class NotionNogiProperties {
             .map(NotionMultiSelectProperty::getName)
             .collect(Collectors.joining("/"));
   }
-
-  /*
-  todo: 필요없는 경우 삭제
-  마크다운 파일의 상대 경로를 생성
-   */
-  // public String createRelativePath() {
-  //   int count = nogiCategory.getMulti_select().size();
-  //   return "../".repeat(count);
-  // }
 
   /*
   github 에 UTC_ISO 날짜 포맷으로 커밋할 수 있다.
@@ -62,7 +85,7 @@ public class NotionNogiProperties {
     // 커밋 날짜가 없을 경우
     if (this.getNogiCommitDate().getDate() == null) {
       String utc_iso = this.convertToUTC_ISO(LocalDateTime.now(koreaZone));
-      this.nogiCommitDate.setDate(new NotionDateProperty(utc_iso));
+      this.nogiCommitDate = new NotionNogiCommitDateProperty(new NotionDateProperty(utc_iso));
       return;
     }
 

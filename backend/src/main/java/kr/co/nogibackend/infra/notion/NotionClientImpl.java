@@ -9,13 +9,14 @@ import static kr.co.nogibackend.response.code.NotionResponseCode.F_UPDATE_TIL_ST
 import java.net.URI;
 import java.util.Map;
 import kr.co.nogibackend.config.exception.GlobalException;
+import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notion.NotionClient;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
-import kr.co.nogibackend.domain.notion.dto.request.NotionGetAccessTokenRequest;
+import kr.co.nogibackend.interfaces.notion.dto.request.NotionGetAccessTokenRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -40,22 +41,40 @@ public class NotionClientImpl implements NotionClient {
               .getPagesFromDatabase(BotToken, databaseId, request)
               .getBody();
     } catch (Exception error) {
+      log.error("Notion Get Page From Database API Fail Message : {}", error.getMessage());
       throw new GlobalException(F_GET_NOTION_PAGE);
     }
   }
 
   @Override
-  public NotionInfo<NotionBlockInfo> getBlocksFromPage(
-      String BotToken,
-      String pageId,
-      String startCursor
+  public NotionInfo<NotionBlockInfo> getBlocksFromParent(
+      String accessToken
+      , String parentBlockId
+      , String startCursor
+  ) {
+    return this.callBlocksFromParentClient(accessToken, parentBlockId, startCursor);
+  }
+
+  @Override
+  public NotionInfo<NotionBlockInfo> getBlocksFromParent(
+      String accessToken,
+      String parentBlockId
+  ) {
+    return this.callBlocksFromParentClient(accessToken, parentBlockId, null);
+  }
+
+  private NotionInfo<NotionBlockInfo> callBlocksFromParentClient(
+      String accessToken
+      , String parentBlockId
+      , String startCursor
   ) {
     try {
       return
           notionFeignClient
-              .getBlocksFromPage(BotToken, pageId, startCursor)
+              .getBlocksFromParent(accessToken, parentBlockId, startCursor)
               .getBody();
     } catch (Exception error) {
+      log.error("Notion Get Blocks API Fail Message: {}", error.getMessage());
       throw new GlobalException(F_GET_NOTION_BLOCK);
     }
   }
@@ -105,6 +124,14 @@ public class NotionClientImpl implements NotionClient {
       NotionGetAccessTokenRequest request
   ) {
     return notionFeignClient.getAccessToken(basicToken, request).getBody();
+  }
+
+  @Override
+  public NotionInfo<NotionPageInfo> createPage(
+      String basicToken,
+      NotionCreateNoticeRequest request
+  ) {
+    return notionFeignClient.createPage(basicToken, request).getBody();
   }
 
 }

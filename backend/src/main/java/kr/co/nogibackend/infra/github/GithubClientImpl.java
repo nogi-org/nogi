@@ -23,7 +23,6 @@ import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
-import kr.co.nogibackend.domain.github.dto.request.GithubUpdateRepoRequest;
 import kr.co.nogibackend.response.code.GitResponseCode;
 import kr.co.nogibackend.util.GithubErrorParser;
 import lombok.RequiredArgsConstructor;
@@ -77,12 +76,6 @@ public class GithubClientImpl implements GithubClient {
     } catch (Exception e) {
       throw new GlobalException(GitResponseCode.F_GIT_UNKNOWN, e.getMessage());
     }
-  }
-
-  @Override
-  public GithubRepoInfo updateRepository(String owner, String repo, GithubUpdateRepoRequest request,
-      String token) {
-    return githubFeignClient.updateRepository(owner, repo, request, token);
   }
 
   @Override

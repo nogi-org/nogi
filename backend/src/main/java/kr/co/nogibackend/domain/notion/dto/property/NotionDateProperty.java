@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,12 +10,17 @@ import lombok.Setter;
 @NoArgsConstructor
 public class NotionDateProperty {
 
-  private String start;
-  private String end;
-  private String time_zone;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String start;
 
-  public NotionDateProperty(String start) {
-    this.start = start;
-  }
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String end;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String time_zone;
+
+	public NotionDateProperty(String start) {
+		this.start = start;
+	}
 
 }

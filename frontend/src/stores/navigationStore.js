@@ -80,13 +80,43 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           ]
         },
         {
+          path: '/notices',
+          name: 'noticesPage',
+          meta: {
+            requiresLogin: false,
+            headerNavigation: {
+              title: '공지사항',
+              order: 2,
+              isActive: false
+            }
+          },
+          component: () => import('@/views/notice/NoticesPage.vue')
+        },
+        {
+          path: '/notice/:noticeId',
+          name: 'noticePage',
+          meta: {
+            requiresLogin: false
+          },
+          component: () => import('@/views/notice/NoticePage.vue')
+        },
+        {
+          path: '/notice/publish',
+          name: 'noticePublishPage',
+          meta: {
+            requiresLogin: true,
+            requiresRole: AuthManager.ROLE.ADMIN
+          },
+          component: () => import('@/views/notice/noticePublishPage.vue')
+        },
+        {
           path: '/my-page',
           name: 'myPage',
           meta: {
             requiresLogin: true,
             headerNavigation: {
               title: 'My Page',
-              order: 2,
+              order: 3,
               isActive: false
             }
           },
@@ -170,7 +200,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
             requiresLogin: true,
             headerNavigation: {
               title: 'Setting',
-              order: 3,
+              order: 5,
               isActive: false
             }
           },

@@ -1,7 +1,7 @@
 package kr.co.nogibackend.application.notion;
 
 import kr.co.nogibackend.application.notion.dto.NotionLoginEventCommand;
-import kr.co.nogibackend.domain.notion.NotionService;
+import kr.co.nogibackend.domain.notion.service.NotionReadService;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotionFacade {
 
-  private final NotionService notionService;
+  private final NotionReadService notionReadService;
   private final UserService userService;
 
   @Async
@@ -25,7 +25,7 @@ public class NotionFacade {
   )
   public void onNotionLogin(NotionLoginEventCommand event) {
     // 1. notion database id 조회
-    String notionDatabaseId = notionService.getNotionDatabaseInfo(
+    String notionDatabaseId = notionReadService.getNotionDatabaseInfo(
         event.notionAccessToken(),
         event.notionPageId()
     );

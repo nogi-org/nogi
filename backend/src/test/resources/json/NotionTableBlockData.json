@@ -1,0 +1,218 @@
+[
+  {
+    "table_width": "2",
+    "has_column_header": false,
+    "has_row_header": false,
+    "rows": [
+      {
+        "cells": [
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "1",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "1",
+              "href": null
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "2",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "2",
+              "href": null
+            }
+          ]
+        ]
+      },
+      {
+        "cells": [
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "3",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "3",
+              "href": null
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "4",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "4",
+              "href": null
+            }
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "table_width": "2",
+    "has_column_header": false,
+    "has_row_header": false,
+    "rows": [
+      {
+        "cells": [
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "1",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "1",
+              "href": null
+            },
+            {
+              "type": "text",
+              "text": {
+                "content": "1줄바꿈",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": true,
+                "color": "default"
+              },
+              "plain_text": "1줄바꿈",
+              "href": null
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "2",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "2",
+              "href": null
+            }
+          ]
+        ]
+      },
+      {
+        "cells": [
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "3",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "3",
+              "href": null
+            },
+            {
+              "type": "text",
+              "text": {
+                "content": "3줄바꿈",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": true,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "3줄바꿈",
+              "href": null
+            }
+          ],
+          [
+            {
+              "type": "text",
+              "text": {
+                "content": "4\n스타일없는4번",
+                "link": null
+              },
+              "annotations": {
+                "bold": false,
+                "italic": false,
+                "strikethrough": false,
+                "underline": false,
+                "code": false,
+                "color": "default"
+              },
+              "plain_text": "4\n스타일없는4번",
+              "href": null
+            }
+          ]
+        ]
+      }
+    ]
+  }
+]

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import kr.co.nogibackend.domain.notion.dto.result.NotionStartTILResult;
+import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;
@@ -31,21 +31,11 @@ public record GithubCommitCommand(
     NogiBot nogiBot
 ) {
 
-  public record NogiBot(
-      String githubToken,
-      String githubOwner,
-      String githubRepository,
-      String githubBranch,
-      String githubEmail
-  ) {
-
-  }
-
   /**
    * 📌 List<NotionStartTILResult>와 List<UserCheckTILResult>를 조합하여 List<GithubCommitCommand> 생성
    */
   public static List<GithubCommitCommand> of(
-      List<NotionStartTILResult> notionResults,
+      List<CompletedPageMarkdownResult> notionResults,
       List<UserCheckTILResult> userCheckResults,
       UserResult nogiBotResult
   ) {
@@ -144,6 +134,16 @@ public record GithubCommitCommand(
     ) {
       fileMap.put(getPrevMarkdownFilePath(), null);
     }
+  }
+
+  public record NogiBot(
+      String githubToken,
+      String githubOwner,
+      String githubRepository,
+      String githubBranch,
+      String githubEmail
+  ) {
+
   }
 
   public record ImageOfGithub(

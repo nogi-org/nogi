@@ -11,8 +11,12 @@ import lombok.ToString;
 @ToString
 public class NotionToggleBlocksContent {
 
-  private List<NotionRichTextContent> rich_text;
-  private String color;
-  private List<NotionBlockInfo> children;
+	private List<NotionRichTextContent> rich_text;
+	private String color;
+	private List<NotionBlockInfo> children;
+
+	public boolean hasChildren() {
+		return this.children != null && !this.children.isEmpty();
+	}
 
 }

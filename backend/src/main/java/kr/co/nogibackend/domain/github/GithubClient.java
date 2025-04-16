@@ -20,7 +20,6 @@ import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
-import kr.co.nogibackend.domain.github.dto.request.GithubUpdateRepoRequest;
 
 public interface GithubClient {
 
@@ -34,13 +33,6 @@ public interface GithubClient {
 
   GithubRepoInfo createUserRepository(
       GithubRepoRequest request,
-      String token
-  );
-
-  GithubRepoInfo updateRepository(
-      String owner,
-      String repo,
-      GithubUpdateRepoRequest request,
       String token
   );
 

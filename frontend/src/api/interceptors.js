@@ -46,8 +46,8 @@ async function handleInterceptorCommonError(response) {
 
   switch (response.code) {
     case ApiResponse.USER_2: // 401
-      await router.push({ name: 'home' });
       useAuthStore().deleteAuth();
+      await router.push({ name: 'home' });
       notifyStore.onActive(response);
       spinnerStore.off();
       break;

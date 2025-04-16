@@ -30,7 +30,6 @@ import kr.co.nogibackend.domain.github.dto.request.GithubCreateTreeRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubRepoRequest;
 import kr.co.nogibackend.domain.github.dto.request.GithubUpdateReferenceRequest;
-import kr.co.nogibackend.domain.github.dto.request.GithubUpdateRepoRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubCommitResult;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
 import kr.co.nogibackend.response.code.GitResponseCode;
@@ -332,16 +331,6 @@ public class GithubService {
         new GithubRepoRequest(repositoryName, true),
         accessToken
     );
-  }
-
-  public GithubRepoInfo updateRepository(
-      String owner,
-      String originRepo,
-      String newRepo,
-      String token
-  ) {
-    return githubClient.updateRepository(owner, originRepo, new GithubUpdateRepoRequest(newRepo),
-        token);
   }
 
   public boolean isUniqueRepositoryName(GithubGetRepositoryCommand command) {

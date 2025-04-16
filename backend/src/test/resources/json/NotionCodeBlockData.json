@@ -1,0 +1,25 @@
+[
+  {
+    "caption": [],
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "public class Java() {\n\tint a = 0;\n\tpublic static void main(String[] args) {\n    SpringApplication.run(NogiBackendApplication.class, args);\n  }\n}",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "public class Java() {\n\tint a = 0;\n\tpublic static void main(String[] args) {\n    SpringApplication.run(NogiBackendApplication.class, args);\n  }\n}",
+        "href": null
+      }
+    ],
+    "language": "java"
+  }
+]

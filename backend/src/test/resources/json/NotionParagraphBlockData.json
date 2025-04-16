@@ -1,0 +1,332 @@
+[
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "문장입니다.",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "문장입니다.",
+        "href": null
+      }
+    ],
+    "color": "default"
+  },
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "문장입니다.\n쉬프트엔터햇습니다",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "문장입니다.\n쉬프트엔터햇습니다",
+        "href": null
+      }
+    ],
+    "color": "default"
+  },
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "문장입니다.\n",
+          "link": {
+            "url": "https://nogi.co.kr/"
+          }
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "문장입니다.\n",
+        "href": "https://nogi.co.kr/"
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "쉬프트엔터햇습니다",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "쉬프트엔터햇습니다",
+        "href": null
+      }
+    ],
+    "color": "default"
+  },
+  {
+    "rich_text": [
+      {
+        "type": "text",
+        "text": {
+          "content": "코드",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": true,
+          "color": "default"
+        },
+        "plain_text": "코드",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": " ",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": " ",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "굵기",
+          "link": null
+        },
+        "annotations": {
+          "bold": true,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "굵기",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": " ",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": " ",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "기울기",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": true,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "기울기",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": " ",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": " ",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "취소선",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": true,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "취소선",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": " ",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": " ",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "링크",
+          "link": {
+            "url": "https://nogi.co.kr/"
+          }
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "링크",
+        "href": "https://nogi.co.kr/"
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "**특수기호가 있음**",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "**특수기호가 있음**",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "**특수기호가 있고 취소선 추가**",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": true,
+          "underline": false,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "**특수기호가 있고 취소선 추가**",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "밑줄",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": false,
+          "underline": true,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "밑줄",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "취소선및밑줄",
+          "link": null
+        },
+        "annotations": {
+          "bold": false,
+          "italic": false,
+          "strikethrough": true,
+          "underline": true,
+          "code": false,
+          "color": "default"
+        },
+        "plain_text": "취소선및밑줄",
+        "href": null
+      },
+      {
+        "type": "text",
+        "text": {
+          "content": "코드및굵기",
+          "link": null
+        },
+        "annotations": {
+          "bold": true,
+          "italic": false,
+          "strikethrough": false,
+          "underline": false,
+          "code": true,
+          "color": "default"
+        },
+        "plain_text": "코드및굵기",
+        "href": null
+      }
+    ],
+    "color": "default"
+  }
+]
