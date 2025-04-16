@@ -342,12 +342,21 @@ public class GithubService {
   }
 
   public void addCollaborator(GithubAddCollaboratorCommand command) {
-    githubClient.addCollaborator(
-        command.owner(),
-        command.repo(),
-        command.username(),
-        new GithubAddCollaboratorRequest(null),
-        command.accessToken()
-    );
+    try {
+      githubClient.addCollaborator(
+          command.owner(),
+          command.repo(),
+          command.username(),
+          new GithubAddCollaboratorRequest(null),
+          command.accessToken()
+      );
+    } catch (Exception e) {
+      log.error("Collaborator 추가 중 오류 발생", e);
+    }
+
+  }
+
+  public GithubRepoInfo getRepositoryInfo(String owner, String repoName, String token) {
+    return githubClient.getOwnerRepositoryInfo(owner, repoName, token);
   }
 }

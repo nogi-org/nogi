@@ -120,5 +120,5 @@ public class UserLoginFacade {
       return new UserLoginByNotionInfo(false, "Notion 과 연결하는데 실패했어요.");
     }
   }
-
+  
 }
