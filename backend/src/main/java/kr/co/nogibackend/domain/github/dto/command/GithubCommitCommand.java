@@ -82,11 +82,15 @@ public record GithubCommitCommand(
   }
 
   private String getMarkdownFilePath() {
-    return newCategory + "/" + newTitle + ".md";
+    String safeCategory = newCategory.replace("/", "_");
+    String safeTitle = newTitle.replace("/", "_");
+    return safeCategory + "/" + safeTitle + ".md";
   }
 
   private String getPrevMarkdownFilePath() {
-    return prevCategory + "/" + prevTitle + ".md";
+    String safeCategory = prevCategory.replace("/", "_");
+    String safeTitle = prevTitle.replace("/", "_");
+    return safeCategory + "/" + safeTitle + ".md";
   }
 
   public Map<String, String> prepareFiles() {
