@@ -58,27 +58,23 @@ public class Notice extends BaseEntity {
 
   public NotionCreateNoticeRequest buildNewPublishToNotion(String databaseId) {
     return new NotionCreateNoticeRequest(
-        NotionParentProperty.buildParent(PARENT_TYPE.DATABASE, databaseId),
+        NotionParentProperty.ofParent(PARENT_TYPE.DATABASE, databaseId),
         NotionEmojiProperty.buildEmoji(EMOJI_TYPE.EMOJI, "\uD83D\uDCE2"),
-        NotionNogiProperties.buildNewNotice(this.title),
-        this.buildContentCallOutBlock()
+        NotionNogiProperties.createNewNotice(this.title),
+        this.createContentCallOutBlock()
     );
   }
 
-  public List<NotionBlockInfo> buildContentCallOutBlock() {
+  public List<NotionBlockInfo> createContentCallOutBlock() {
     NotionRichTextContent linkText =
         NotionRichTextContent.buildLinkText(this.title + " \uD83D\uDC48 공지 확인하기", this.url);
     List<NotionRichTextContent> richTexts = List.of(linkText);
 
-    return
-        List.of(
-            NotionBlockInfo
-                .builder()
-                .object("block")
-                .type(NotionBlockInfo.CALL_OUT)
-                .callout(NotionCalloutContent.buildEmoji(richTexts, "\uD83D\uDCA1"))
-                .build()
-        );
+    NotionBlockInfo notionBlockInfo = new NotionBlockInfo();
+    notionBlockInfo.setObject("block");
+    notionBlockInfo.setType(NotionBlockInfo.CALL_OUT);
+    notionBlockInfo.setCallout(NotionCalloutContent.of(richTexts, "\uD83D\uDCA1"));
+    return List.of(notionBlockInfo);
   }
 
   public void updateUrl() {

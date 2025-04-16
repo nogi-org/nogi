@@ -11,20 +11,15 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 import kr.co.nogibackend.domain.notion.dto.constant.NotionColor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 /*
 reference:
 https://developers.notion.com/reference/property-object#date
  */
-// todo: builder 패턴 삭제하기
 @Getter
 @Setter
-@Builder
-@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionNogiProperties {
 
@@ -39,24 +34,23 @@ public class NotionNogiProperties {
   private NotionNogiTitleProperty nogiTitle;
   private NotionNogiCommitMessageProperty nogiCommitMessage;
 
-  public static NotionNogiProperties buildNewNotice(String title) {
+  public static NotionNogiProperties createNewNotice(String title) {
     NotionNogiTitleProperty titles =
-        NotionNogiTitleProperty.buildTitles(List.of(title));
+        NotionNogiTitleProperty.of(List.of(title));
     NotionNogiStatusProperty status =
-        NotionNogiStatusProperty.buildColorStatus("운영", NotionColor.RED);
+        NotionNogiStatusProperty.of("운영", NotionColor.RED);
     NotionNogiCategoryProperty category =
-        NotionNogiCategoryProperty.buildColorMultiSelect("공지", NotionColor.BLUE);
+        NotionNogiCategoryProperty.of("공지", NotionColor.BLUE);
     NotionNogiCommitDateProperty commitDate =
         NotionNogiCommitDateProperty.buildTodayDateAsYYYYMMDDString();
 
-    return
-        NotionNogiProperties
-            .builder()
-            .nogiTitle(titles)
-            .nogiStatus(status)
-            .nogiCategory(category)
-            .nogiCommitDate(commitDate)
-            .build();
+    NotionNogiProperties notionNogiProperties = new NotionNogiProperties();
+    notionNogiProperties.setNogiTitle(titles);
+    notionNogiProperties.setNogiStatus(status);
+    notionNogiProperties.setNogiCategory(category);
+    notionNogiProperties.setNogiCommitDate(commitDate);
+
+    return notionNogiProperties;
   }
 
   // 카테고리가 깃헙의 디렉토리 경로로 사용됨(ex: java/문법)
@@ -85,7 +79,14 @@ public class NotionNogiProperties {
     // 커밋 날짜가 없을 경우
     if (this.getNogiCommitDate().getDate() == null) {
       String utc_iso = this.convertToUTC_ISO(LocalDateTime.now(koreaZone));
-      this.nogiCommitDate = new NotionNogiCommitDateProperty(new NotionDateProperty(utc_iso));
+
+      NotionDateProperty notionDateProperty = new NotionDateProperty();
+      notionDateProperty.setStart(utc_iso);
+
+      NotionNogiCommitDateProperty notionNogiCommitDateProperty = new NotionNogiCommitDateProperty();
+      notionNogiCommitDateProperty.setDate(notionDateProperty);
+
+      this.nogiCommitDate = notionNogiCommitDateProperty;
       return;
     }
 

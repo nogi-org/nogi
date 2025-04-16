@@ -1,31 +1,23 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
 
 @Getter
-@Builder
-@ToString
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionStatusProperty {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String id;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String name;
-
-  @JsonInclude(JsonInclude.Include.NON_NULL)
   private String color;
 
-  public static NotionStatusProperty buildColorName(String name, String color) {
-    return
-        NotionStatusProperty
-            .builder()
-            .name(name)
-            .color(color)
-            .build();
+  public static NotionStatusProperty of(String name, String color) {
+    NotionStatusProperty notionStatusProperty = new NotionStatusProperty();
+    notionStatusProperty.setName(name);
+    notionStatusProperty.setColor(color);
+    return notionStatusProperty;
   }
 
 }

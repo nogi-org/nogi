@@ -3,10 +3,10 @@ package kr.co.nogibackend.infra.notion;
 import java.util.Map;
 import kr.co.nogibackend.config.openfeign.NotionFeignClientConfig;
 import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
+import kr.co.nogibackend.domain.notion.dto.info.NotionBaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionDatabaseInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionGetAccessInfo;
-import kr.co.nogibackend.domain.notion.dto.info.NotionInfo;
 import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
 import kr.co.nogibackend.interfaces.notion.dto.request.NotionGetAccessTokenRequest;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -24,14 +24,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface NotionFeignClient {
 
   @PostMapping("/databases/{databaseId}/query")
-  ResponseEntity<NotionInfo<NotionPageInfo>> getPagesFromDatabase(
+  ResponseEntity<NotionBaseInfo<NotionPageInfo>> getPagesFromDatabase(
       @RequestHeader("Authorization") String token,
       @PathVariable(value = "databaseId") String databaseId,
       Map<String, Object> request
   );
 
   @GetMapping("/blocks/{parentBlockId}/children?page_size=100")
-  ResponseEntity<NotionInfo<NotionBlockInfo>> getBlocksFromParent(
+  ResponseEntity<NotionBaseInfo<NotionBlockInfo>> getBlocksFromParent(
       @RequestHeader("Authorization") String token,
       @PathVariable(value = "parentBlockId") String parentBlockId,
       @RequestParam(value = "start_cursor", required = false) String startCursor
@@ -57,7 +57,7 @@ public interface NotionFeignClient {
   );
 
   @RequestMapping(method = RequestMethod.POST, value = "/pages")
-  ResponseEntity<NotionInfo<NotionPageInfo>> createPage(
+  ResponseEntity<NotionBaseInfo<NotionPageInfo>> createPage(
       @RequestHeader("Authorization") String token,
       @RequestBody NotionCreateNoticeRequest request
   );

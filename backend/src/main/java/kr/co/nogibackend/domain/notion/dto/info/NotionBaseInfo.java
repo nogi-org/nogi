@@ -8,7 +8,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class NotionInfo<T> {
+public class NotionBaseInfo<T> {
 
   private String object;
   private List<T> results;

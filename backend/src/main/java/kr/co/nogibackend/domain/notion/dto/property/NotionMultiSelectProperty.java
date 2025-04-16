@@ -1,13 +1,11 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.ToString;
+import lombok.Setter;
 
 @Getter
-@Builder
-@ToString
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionMultiSelectProperty {
 
@@ -15,13 +13,12 @@ public class NotionMultiSelectProperty {
   private String name;
   private String color;
 
-  public static NotionMultiSelectProperty buildColorName(String name, String color) {
-    return
-        NotionMultiSelectProperty
-            .builder()
-            .name(name)
-            .color(color)
-            .build();
+  public static NotionMultiSelectProperty of(String name, String color) {
+    NotionMultiSelectProperty notionMultiSelectProperty = new NotionMultiSelectProperty();
+    notionMultiSelectProperty.setName(name);
+    notionMultiSelectProperty.setColor(color);
+
+    return notionMultiSelectProperty;
   }
 
 }

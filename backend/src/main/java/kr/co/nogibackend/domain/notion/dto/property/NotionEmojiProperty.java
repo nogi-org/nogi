@@ -1,25 +1,23 @@
 package kr.co.nogibackend.domain.notion.dto.property;
 
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
-// todo: builder 패턴 삭제하기
 @Getter
-@Builder
 @Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionEmojiProperty {
 
   private String type;
   private String emoji;
 
   public static NotionEmojiProperty buildEmoji(EMOJI_TYPE type, String emoji) {
-    return
-        NotionEmojiProperty
-            .builder()
-            .type(type.value)
-            .emoji(emoji)
-            .build();
+    NotionEmojiProperty notionEmojiProperty = new NotionEmojiProperty();
+    notionEmojiProperty.setType(type.value);
+    notionEmojiProperty.setEmoji(emoji);
+
+    return notionEmojiProperty;
   }
 
   public enum EMOJI_TYPE {

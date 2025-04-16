@@ -1,5 +1,6 @@
 package kr.co.nogibackend.domain.notion.dto.info;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.time.LocalDateTime;
 import kr.co.nogibackend.domain.notion.dto.property.NotionCoverProperty;
 import kr.co.nogibackend.domain.notion.dto.property.NotionCreatedByProperty;
@@ -9,11 +10,10 @@ import kr.co.nogibackend.domain.notion.dto.property.NotionNogiProperties;
 import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
 
 @Getter
 @Setter
-@ToString
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionPageInfo {
 
   private String object;
