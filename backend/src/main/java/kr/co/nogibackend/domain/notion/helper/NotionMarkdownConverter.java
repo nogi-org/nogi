@@ -238,14 +238,15 @@ public class NotionMarkdownConverter {
    * <h1>List(글머리, 번호) 마크다운 변환기</h1>
    */
   public String buildListItem(NotionListItemContent listItem, boolean isNumberList) {
-    // todo: listItem이 왜 null인지 확인필요. 운영에서 null로 들어와서 에러발생함.
-    if (listItem == null) {
-      return "";
-    }
     return buildListItem(listItem, isNumberList, 0);
   }
 
   private String buildListItem(NotionListItemContent listItem, boolean isNumberList, int depth) {
+    // todo: listItem이 왜 null인지 확인필요. 운영에서 null로 들어와서 에러발생함.
+    if (listItem == null) {
+      return "";
+    }
+
     StringBuilder markdown = new StringBuilder();
 
     // depth에 따라 들여쓰기 (스페이스 3칸씩)
