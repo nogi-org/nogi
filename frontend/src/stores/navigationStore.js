@@ -190,6 +190,19 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                 }
               },
               component: () => import('@/views/admin/AdminUserPage.vue')
+            },
+            // todo: 이름 바꾸기
+            {
+              path: '/admin/user-notion-page',
+              name: 'userNotionPagePage',
+              meta: {
+                subNavigation: {
+                  title: '유저 노션 페이지',
+                  order: 3,
+                  isActive: false
+                }
+              },
+              component: () => import('@/views/admin/NotionUserPagePage.vue')
             }
           ]
         },

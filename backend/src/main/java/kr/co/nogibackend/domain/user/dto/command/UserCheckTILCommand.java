@@ -1,6 +1,6 @@
 package kr.co.nogibackend.domain.user.dto.command;
 
-import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
+import kr.co.nogibackend.domain.notion.result.CompletedPageMarkdownResult;
 
 public record UserCheckTILCommand(
     Long userId,// 유저 ID

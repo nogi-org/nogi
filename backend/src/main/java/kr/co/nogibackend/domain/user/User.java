@@ -53,6 +53,7 @@ public class User extends BaseEntity {
   private String githubOwner;
   @Builder.Default
   private Boolean isNotificationAllowed = true;
+  private String selfIntroduction;
 
 
   public User update(UserUpdateCommand command) {
@@ -82,6 +83,9 @@ public class User extends BaseEntity {
     }
     if (command.getIsNotificationAllowed() != null) {
       this.isNotificationAllowed = command.getIsNotificationAllowed();
+    }
+    if (StringUtils.hasText(command.getSelfIntroduction())) {
+      this.selfIntroduction = command.getSelfIntroduction();
     }
     return this;
   }

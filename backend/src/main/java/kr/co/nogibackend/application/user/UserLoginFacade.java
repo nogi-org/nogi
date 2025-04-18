@@ -7,7 +7,7 @@ import kr.co.nogibackend.config.security.JwtProvider;
 import kr.co.nogibackend.domain.github.GithubService;
 import kr.co.nogibackend.domain.github.dto.request.GithubOAuthAccessTokenRequest;
 import kr.co.nogibackend.domain.github.dto.result.GithubUserResult;
-import kr.co.nogibackend.domain.notion.dto.result.NotionGetAccessResult;
+import kr.co.nogibackend.domain.notion.result.NotionGetAccessResult;
 import kr.co.nogibackend.domain.notion.service.NotionReadService;
 import kr.co.nogibackend.domain.user.UserService;
 import kr.co.nogibackend.domain.user.dto.command.UserUpdateCommand;
@@ -120,5 +120,5 @@ public class UserLoginFacade {
       return new UserLoginByNotionInfo(false, "Notion 과 연결하는데 실패했어요.");
     }
   }
-  
+
 }

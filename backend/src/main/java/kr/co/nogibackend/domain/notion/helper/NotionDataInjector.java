@@ -7,7 +7,7 @@ import kr.co.nogibackend.config.context.ExecutionResultContext;
 import kr.co.nogibackend.domain.admin.dto.request.NotionCreateNoticeRequest;
 import kr.co.nogibackend.domain.notice.dto.result.PublishNewNoticeResult;
 import kr.co.nogibackend.domain.notice.entity.Notice;
-import kr.co.nogibackend.domain.notion.NotionClient;
+import kr.co.nogibackend.domain.notion.feignclient.NotionClient;
 import kr.co.nogibackend.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

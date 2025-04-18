@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kr.co.nogibackend.domain.notion.dto.content.NotionTableContent;
+import kr.co.nogibackend.domain.notion.content.NotionTableContent;
 import kr.co.nogibackend.domain.notion.helper.NotionMarkdownConverter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;

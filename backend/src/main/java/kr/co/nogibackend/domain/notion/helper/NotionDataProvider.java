@@ -1,11 +1,11 @@
 package kr.co.nogibackend.domain.notion.helper;
 
-import static kr.co.nogibackend.domain.notion.dto.constant.NotionPropertyValue.STATUS_COMPLETED;
-import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.BULLETED_LIST;
-import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.IMAGE;
-import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.NUMBERED_LIST;
-import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.TABLE;
-import static kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo.TOGGLE;
+import static kr.co.nogibackend.domain.notion.constant.NotionPropertyValue.STATUS_COMPLETED;
+import static kr.co.nogibackend.domain.notion.info.NotionBlockInfo.BULLETED_LIST;
+import static kr.co.nogibackend.domain.notion.info.NotionBlockInfo.IMAGE;
+import static kr.co.nogibackend.domain.notion.info.NotionBlockInfo.NUMBERED_LIST;
+import static kr.co.nogibackend.domain.notion.info.NotionBlockInfo.TABLE;
+import static kr.co.nogibackend.domain.notion.info.NotionBlockInfo.TOGGLE;
 import static kr.co.nogibackend.response.code.NotionResponseCode.F_PREPROCESS_MARKDOWN;
 
 import java.net.URI;
@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import kr.co.nogibackend.config.exception.GlobalException;
-import kr.co.nogibackend.domain.notion.NotionClient;
-import kr.co.nogibackend.domain.notion.dto.content.NotionListItemContent;
-import kr.co.nogibackend.domain.notion.dto.content.NotionTableRowContent;
-import kr.co.nogibackend.domain.notion.dto.info.NotionBaseInfo;
-import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
-import kr.co.nogibackend.domain.notion.dto.info.NotionPageInfo;
+import kr.co.nogibackend.domain.notion.content.NotionListItemContent;
+import kr.co.nogibackend.domain.notion.content.NotionTableRowContent;
+import kr.co.nogibackend.domain.notion.feignclient.NotionClient;
+import kr.co.nogibackend.domain.notion.info.NotionBaseInfo;
+import kr.co.nogibackend.domain.notion.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.info.NotionPageInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -165,7 +165,7 @@ public class NotionDataProvider {
 
   public List<NotionPageInfo> getCompletedPages(String AuthToken, String databaseId) {
     try {
-      Map<String, Object> filter = NotionRequestMaker.createPageFilterEqStatus(STATUS_COMPLETED);
+      Map<String, Object> filter = NotionRequestMaker.createPageStatusEqFilter(STATUS_COMPLETED);
       return
           notionClient
               .getPagesFromDatabase(AuthToken, databaseId, filter)
