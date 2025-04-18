@@ -59,8 +59,10 @@ public interface GithubFeignClient {
 
   /*
   ➡️ 유저의 repository 목록 가져오기
+  todo: 기본 레포지토리 30개만 들고옴(레포지토리 36개 있는 유저가 깃허브 연결 안된다고 문의들어옴 2025-04-18)
+   하드코딩으로 max 100개 들고 올 수 잇게 함. 수정필요 시 수정하기 (참고: https://docs.github.com/ko/rest/repos/repos?apiVersion=2022-11-28)
    */
-  @GetMapping("/user/repos")
+  @GetMapping("/user/repos?per_page=100")
   List<GithubRepoInfo> getUserRepositories(
       @RequestHeader("Authorization") String token
   );

@@ -4,8 +4,8 @@ import static kr.co.nogibackend.response.code.UserResponseCode.F_NOT_FOUND_USER;
 
 import java.util.Optional;
 import kr.co.nogibackend.config.exception.GlobalException;
-import kr.co.nogibackend.domain.notion.NotionClient;
-import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.feignclient.NotionClient;
+import kr.co.nogibackend.domain.notion.info.NotionBlockInfo;
 import kr.co.nogibackend.domain.notion.helper.NotionDataProvider;
 import kr.co.nogibackend.domain.user.User;
 import kr.co.nogibackend.domain.user.UserRepository;

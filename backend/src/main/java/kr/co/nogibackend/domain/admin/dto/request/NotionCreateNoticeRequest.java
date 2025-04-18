@@ -2,10 +2,10 @@ package kr.co.nogibackend.domain.admin.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
-import kr.co.nogibackend.domain.notion.dto.info.NotionBlockInfo;
-import kr.co.nogibackend.domain.notion.dto.property.NotionEmojiProperty;
-import kr.co.nogibackend.domain.notion.dto.property.NotionNogiProperties;
-import kr.co.nogibackend.domain.notion.dto.property.NotionParentProperty;
+import kr.co.nogibackend.domain.notion.info.NotionBlockInfo;
+import kr.co.nogibackend.domain.notion.property.NotionEmojiProperty;
+import kr.co.nogibackend.domain.notion.property.NotionNogiProperties;
+import kr.co.nogibackend.domain.notion.property.NotionParentProperty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record NotionCreateNoticeRequest(

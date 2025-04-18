@@ -2,8 +2,8 @@ package kr.co.nogibackend.domain.notion.service;
 
 import java.util.List;
 import java.util.Optional;
-import kr.co.nogibackend.domain.notion.dto.command.NotionEndTILCommand;
-import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
+import kr.co.nogibackend.domain.notion.command.NotionEndTILCommand;
+import kr.co.nogibackend.domain.notion.result.NotionEndTILResult;
 import kr.co.nogibackend.domain.notion.helper.NotionDataInjector;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

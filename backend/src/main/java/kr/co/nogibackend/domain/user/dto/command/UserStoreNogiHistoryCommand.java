@@ -1,6 +1,6 @@
 package kr.co.nogibackend.domain.user.dto.command;
 
-import kr.co.nogibackend.domain.notion.dto.result.NotionEndTILResult;
+import kr.co.nogibackend.domain.notion.result.NotionEndTILResult;
 
 public record UserStoreNogiHistoryCommand(
     Long userId, // 유저 ID

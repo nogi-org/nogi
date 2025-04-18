@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import kr.co.nogibackend.domain.notion.dto.result.CompletedPageMarkdownResult;
+import kr.co.nogibackend.domain.notion.result.CompletedPageMarkdownResult;
 import kr.co.nogibackend.domain.user.NogiHistoryType;
 import kr.co.nogibackend.domain.user.dto.result.UserCheckTILResult;
 import kr.co.nogibackend.domain.user.dto.result.UserResult;

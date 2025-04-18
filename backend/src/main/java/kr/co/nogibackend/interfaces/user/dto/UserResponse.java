@@ -21,6 +21,7 @@ public class UserResponse {
   private String githubOwner;
   private Boolean isConnectToNotion;// notionPageId 가 있으면 연결이 되었다고 판단
   private Boolean isNotificationAllowed;
+  private String selfIntroduction;
 
   public static UserResponse from(UserInfo userInfo) {
     return UserResponse.builder()
@@ -30,6 +31,7 @@ public class UserResponse {
         .githubOwner(userInfo.githubOwner())
         .isConnectToNotion(StringUtils.hasText(userInfo.notionPageId()))
         .isNotificationAllowed(userInfo.isNotificationAllowed())
+        .selfIntroduction(userInfo.selfIntroduction())
         .build();
   }
 

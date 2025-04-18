@@ -25,6 +25,7 @@ public class UserUpdateCommand {
   private String githubEmail;
   private String githubOwner;
   private Boolean isNotificationAllowed;
+  private String selfIntroduction;
 
   public static UserUpdateCommand fromGithubLogin(
       GithubUserResult githubUserResult,
