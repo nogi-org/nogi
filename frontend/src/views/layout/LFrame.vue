@@ -1,5 +1,5 @@
 <script setup>
-import Footer from '@/views/layout/Footer.vue';
+import LFooter from '@/views/layout/LFooter.vue';
 import { RouterView, useRoute } from 'vue-router';
 import SApiResponseModal from '@/shared/modal/SApiResponseModal.vue';
 import SSpinner from '@/shared/spinner/SSpinner.vue';
@@ -7,7 +7,7 @@ import SIssueButton from '@/shared/buttons/SIssueButton.vue';
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { onMounted, ref, watch } from 'vue';
 import { useNavigationStore } from '@/stores/navigationStore.js';
-import Header from '@/views/layout/Header.vue';
+import LHeader from '@/views/layout/LHeader.vue';
 
 const route = useRoute();
 const spinnerStore = useSpinnerStore();
@@ -26,13 +26,13 @@ watch(route, (value) => {
 <template>
   <div>
     <div class="border-b border-main">
-      <Header class="layout" />
+      <LHeader class="layout" />
     </div>
     <div :class="layoutStyle">
       <RouterView />
     </div>
     <div>
-      <Footer class="layout" />
+      <LFooter class="layout" />
     </div>
   </div>
 

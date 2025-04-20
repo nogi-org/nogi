@@ -2,11 +2,16 @@
 import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
 import { AdminManager } from '@/manager/admin/AdminManager.js';
 import { onMounted } from 'vue';
+import router from '@/router/router.js';
 
 const admin = new AdminManager();
 onMounted(async () => {
   await admin.getUsersInfo();
 });
+
+const goToUserNotionPages = () => {
+  router.push({ name: 'userNotionPages' });
+};
 </script>
 
 <template>
@@ -43,6 +48,7 @@ onMounted(async () => {
             class=""
             v-for="(item, index) in admin.usersInfo.value"
             :key="index"
+            @click="goToUserNotionPages"
           >
             <th scope="row" class="px-6 py-4">{{ item.githubId }}</th>
             <th scope="row" class="px-6 py-4">{{ item.role }}</th>

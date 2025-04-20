@@ -12,12 +12,12 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
     {
       path: '/authorize/redirect',
       name: 'authorizeRedirect',
-      component: () => import('@/views/auth/AuthorizeRedirect.vue')
+      component: () => import('@/views/auth/VAuthorizeRedirect.vue')
     },
     {
       path: '/404',
       name: 'notFound',
-      component: () => import('@/views/common/NotFound.vue')
+      component: () => import('@/views/common/VNotFound.vue')
     },
     {
       path: '/:pathMatch(.*)*',
@@ -26,18 +26,18 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
     {
       path: '/use-policy',
       name: 'usePolicy',
-      component: () => import('@/views/policy/UsePolicy.vue')
+      component: () => import('@/views/policy/VUsePolicy.vue')
     },
     {
       path: '/',
       name: 'frame',
-      component: () => import('@/views/layout/Frame.vue'),
+      component: () => import('@/views/layout/LFrame.vue'),
       children: [
         {
           path: '/',
           name: 'home',
           meta: { layoutStyle: LAYOUT_STYLES.FULL },
-          component: () => import('@/views/layout/Home.vue')
+          component: () => import('@/views/layout/LHome.vue')
         },
         {
           path: '/guide',
@@ -51,7 +51,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
             }
           },
           redirect: { name: 'setupGuidePage' },
-          component: () => import('@/views/layout/SubFrame.vue'),
+          component: () => import('@/views/layout/LSubFrame.vue'),
           children: [
             {
               path: '/guide/usage',
@@ -63,7 +63,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                   isActive: false
                 }
               },
-              component: () => import('@/views/guide/UsageGuidePage.vue')
+              component: () => import('@/views/guide/VUsageGuide.vue')
             },
             {
               path: '/guide/setup',
@@ -75,7 +75,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                   isActive: false
                 }
               },
-              component: () => import('@/views/guide/SetupGuidePage.vue')
+              component: () => import('@/views/guide/VSetupGuide.vue')
             }
           ]
         },
@@ -90,7 +90,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/notice/NoticesPage.vue')
+          component: () => import('@/views/notice/VNoticesPage.vue')
         },
         {
           path: '/notice/:noticeId',
@@ -98,7 +98,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           meta: {
             requiresLogin: false
           },
-          component: () => import('@/views/notice/NoticePage.vue')
+          component: () => import('@/views/notice/VNoticePage.vue')
         },
         {
           path: '/notice/publish',
@@ -107,7 +107,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
             requiresLogin: true,
             requiresRole: AuthManager.ROLE.ADMIN
           },
-          component: () => import('@/views/notice/NoticePublishPage.vue')
+          component: () => import('@/views/notice/VNoticePublishPage.vue')
         },
         {
           path: '/my-page',
@@ -124,7 +124,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
 
           // todo: 아래 주석 풀어서 사용하시면 됩니다.
           // redirect: { name: 'demo1mypage' },
-          // component: () => import('@/views/layout/SubFrame.vue')
+          // component: () => import('@/views/layout/LSubFrame.vue')
           // children: [
           //   {
           //     path: '/my-page/demo1',
@@ -152,6 +152,8 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
           //   }
           // ]
         },
+
+        // admin
         {
           path: '/admin',
           name: 'adminPage',
@@ -164,45 +166,46 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/layout/SubFrame.vue'),
-          redirect: { name: 'adminGuidePage' },
+          component: () => import('@/views/layout/LSubFrame.vue'),
+          redirect: { name: 'newGuide' },
           children: [
             {
-              path: '/admin/guide',
-              name: 'adminGuidePage',
+              path: 'guide/new',
+              name: 'newGuide',
               meta: {
                 subNavigation: {
                   title: '가이드 관리',
-                  order: 1,
-                  isActive: false
-                }
-              },
-              component: () => import('@/views/admin/AdminGuidePage.vue')
-            },
-            {
-              path: '/admin/user',
-              name: 'adminUserPage',
-              meta: {
-                subNavigation: {
-                  title: '유저 관리',
                   order: 2,
                   isActive: false
                 }
               },
-              component: () => import('@/views/admin/AdminUserPage.vue')
+              component: () => import('@/views/guide/VNewGuide.vue')
             },
-            // todo: 이름 바꾸기
             {
-              path: '/admin/user-notion-page',
-              name: 'userNotionPagePage',
+              path: 'users',
+              name: 'userInfo',
               meta: {
                 subNavigation: {
-                  title: '유저 노션 페이지',
-                  order: 3,
+                  title: '유저정보',
+                  order: 1,
                   isActive: false
                 }
               },
-              component: () => import('@/views/admin/NotionUserPagePage.vue')
+              redirect: { name: 'usersInfo' },
+              component: () => import('@/views/user/info/LUserInfo.vue'),
+              children: [
+                {
+                  path: '',
+                  name: 'usersInfo',
+                  component: () => import('@/views/user/info/VUsersInfo.vue')
+                },
+                {
+                  path: 'notion-pages',
+                  name: 'userNotionPages',
+                  component: () =>
+                    import('@/views/user/info/VUserNotionPages.vue')
+                }
+              ]
             }
           ]
         },
@@ -217,7 +220,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/user/setting/SettingPage.vue')
+          component: () => import('@/views/user/setting/VSetting.vue')
         }
       ]
     }
@@ -274,37 +277,40 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
   }
 
   function getSubNavigations(route) {
-    const parentRoute =
-      route.matched.find(
-        (r, index, arr) => arr[index + 1]?.name === route.name
-      ) || [];
+    const matchedRoutes = route.matched;
 
-    return parentRoute.children
-      .map((route) => ({
-        name: route.name,
-        title: route.meta.subNavigation.title,
-        isActive: route.meta.subNavigation.isActive,
-        order: route.meta.subNavigation.order
+    // 가장 가까운 subNavigation 그룹이 포함된 라우트를 찾음
+    const subNavParent = matchedRoutes
+      .slice()
+      .reverse()
+      .find((r) => r.children?.some((child) => child.meta?.subNavigation));
+
+    if (!subNavParent) return [];
+
+    return subNavParent.children
+      .filter((r) => r.meta?.subNavigation)
+      .map((r) => ({
+        name: r.name,
+        title: r.meta.subNavigation.title,
+        isActive: r.name === route.name,
+        order: r.meta.subNavigation.order ?? 0
       }))
       .sort((a, b) => a.order - b.order);
   }
 
-  function onActiveSubNavigation(navigations, name) {
-    navigations.value.forEach((navi) => (navi.isActive = navi.name === name));
+  function onActiveSubNavigation(navigations, route) {
+    const currentMatchedNames = route.matched.map((r) => r.name);
+
+    navigations.value.forEach((nav) => {
+      nav.isActive = currentMatchedNames.includes(nav.name);
+    });
   }
 
   function onActiveHeaderNavigation(navigations, route) {
-    const parentRoute =
-      route.matched.find(
-        (r, index, arr) => arr[index + 1]?.name === route.name
-      ) || [];
+    const currentMatchedNames = route.matched.map((r) => r.name);
 
-    // route.matched 가 2개 아래면 단일 페이지, 2개 이상이면 서브 네비게이션이 있는 페이지
-    const isParentActive = route.matched.length > 2;
     navigations.value.forEach((navi) => {
-      navi.isActive = isParentActive
-        ? navi.name === parentRoute.name
-        : navi.name === route.name;
+      navi.isActive = currentMatchedNames.includes(navi.name);
     });
   }
 

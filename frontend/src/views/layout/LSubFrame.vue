@@ -18,7 +18,8 @@ watch(route, () => {
 
 const initNavigation = () => {
   navigations.value = navigationStore.getSubNavigations(route);
-  navigationStore.onActiveSubNavigation(navigations, route.name);
+  navigationStore.onActiveSubNavigation(navigations, route);
+  // navigationStore.onActiveSubNavigation(navigations, route.name);
 };
 </script>
 
