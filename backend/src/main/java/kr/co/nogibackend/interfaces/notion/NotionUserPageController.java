@@ -14,24 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class NotionUserPageController {
 
-  private final NotionUserPageService notionUserPageService;
+	private final NotionUserPageService notionUserPageService;
 
-  // todo: security에 어드민만 가능하게
-  @GetMapping("/{userId}/pages")
-  public ResponseEntity<?> getPages(
-      @PathVariable("userId") Long userId
-      , String nextCursor
-  ) {
-    return Response.success(notionUserPageService.getPages(userId, nextCursor));
-  }
+	@GetMapping("/{userId}/pages")
+	public ResponseEntity<?> getPages(
+			@PathVariable("userId") Long userId
+			, String nextCursor
+	) {
+		return Response.success(notionUserPageService.getPages(userId, nextCursor));
+	}
 
-  // todo: security에 어드민만 가능하게
-  @GetMapping("/{userId}/{pageId}/page")
-  public ResponseEntity<?> getPage(
-      @PathVariable("userId") Long userId,
-      @PathVariable("pageId") String pageId
-  ) {
-    return Response.success(notionUserPageService.getPage(userId, pageId));
-  }
+	@GetMapping("/{userId}/{pageId}/page")
+	public ResponseEntity<?> getPage(
+			@PathVariable("userId") Long userId,
+			@PathVariable("pageId") String pageId
+	) {
+		return Response.success(notionUserPageService.getPage(userId, pageId));
+	}
 
 }

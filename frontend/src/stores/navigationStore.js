@@ -200,7 +200,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                   component: () => import('@/views/user/info/VUsersInfo.vue')
                 },
                 {
-                  path: 'notion-pages',
+                  path: ':userId/notion-pages',
                   name: 'userNotionPages',
                   component: () =>
                     import('@/views/user/info/VUserNotionPages.vue')

@@ -5,6 +5,7 @@ import java.util.List;
 import kr.co.nogibackend.domain.user.User;
 
 public record UserInfoResponse(
+		Long id,
 		Long githubId,
 		String role,
 		String owner,
@@ -23,7 +24,8 @@ public record UserInfoResponse(
 						.stream()
 						.map(user ->
 								new UserInfoResponse(
-										user.getGithubId()
+										user.getId()
+										, user.getGithubId()
 										, user.getRole().name()
 										, user.getGithubOwner()
 										, user.getGithubEmail()

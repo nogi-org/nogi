@@ -35,3 +35,7 @@ export const onManualNogiApi = () => {
 export const getConnectedGithubInfoApi = () => {
   return api.get(`/users/github/validate`).then((success) => success.result);
 };
+
+export const getUsersInfoApi = () => {
+  return api.get(`/admin/user-info`).then((success) => success.result);
+};
