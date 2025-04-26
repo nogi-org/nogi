@@ -3,11 +3,11 @@ package kr.co.nogibackend.infra.github;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
-import kr.co.nogibackend.domain.github.dto.request.GithubAddCollaboratorRequest;
-import kr.co.nogibackend.domain.github.dto.request.GithubCreateIssueRequest;
+import kr.co.nogibackend.domain.github.command.GithubAddCollaboratorsCommand;
+import kr.co.nogibackend.domain.github.command.GithubCreateIssueCommand;
+import kr.co.nogibackend.domain.github.result.GithubRepoResult;
+import kr.co.nogibackend.domain.github.result.GithubUserDetailResult;
+import kr.co.nogibackend.domain.github.result.GithubUserEmailResult;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
@@ -24,65 +24,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Slf4j
 class GithubFeignClientIntegrationTest extends GithubTestEnvironment {
 
-  @Autowired
-  private GithubFeignClient githubFeignClient;
+	@Autowired
+	private kr.co.nogibackend.infra.github.GithubClient githubClient;
 
-  @Test
-  @DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
-  void testCreateIssue() {
-    // when // then
-    githubFeignClient.addCollaborator(
-        testUserOwner,
-        testUserRepo,
-        "nogi-bot",
-        new GithubAddCollaboratorRequest(null),
-        testUserToken
-    );
-    githubFeignClient.createIssue(
-        testUserOwner,
-        testUserRepo,
-        new GithubCreateIssueRequest(
-            "Test Issue",
-            "Test Issue Body @" + testUserOwner,
-            List.of(testUserOwner)
-        ),
-        nogiBotToken
-    );
-  }
+	@Test
+	@DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")
+	void testCreateIssue() {
+		// when // then
+		githubClient.addCollaborator(
+				testUserOwner,
+				testUserRepo,
+				"nogi-bot",
+				new GithubAddCollaboratorsCommand(null),
+				testUserToken
+		);
+		githubClient.createIssue(
+				testUserOwner,
+				testUserRepo,
+				new GithubCreateIssueCommand(
+						"Test Issue",
+						"Test Issue Body @" + testUserOwner,
+						List.of(testUserOwner)
+				),
+				nogiBotToken
+		);
+	}
 
-  @Test
-  @DisplayName("토큰으로 유저의 정보를 조회하면 유저의 owner 를 조회할 수 있다.")
-  public void getUserInfo() {
-    // when
-    GithubUserInfo userInfo = githubFeignClient.getUserInfo(testUserToken);
-    // then
-    assertThat(userInfo.login()).isEqualTo(testUserOwner);
-  }
+	@Test
+	@DisplayName("토큰으로 유저의 정보를 조회하면 유저의 owner 를 조회할 수 있다.")
+	public void getUserInfo() {
+		// when
+		GithubUserDetailResult userInfo = githubClient.getUserInfo(testUserToken);
+		// then
+		assertThat(userInfo.login()).isEqualTo(testUserOwner);
+	}
 
-  @Test
-  @DisplayName("토큰으로 유저의 이메일 정보를 조회하면 이메일 정보를 조회할 수 있고, primary 이메일이 존재한다.")
-  public void getUserEmailInfo() {
-    // when
-    List<GithubUserEmailInfo> userEmailInfos = githubFeignClient.getUserEmailInfo(testUserToken);
+	@Test
+	@DisplayName("토큰으로 유저의 이메일 정보를 조회하면 이메일 정보를 조회할 수 있고, primary 이메일이 존재한다.")
+	public void getUserEmailInfo() {
+		// when
+		List<GithubUserEmailResult> userEmailInfos = githubClient.getUserEmailInfo(testUserToken);
 
-    // then
-    assertThat(userEmailInfos).isNotEmpty();
+		// then
+		assertThat(userEmailInfos).isNotEmpty();
 
-    GithubUserEmailInfo githubUserEmailInfo = userEmailInfos.stream()
-        .filter(GithubUserEmailInfo::primary)
-        .findFirst()
-        .orElse(null);
-    assertThat(githubUserEmailInfo).isNotNull();
-  }
+		GithubUserEmailResult githubUserEmailResult = userEmailInfos.stream()
+				.filter(GithubUserEmailResult::primary)
+				.findFirst()
+				.orElse(null);
+		assertThat(githubUserEmailResult).isNotNull();
+	}
 
-  @Test
-  @DisplayName("토큰으로 유저의 레포지토리 목록을 조회하면 레포지토리 목록을 조회할 수 있다.")
-  public void getRepositories() {
-    // when
-    List<GithubRepoInfo> githubRepoInfos = githubFeignClient.getUserRepositories(testUserToken);
+	@Test
+	@DisplayName("토큰으로 유저의 레포지토리 목록을 조회하면 레포지토리 목록을 조회할 수 있다.")
+	public void getRepositories() {
+		// when
+		List<GithubRepoResult> githubRepoResults = githubClient.getUserRepositories(testUserToken);
 
-    // then
-    log.info("githubRepoInfos: {}", githubRepoInfos);
-    assertThat(githubRepoInfos).isNotEmpty();
-  }
+		// then
+		log.info("githubRepoInfos: {}", githubRepoResults);
+		assertThat(githubRepoResults).isNotEmpty();
+	}
 }

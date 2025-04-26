@@ -1,6 +1,6 @@
 package kr.co.nogibackend.interfaces.notice.request;
 
-import kr.co.nogibackend.application.notice.dto.NoticePublishCommand;
+import kr.co.nogibackend.application.notice.command.NoticePublishCommand;
 
 public record NoticePublishRequest(
 		String title,

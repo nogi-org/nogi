@@ -1,13 +1,13 @@
 package kr.co.nogibackend.application.user;
 
 import java.util.List;
-import kr.co.nogibackend.domain.github.GithubClient;
-import kr.co.nogibackend.domain.github.dto.info.GithubRepoInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubUserEmailInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubUserInfo;
-import kr.co.nogibackend.domain.github.dto.info.GithubValidateInfo;
-import kr.co.nogibackend.domain.user.UserService;
-import kr.co.nogibackend.domain.user.dto.info.UserInfo;
+import kr.co.nogibackend.domain.github.port.GithubClientPort;
+import kr.co.nogibackend.domain.github.result.GithubRepoResult;
+import kr.co.nogibackend.domain.github.result.GithubUserDetailResult;
+import kr.co.nogibackend.domain.github.result.GithubUserEmailResult;
+import kr.co.nogibackend.domain.github.result.GithubValidateResult;
+import kr.co.nogibackend.domain.user.result.UserReslut;
+import kr.co.nogibackend.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,21 +15,21 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserValidateFacade {
 
-  private final UserService userService;
-  private final GithubClient githubClient;
+	private final UserService userService;
+	private final GithubClientPort githubClientPort;
 
-  public GithubValidateInfo validateGithub(Long userId) {
-    UserInfo userInfo = userService.findUserById(userId);
+	public GithubValidateResult validateGithub(Long userId) {
+		UserReslut userReslut = userService.findUserById(userId);
 
-    GithubUserInfo githubInfo = githubClient.getUserInfo(userInfo.githubAuthToken());
+		GithubUserDetailResult githubInfo = githubClientPort.getUserInfo(userReslut.githubAuthToken());
 
-    List<GithubUserEmailInfo> githubEmails = githubClient.getUserEmails(
-        userInfo.githubAuthToken());
+		List<GithubUserEmailResult> githubEmails = githubClientPort.getUserEmails(
+				userReslut.githubAuthToken());
 
-    List<GithubRepoInfo> githubRepositories = githubClient.getUserRepositories(
-        userInfo.githubAuthToken());
+		List<GithubRepoResult> githubRepositories = githubClientPort.getUserRepositories(
+				userReslut.githubAuthToken());
 
-    return new GithubValidateInfo(userInfo, githubInfo, githubEmails, githubRepositories);
-  }
+		return new GithubValidateResult(userReslut, githubInfo, githubEmails, githubRepositories);
+	}
 
 }
