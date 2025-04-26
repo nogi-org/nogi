@@ -12,17 +12,15 @@ export class NotionManager {
   #spinner = useSpinnerStore();
 
   // 변수
-  #connection = ref({});
+  #connection = ref();
 
   get connection() {
     return this.#connection;
   }
 
   async getConnectedNotion() {
-    this.#spinner.on();
     const response = await getConnectedNotionApi();
-    this.#spinner.off();
-    this.#notifyModal.onActive(response);
+    this.#connection.value = response.result.isConnection;
   }
 
   async updateNotionPageId() {

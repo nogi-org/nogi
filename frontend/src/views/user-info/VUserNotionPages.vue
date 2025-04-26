@@ -1,11 +1,11 @@
 <script setup>
 import { onMounted, ref } from 'vue';
-import { getNotionUserPage } from '@/api/admin/admin.js';
+import { getUserNotionPages } from '@/api/notion/notion.js';
 
 const demo = ref('');
 
 onMounted(async () => {
-  const response = await getNotionUserPage({
+  const response = await getUserNotionPages({
     userId: 29,
     pageId: '1d8a9cc8-1056-811f-b46c-e16cc083e7eb'
   });

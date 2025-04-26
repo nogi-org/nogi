@@ -19,7 +19,7 @@ export const getUsersAdminApi = () => {
 // todo: response 객체 변경
 export const onManualSyncApi = () => {
   return api
-    .post(`/v1/sync`)
+    .post(`/v1/sync/manual`)
     .then(success => handleUserInfo(success))
     .catch(error => handleUserInfo(error));
 };

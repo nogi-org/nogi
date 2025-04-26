@@ -3,11 +3,11 @@ import {
   getGithubLoginURLApi,
   getNotionLoginURLApi
 } from '@/api/auth/auth.js';
-import { useAuthStore } from '@/stores/auth.js';
 import { useRouter } from 'vue-router';
-import { useSpinnerStore } from '@/stores/spinner.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
 import { code } from '@/api/apiResponse.js';
+import { useAuthStore } from '@/stores/authStore.js';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 export class AuthManager {
   // 스토어

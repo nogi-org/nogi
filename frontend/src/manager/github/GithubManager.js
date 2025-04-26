@@ -17,9 +17,7 @@ export class GithubManager {
   }
 
   async getConnectedGithub() {
-    this.#spinner.on();
     this.#connection.value = await getConnectedGithubApi();
-    this.#spinner.off();
   }
 
   isSaveValidationRepositoryName(name) {

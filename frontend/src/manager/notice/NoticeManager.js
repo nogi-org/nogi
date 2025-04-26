@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import { useSpinnerStore } from '@/stores/spinner.js';
 import {
   getNoticeApi,
   getNoticeRecipientsAdminApi,
@@ -7,7 +6,8 @@ import {
   noticePublishAdminApi
 } from '@/api/notice/notice.js';
 import { useRouter } from 'vue-router';
-import { useNotifyStore } from '@/stores/notifyModal.js';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
+import { useNotifyStore } from '@/stores/notifyStore.js';
 
 export class NoticeManager {
   // 스토어

@@ -11,7 +11,6 @@ export const useAuthStore = defineStore('useAuthStore', () => {
 
   function deleteAuth() {
     auth.value = null;
-    console.log('Auth ', auth.value);
     localStorage.removeItem(AuthManager.AUTH_KEY);
   }
 

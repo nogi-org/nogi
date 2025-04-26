@@ -17,27 +17,27 @@ const connectionStatus = computed(() => {
 
 <template>
   <div
-    class="font-noto_sans_m"
     :class="{
       'text-green-500': isConnected === true,
       'text-danger': isConnected === false,
       'text-neutral': isConnected === null
     }"
+    class="font-noto_sans_m"
   >
     <font-awesome-icon
-      icon="fa-solid fa-circle-check"
       v-if="isConnected"
       class="mr-1"
+      icon="fa-solid fa-circle-check"
     />
     <font-awesome-icon
-      icon="fa-solid fa-circle-xmark"
       v-if="isConnected === false"
       class="mr-1"
+      icon="fa-solid fa-circle-xmark"
     />
     <font-awesome-icon
       v-if="isConnected === null"
-      icon="fa-solid fa-spinner"
       class="mr-1 fa-spin"
+      icon="fa-solid fa-spinner"
     />
     <span>
       {{ connectionStatus }}
