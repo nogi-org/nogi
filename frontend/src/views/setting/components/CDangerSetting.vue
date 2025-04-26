@@ -12,7 +12,7 @@ const user = inject('userManager');
     <ul class="border border-danger rounded-sm p-4">
       <li class="flex justify-between items-center">
         <span class="text-sm">회원탈퇴</span>
-        <SDangerButton name="Delete" @action="user.deleteUser()" />
+        <SDangerButton name="Delete" @action="user.deleteMe()" />
       </li>
     </ul>
   </div>

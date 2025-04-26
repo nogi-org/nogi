@@ -1,8 +1,8 @@
 <script setup>
-import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
+import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
 import SConnectionStatus from '@/shared/common/SConnectionStatus.vue';
 import SActionButton from '@/shared/buttons/SActionButton.vue';
-import CSettingSubTitle from '@/views/user/setting/components/CSettingSubTitle.vue';
+import CSettingSubTitle from '@/views/setting/components/CSettingSubTitle.vue';
 import SInformationHint from '@/shared/hints/SInformationHint.vue';
 import { inject, onMounted, ref, watch } from 'vue';
 import SSimpleTextInput from '@/shared/input/SSimpleTextInput.vue';
@@ -10,33 +10,55 @@ import SSpinnerInner from '@/shared/spinner/SSpinnerInner.vue';
 import SWarningHint from '@/shared/hints/SWarningHint.vue';
 
 const user = inject('userManager');
-const githubInfoFrom = ref({
+const github = inject('githubManager');
+
+const githubFrom = ref({
   repositoryName: '',
   owner: '',
   email: ''
 });
 
-watch(user.info, (info) => {
-  githubInfoFrom.value.repositoryName = info.githubRepository;
-  githubInfoFrom.value.owner = info.githubOwner;
-  githubInfoFrom.value.email = info.githubEmail;
+watch(user.me, info => {
+  githubFrom.value.repositoryName = info.githubRepository;
+  githubFrom.value.owner = info.githubOwner;
+  githubFrom.value.email = info.githubEmail;
 });
 
 onMounted(() => {
-  getGithubInfo();
+  github.getConnectedGithub();
 });
 
-const getGithubInfo = () => {
-  user.getConnectedGithubInfo();
-};
-
-const bindRepositoryName = (repository) => {
-  githubInfoFrom.value.repositoryName = repository.name;
+const bindRepositoryName = repository => {
+  githubFrom.value.repositoryName = repository.name;
 };
 
 const checkConnectedGithub = () => {
-  user.getConnectedGithubInfo();
-  user.getInfo();
+  github.getConnectedGithub();
+  user.getMe();
+};
+
+const saveRepositoryName = async () => {
+  if (!github.isSaveValidationRepositoryName(githubFrom.value.repositoryName)) {
+    return;
+  }
+  await user.updateMe({ githubRepository: githubFrom.value.repositoryName });
+  await github.getConnectedGithub();
+};
+
+const saveOwner = async () => {
+  if (!github.isSaveValidationOwner(githubFrom.value.owner)) {
+    return;
+  }
+  await user.updateMe({ githubOwner: githubFrom.value.owner });
+  await github.getConnectedGithub();
+};
+
+const saveEmail = async () => {
+  if (!github.isSaveValidationEmail(githubFrom.value.email)) {
+    return;
+  }
+  await user.updateMe({ githubEmail: githubFrom.value.email });
+  await github.getConnectedGithub();
 };
 </script>
 
@@ -48,11 +70,11 @@ const checkConnectedGithub = () => {
       <li class="flex justify-between border-b border-main pb-4 items-center">
         <div>
           <SConnectionStatus
-            :isConnected="user.githubInfo.value?.isGithubValid"
+            :isConnected="github.connection.value?.isGithubValid"
           />
           <SWarningHint
+            v-if="github.connection.value?.isGithubValid === false"
             class="mt-1 text-danger"
-            v-if="user.githubInfo.value?.isGithubValid === false"
             text="Github정보와 아래정보가 동일한지 확인해주세요."
           />
         </div>
@@ -64,25 +86,25 @@ const checkConnectedGithub = () => {
         <CSettingSubTitle title="Repository name" />
         <div class="sm:flex sm:justify-between sm:items-center sm:mb-4">
           <SSimpleTextInput
-            v-model="githubInfoFrom.repositoryName"
-            class="sm:w-[50%]"
-            placeholder="Repository Name"
+            v-model="githubFrom.repositoryName"
             :class="{
               'border-2 border-danger rounded-md outline-none':
-                user.githubInfo.value.isGithubRepositoryValid === false
+                github.connection.value.isGithubRepositoryValid === false
             }"
+            class="sm:w-[50%]"
+            placeholder="Repository Name"
           />
           <SActionButton
             class="sm:w-[50%] text-right mt-1 sm:mt-0"
             name="저장"
-            @action="user.saveRepositoryName(githubInfoFrom.repositoryName)"
+            @action="saveRepositoryName"
           />
         </div>
 
         <div class="mt-8 flex items-center gap-2">
           <CSettingSubTitle title="Github Public Repository" />
           <span class="text-xs font-noto_sans_m">
-            {{ user.githubInfo.value?.githubRepositories?.length }}
+            {{ github.connection.value?.githubRepositories?.length }}
           </span>
         </div>
         <SInformationHint
@@ -90,11 +112,11 @@ const checkConnectedGithub = () => {
           text="기존 Git Repository를 NOGI와 연결할 수 있어요"
         />
         <ul
+          v-if="github.connection.value.githubRepositories"
           class="max-h-40 overflow-y-scroll"
-          v-if="user.githubInfo.value.githubRepositories"
         >
           <li
-            v-for="(item, index) in user.githubInfo.value?.githubRepositories"
+            v-for="(item, index) in github.connection.value?.githubRepositories"
             :key="index"
             class="sm:flex sm:gap-5 mb-3"
           >
@@ -115,7 +137,7 @@ const checkConnectedGithub = () => {
             </a>
           </li>
         </ul>
-        <div class="h-40" v-else>
+        <div v-else class="h-40">
           <SSpinnerInner />
         </div>
       </li>
@@ -125,18 +147,18 @@ const checkConnectedGithub = () => {
         <CSettingSubTitle title="Owner" />
         <div class="sm:flex sm:justify-between sm:items-center">
           <SSimpleTextInput
-            v-model="githubInfoFrom.owner"
-            class="sm:w-[50%]"
-            placeholder="NOGI Owner"
+            v-model="githubFrom.owner"
             :class="{
               'border-2 border-danger rounded-md outline-none':
-                user.githubInfo.value.isGithubOwnerValid === false
+                github.connection.value.isGithubOwnerValid === false
             }"
+            class="sm:w-[50%]"
+            placeholder="NOGI Owner"
           />
           <SActionButton
             class="sm:w-[50%] text-right mt-1 sm:mt-0"
             name="저장"
-            @action="user.saveGithubOwner(githubInfoFrom.owner)"
+            @action="saveOwner"
           />
         </div>
       </li>
@@ -146,18 +168,18 @@ const checkConnectedGithub = () => {
         <CSettingSubTitle title="Email" />
         <div class="sm:flex sm:justify-between sm:items-center">
           <SSimpleTextInput
-            v-model="githubInfoFrom.email"
-            class="sm:w-[50%]"
-            placeholder="NOGI Email"
+            v-model="githubFrom.email"
             :class="{
               'border-2 border-danger rounded-md outline-none':
-                user.githubInfo.value.isGithubEmailValid === false
+                github.connection.value.isGithubEmailValid === false
             }"
+            class="sm:w-[50%]"
+            placeholder="NOGI Email"
           />
           <SActionButton
             class="sm:w-[50%] text-right mt-1 sm:mt-0"
             name="저장"
-            @action="user.saveGithubEmail(githubInfoFrom.email)"
+            @action="saveEmail"
           />
         </div>
       </li>

@@ -17,7 +17,7 @@ onBeforeMount(async () => {
 const getUserGuides = async () => {
   spinnerStore.on();
   const response = await userGuideManager.getUserGuides();
-  userGuides.value = response.filter((guide) => guide.step === 1);
+  userGuides.value = response.filter(guide => guide.step === 1);
   spinnerStore.off();
 };
 
@@ -26,12 +26,12 @@ const confirmModalAction = reactive({
   hasActive: false
 });
 
-const showFullProfileImage = (image) => {
+const showFullProfileImage = image => {
   confirmModalAction.hasActive = true;
   confirmModalAction.message = image;
 };
 
-const toggleFullImage = (hasAction) => {
+const toggleFullImage = hasAction => {
   confirmModalAction.hasActive = hasAction;
 };
 </script>

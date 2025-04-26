@@ -3,7 +3,7 @@ import { onMounted } from 'vue';
 import { NoticeManager } from '@/manager/notice/NoticeManager.js';
 import { useRoute } from 'vue-router';
 import SPagination from '@/shared/common/SPagination.vue';
-import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
+import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
 import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
 import * as dateFormat from '@/utils/dateFormat.js';
@@ -20,7 +20,7 @@ onMounted(() => {
   }
 });
 
-const onChangePage = (pageNo) => {
+const onChangePage = pageNo => {
   notice.loadNoticeRecipients(route.params.noticeId, pageNo);
 };
 </script>
@@ -53,15 +53,15 @@ const onChangePage = (pageNo) => {
           <thead class="text-xs bg-main font-noto_sans_m">
             <tr>
               <th
-                scope="col"
                 class="w-8/12 px-6 py-3 rounded-tl-md rounded-bl-md"
+                scope="col"
               >
                 이름
               </th>
-              <th scope="col" class="w-4/12 px-6 py-3">결과</th>
+              <th class="w-4/12 px-6 py-3" scope="col">결과</th>
               <th
-                scope="col"
                 class="w-4/12 px-6 py-3 rounded-tr-md rounded-br-md"
+                scope="col"
               >
                 날짜
               </th>
@@ -69,28 +69,28 @@ const onChangePage = (pageNo) => {
           </thead>
           <tbody>
             <tr
-              class="cursor-pointer hover:bg-main"
               v-for="(item, index) in notice.getRecipients().value"
               :key="index"
+              class="cursor-pointer hover:bg-main"
             >
               <th
-                scope="row"
                 class="w-8/12 px-6 py-4 rounded-tl-md rounded-bl-md"
+                scope="row"
               >
                 {{ item?.githubOwner }}
               </th>
               <th
-                scope="row"
-                class="w-8/12 px-6 py-4"
                 :class="
                   item?.isSuccess === true ? 'text-action' : 'text-danger'
                 "
+                class="w-8/12 px-6 py-4"
+                scope="row"
               >
                 {{ item?.isSuccess ? '성공' : '실패' }}
               </th>
               <th
-                scope="row"
                 class="w-4/12 px-6 py-4 rounded-tr-md rounded-br-md text-xs"
+                scope="row"
               >
                 {{ toYMD(item?.createdAt) }}
               </th>
@@ -99,10 +99,10 @@ const onChangePage = (pageNo) => {
         </table>
       </div>
       <SPagination
-        class="mt-10"
-        :total="notice.getRecipientsPagination().total"
         :page="notice.getRecipientsPagination().page"
         :size="notice.getRecipientsPagination().size"
+        :total="notice.getRecipientsPagination().total"
+        class="mt-10"
         @changePage="onChangePage"
       />
     </div>

@@ -17,7 +17,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
     {
       path: '/404',
       name: 'notFound',
-      component: () => import('@/views/common/VNotFound.vue')
+      component: () => import('@/views/exception/VNotFound.vue')
     },
     {
       path: '/:pathMatch(.*)*',
@@ -120,7 +120,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/user/mypage/Demo1MyPage.vue')
+          component: () => import('@/views/mypage/Demo1MyPage.vue')
 
           // todo: 아래 주석 풀어서 사용하시면 됩니다.
           // redirect: { name: 'demo1mypage' },
@@ -192,18 +192,18 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                 }
               },
               redirect: { name: 'usersInfo' },
-              component: () => import('@/views/user/info/LUserInfo.vue'),
+              component: () => import('@/views/user-info/LUserInfo.vue'),
               children: [
                 {
                   path: '',
                   name: 'usersInfo',
-                  component: () => import('@/views/user/info/VUsersInfo.vue')
+                  component: () => import('@/views/user-info/VUsersInfo.vue')
                 },
                 {
                   path: ':userId/notion-pages',
                   name: 'userNotionPages',
                   component: () =>
-                    import('@/views/user/info/VUserNotionPages.vue')
+                    import('@/views/user-info/VUserNotionPages.vue')
                 }
               ]
             }
@@ -220,7 +220,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               isActive: false
             }
           },
-          component: () => import('@/views/user/setting/VSetting.vue')
+          component: () => import('@/views/setting/VSetting.vue')
         }
       ]
     }
@@ -244,7 +244,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
     const auth = authStore.getAuth().value;
     return router
       .getRoutes()
-      .filter((route) => {
+      .filter(route => {
         const headerNavigation = route.meta?.headerNavigation;
 
         // 헤더 네비게이션만 가져오기
@@ -265,7 +265,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
 
         return true;
       })
-      .map((route) => {
+      .map(route => {
         return {
           name: route.name,
           title: route.meta.headerNavigation.title,
@@ -283,13 +283,13 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
     const subNavParent = matchedRoutes
       .slice()
       .reverse()
-      .find((r) => r.children?.some((child) => child.meta?.subNavigation));
+      .find(r => r.children?.some(child => child.meta?.subNavigation));
 
     if (!subNavParent) return [];
 
     return subNavParent.children
-      .filter((r) => r.meta?.subNavigation)
-      .map((r) => ({
+      .filter(r => r.meta?.subNavigation)
+      .map(r => ({
         name: r.name,
         title: r.meta.subNavigation.title,
         isActive: r.name === route.name,
@@ -299,17 +299,17 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
   }
 
   function onActiveSubNavigation(navigations, route) {
-    const currentMatchedNames = route.matched.map((r) => r.name);
+    const currentMatchedNames = route.matched.map(r => r.name);
 
-    navigations.value.forEach((nav) => {
+    navigations.value.forEach(nav => {
       nav.isActive = currentMatchedNames.includes(nav.name);
     });
   }
 
   function onActiveHeaderNavigation(navigations, route) {
-    const currentMatchedNames = route.matched.map((r) => r.name);
+    const currentMatchedNames = route.matched.map(r => r.name);
 
-    navigations.value.forEach((navi) => {
+    navigations.value.forEach(navi => {
       navi.isActive = currentMatchedNames.includes(navi.name);
     });
   }

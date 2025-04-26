@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { NoticeManager } from '@/manager/notice/NoticeManager.js';
-import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
+import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
 import SPagination from '@/shared/common/SPagination.vue';
 import { toYMD } from '../../utils/dateFormat.js';
 import SActionButton from '@/shared/buttons/SActionButton.vue';
@@ -14,11 +14,11 @@ onMounted(async () => {
   await notice.loadNotices();
 });
 
-const goToNoticeDetail = (id) => {
+const goToNoticeDetail = id => {
   notice.goToNotice(id);
 };
 
-const onChangePage = async (pageNo) => {
+const onChangePage = async pageNo => {
   await notice.loadNotices(pageNo);
 };
 </script>
@@ -28,8 +28,8 @@ const onChangePage = async (pageNo) => {
     <CSettingTitle :title="`공지사항 (${notice.getPagination().total})`" />
     <SActionButton
       v-if="auth.isAdmin()"
-      name="신규발행"
       class="flex justify-end py-3"
+      name="신규발행"
       @action="notice.goToPublishPage()"
     />
     <div class="relative overflow-x-auto rounded-md">
@@ -37,14 +37,14 @@ const onChangePage = async (pageNo) => {
         <thead class="text-xs bg-main font-noto_sans_m">
           <tr>
             <th
-              scope="col"
               class="w-8/12 sm:w-9/12 md:w-10/12 px-6 py-3 rounded-tl-md rounded-bl-md"
+              scope="col"
             >
               제목
             </th>
             <th
-              scope="col"
               class="w-4/12 sm:w-3/12 md:w-2/12 px-6 py-3 rounded-tr-md rounded-br-md"
+              scope="col"
             >
               날짜
             </th>
@@ -52,20 +52,20 @@ const onChangePage = async (pageNo) => {
         </thead>
         <tbody>
           <tr
-            class="cursor-pointer hover:bg-main"
             v-for="(item, index) in notice.getNotices().value"
             :key="index"
+            class="cursor-pointer hover:bg-main"
             @click="goToNoticeDetail(item.id)"
           >
             <th
-              scope="row"
               class="w-8/12 sm:w-9/12 md:w-10/12 px-6 py-4 rounded-tl-md rounded-bl-md"
+              scope="row"
             >
               {{ item?.title }}
             </th>
             <th
-              scope="row"
               class="w-4/12 sm:w-3/12 md:w-2/12 px-6 py-4 rounded-tr-md rounded-br-md text-xs"
+              scope="row"
             >
               {{ toYMD(item?.createdAt) }}
             </th>
@@ -74,10 +74,10 @@ const onChangePage = async (pageNo) => {
       </table>
     </div>
     <SPagination
-      class="mt-10"
-      :total="notice.getPagination().total"
       :page="notice.getPagination().page"
       :size="notice.getPagination().size"
+      :total="notice.getPagination().total"
+      class="mt-10"
       @changePage="onChangePage"
     />
   </div>

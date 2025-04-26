@@ -18,7 +18,7 @@ const getUserGuides = async () => {
   spinnerStore.on();
   const response = await userGuideManager.getUserGuides();
   const step = [10, 11, 12, 13, 14, 15, 16, 17];
-  userGuides.value = response.filter((guide) => step.includes(guide.step));
+  userGuides.value = response.filter(guide => step.includes(guide.step));
   spinnerStore.off();
 };
 
@@ -27,12 +27,12 @@ const confirmModalAction = reactive({
   hasActive: false
 });
 
-const showFullProfileImage = (image) => {
+const showFullProfileImage = image => {
   confirmModalAction.hasActive = true;
   confirmModalAction.message = image;
 };
 
-const toggleFullImage = (hasAction) => {
+const toggleFullImage = hasAction => {
   confirmModalAction.hasActive = hasAction;
 };
 </script>

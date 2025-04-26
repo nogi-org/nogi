@@ -2,21 +2,15 @@
 import SInformationHint from '@/shared/hints/SInformationHint.vue';
 import SConnectionStatus from '@/shared/common/SConnectionStatus.vue';
 import SActionButton from '@/shared/buttons/SActionButton.vue';
-import CSettingTitle from '@/views/user/setting/components/CSettingTitle.vue';
+import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
 import { inject, onMounted } from 'vue';
-import { NotionManager } from '@/manager/notion/NotionManager.js';
 
-const notion = new NotionManager();
 const auth = inject('authManager');
-const user = inject('userManager');
+const notion = inject('notionManager');
 
 onMounted(() => {
-  checkNotionConnected();
+  notion.getConnectedNotion();
 });
-
-const checkNotionConnected = () => {
-  user.getConnectedNotion();
-};
 </script>
 
 <template>
@@ -24,7 +18,7 @@ const checkNotionConnected = () => {
     <CSettingTitle title="Notion" />
     <div class="border border-main p-4">
       <div class="flex justify-between">
-        <SConnectionStatus :isConnected="user.notionConnected.value" />
+        <SConnectionStatus :isConnected="notion.connection.value" />
         <div class="flex gap-2">
           <SActionButton
             name="New연결"
@@ -32,13 +26,13 @@ const checkNotionConnected = () => {
           />
           <SActionButton
             name="연결 확인"
-            @action="notion.onDatabaseConnectionTest()"
+            @action="notion.getConnectedNotion()"
           />
         </div>
       </div>
       <SInformationHint
-        text="New연결 버튼으로 새로운 노션 Database를 생성할 수 있어요"
         class="mt-1"
+        text="New연결 버튼으로 새로운 노션 Database를 생성할 수 있어요"
       />
     </div>
   </div>
