@@ -6,7 +6,7 @@ import kr.co.nogibackend.global.response.service.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,7 +18,7 @@ public class NotionConnectionControllerV1 {
 
 	private final NotionConnectionService notionConnectionService;
 
-	@PostMapping("/connection-check")
+	@GetMapping("/connection-check")
 	public ResponseEntity<?> onConnectionTest(Auth auth) {
 		return Response.success(notionConnectionService.onConnectionCheck(auth.getUserId()));
 	}
