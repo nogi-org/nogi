@@ -1,5 +1,5 @@
 <script setup>
-import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
+import SMainTitle from '@/shared/title/SMainTitle.vue';
 import { inject } from 'vue';
 import SOnOffToggleButton from '@/shared/buttons/SOnOffToggleButton.vue';
 
@@ -9,7 +9,7 @@ const user = inject('userManager');
 <template>
   <div>
     <div>
-      <CSettingTitle title="Notice" />
+      <SMainTitle title="Notice" />
       <ul class="border border-main p-4">
         <li class="flex items-center justify-between gap-3">
           <span class="text-sm">

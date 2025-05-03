@@ -1,8 +1,8 @@
 <script setup>
-import SInformationHint from '@/shared/hints/SInformationHint.vue';
+import SSimpleTextCallout from '@/shared/callout/SSimpleTextCallout.vue';
 import SConnectionStatus from '@/shared/common/SConnectionStatus.vue';
 import SActionButton from '@/shared/buttons/SActionButton.vue';
-import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
+import SMainTitle from '@/shared/title/SMainTitle.vue';
 import { inject, onMounted } from 'vue';
 
 const auth = inject('authManager');
@@ -15,7 +15,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <CSettingTitle title="Notion" />
+    <SMainTitle title="Notion" />
     <div class="border border-main p-4">
       <div class="flex justify-between">
         <SConnectionStatus :isConnected="notion.connection.value" />
@@ -30,7 +30,7 @@ onMounted(() => {
           />
         </div>
       </div>
-      <SInformationHint
+      <SSimpleTextCallout
         class="mt-1"
         text="New연결 버튼으로 새로운 노션 Database를 생성할 수 있어요"
       />

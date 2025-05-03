@@ -3,7 +3,7 @@ import { onMounted } from 'vue';
 import { NoticeManager } from '@/manager/notice/NoticeManager.js';
 import { useRoute } from 'vue-router';
 import SPagination from '@/shared/common/SPagination.vue';
-import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
+import SMainTitle from '@/shared/title/SMainTitle.vue';
 import { AuthManager } from '@/manager/auth/AuthManager.js';
 import STextEditorContent from '@/shared/editor/STextEditorContent.vue';
 import * as dateFormat from '@/utils/dateFormat.js';
@@ -40,7 +40,7 @@ const onChangePage = pageNo => {
 
     <!--    todo: 컴포넌트로 빼기-->
     <div v-if="auth.isAdmin()">
-      <CSettingTitle
+      <SMainTitle
         :title="`공지 발행(${notice.getRecipientsPagination().total})`"
       />
       <div class="flex justify-end items-center">

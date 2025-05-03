@@ -1,13 +1,13 @@
 <script setup>
-import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
+import SMainTitle from '@/shared/title/SMainTitle.vue';
 import SConnectionStatus from '@/shared/common/SConnectionStatus.vue';
 import SActionButton from '@/shared/buttons/SActionButton.vue';
-import CSettingSubTitle from '@/views/setting/components/CSettingSubTitle.vue';
-import SInformationHint from '@/shared/hints/SInformationHint.vue';
+import SSubTitle from '@/shared/title/SSubTitle.vue';
+import SSimpleTextCallout from '@/shared/callout/SSimpleTextCallout.vue';
 import { inject, onMounted, ref, watch } from 'vue';
 import SSimpleTextInput from '@/shared/input/SSimpleTextInput.vue';
 import SSpinnerInner from '@/shared/spinner/SSpinnerInner.vue';
-import SWarningHint from '@/shared/hints/SWarningHint.vue';
+import SWarningCallout from '@/shared/callout/SWarningCallout.vue';
 
 const user = inject('userManager');
 const github = inject('githubManager');
@@ -64,7 +64,7 @@ const saveEmail = async () => {
 
 <template>
   <div>
-    <CSettingTitle title="Github" />
+    <SMainTitle title="Github" />
     <ul class="border border-main p-4">
       <!--      connected -->
       <li class="flex justify-between border-b border-main pb-4 items-center">
@@ -72,7 +72,7 @@ const saveEmail = async () => {
           <SConnectionStatus
             :isConnected="github.connection.value?.isGithubValid"
           />
-          <SWarningHint
+          <SWarningCallout
             v-if="github.connection.value?.isGithubValid === false"
             class="mt-1 text-danger"
             text="Github정보와 아래정보가 동일한지 확인해주세요."
@@ -83,7 +83,7 @@ const saveEmail = async () => {
 
       <!--          repository -->
       <li class="border-b border-main py-4">
-        <CSettingSubTitle title="Repository name" />
+        <SSubTitle title="Repository name" />
         <div class="sm:flex sm:justify-between sm:items-center sm:mb-4">
           <SSimpleTextInput
             v-model="githubFrom.repositoryName"
@@ -102,12 +102,12 @@ const saveEmail = async () => {
         </div>
 
         <div class="mt-8 flex items-center gap-2">
-          <CSettingSubTitle title="Github Public Repository" />
+          <SSubTitle title="Github Public Repository" />
           <span class="text-xs font-noto_sans_m">
             {{ github.connection.value?.githubRepositories?.length }}
           </span>
         </div>
-        <SInformationHint
+        <SSimpleTextCallout
           class="mb-2"
           text="기존 Git Repository를 NOGI와 연결할 수 있어요"
         />
@@ -144,7 +144,7 @@ const saveEmail = async () => {
 
       <!--          owner -->
       <li class="border-b border-main py-4">
-        <CSettingSubTitle title="Owner" />
+        <SSubTitle title="Owner" />
         <div class="sm:flex sm:justify-between sm:items-center">
           <SSimpleTextInput
             v-model="githubFrom.owner"
@@ -165,7 +165,7 @@ const saveEmail = async () => {
 
       <!--          email -->
       <li class="py-4">
-        <CSettingSubTitle title="Email" />
+        <SSubTitle title="Email" />
         <div class="sm:flex sm:justify-between sm:items-center">
           <SSimpleTextInput
             v-model="githubFrom.email"

@@ -2,7 +2,7 @@
 defineProps({
   title: {
     type: String,
-    default: 'Setting Title'
+    default: 'Main Title'
   }
 });
 </script>

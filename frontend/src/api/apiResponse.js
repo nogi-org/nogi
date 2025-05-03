@@ -23,8 +23,19 @@ export const code = Object.freeze({
   EXTERNAL_2: 'EXTERNAL-2',
   EXTERNAL_3: 'EXTERNAL-3',
   // notion
+  NOTION_3: 'NOTION-3',
   NOTION_4: 'NOTION-4'
 });
+
+export const handleNotionPage = response => {
+  switch (response.code) {
+    case code.NOTION_3:
+      response.message =
+        '노션페이지를 가져올 수 없어요. 노션 정보를 확인해주세요.';
+      break;
+  }
+  return response;
+};
 
 export const handleLogout = response => {
   switch (response.code) {

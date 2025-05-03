@@ -167,7 +167,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
             }
           },
           component: () => import('@/views/layout/LSubFrame.vue'),
-          redirect: { name: 'newGuide' },
+          redirect: { name: 'userInfo' },
           children: [
             {
               path: 'guide/new',
@@ -186,7 +186,7 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
               name: 'userInfo',
               meta: {
                 subNavigation: {
-                  title: '유저정보',
+                  title: '유저 관리',
                   order: 1,
                   isActive: false
                 }
@@ -200,10 +200,22 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                   component: () => import('@/views/user-info/VUsersInfo.vue')
                 },
                 {
+                  path: ':userId/notion-database',
+                  name: 'userNotionDatabase',
+                  component: () =>
+                    import('@/views/user-info/VUserNotionDatabase.vue')
+                },
+                {
                   path: ':userId/notion-pages',
                   name: 'userNotionPages',
                   component: () =>
                     import('@/views/user-info/VUserNotionPages.vue')
+                },
+                {
+                  path: ':userId/notion-page/:pageId',
+                  name: 'userNotionPage',
+                  component: () =>
+                    import('@/views/user-info/VUserNotionPage.vue')
                 }
               ]
             }

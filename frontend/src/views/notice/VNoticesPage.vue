@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { NoticeManager } from '@/manager/notice/NoticeManager.js';
-import CSettingTitle from '@/views/setting/components/CSettingTitle.vue';
+import SMainTitle from '@/shared/title/SMainTitle.vue';
 import SPagination from '@/shared/common/SPagination.vue';
 import { toYMD } from '../../utils/dateFormat.js';
 import SActionButton from '@/shared/buttons/SActionButton.vue';
@@ -25,7 +25,7 @@ const onChangePage = async pageNo => {
 
 <template>
   <div>
-    <CSettingTitle :title="`공지사항 (${notice.getPagination().total})`" />
+    <SMainTitle :title="`공지사항 (${notice.getPagination().total})`" />
     <SActionButton
       v-if="auth.isAdmin()"
       class="flex justify-end py-3"
