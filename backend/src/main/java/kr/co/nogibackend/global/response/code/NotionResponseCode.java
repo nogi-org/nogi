@@ -30,7 +30,10 @@ public enum NotionResponseCode implements ResponseCode {
 			(HttpStatus.INTERNAL_SERVER_ERROR, "NOTION-6", "Notion Block을 마크다운 전처리 과정에서 실패"),
 
 	F_PROCESS_MARKDOWN
-			(HttpStatus.INTERNAL_SERVER_ERROR, "NOTION-7", "Notion Block을 마크다운 변환 과정에서 실패");
+			(HttpStatus.INTERNAL_SERVER_ERROR, "NOTION-7", "Notion Block을 마크다운 변환 과정에서 실패"),
+
+	F_PROPERTY_PARSING
+			(HttpStatus.INTERNAL_SERVER_ERROR, "NOTION-8", "Property 속성 파싱 실패");
 
 	public final HttpStatus status;
 	public final String code;

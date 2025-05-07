@@ -110,6 +110,10 @@ public class User extends BaseEntity {
 		return this.notionDatabaseId != null;
 	}
 
+	public boolean hasNotionPageId() {
+		return this.notionPageId != null;
+	}
+
 	public void updateNotionPageId(String pageId) {
 		this.notionPageId = pageId;
 	}

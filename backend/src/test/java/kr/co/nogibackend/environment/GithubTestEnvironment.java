@@ -1,7 +1,7 @@
 package kr.co.nogibackend.environment;
 
 import kr.co.nogibackend.domain.github.command.GithubRepoCommand;
-import kr.co.nogibackend.infra.github.GithubClient;
+import kr.co.nogibackend.infra.github.client.GithubFeignClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +27,7 @@ public class GithubTestEnvironment {
 	@Value("${github.test-user.repo}")
 	protected String testUserRepo;
 	@Autowired
-	protected GithubClient githubClient;
+	protected GithubFeignClient githubClient;
 
 	@BeforeEach
 	public void createUsers() {

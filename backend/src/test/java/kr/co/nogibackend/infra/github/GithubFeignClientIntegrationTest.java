@@ -9,6 +9,7 @@ import kr.co.nogibackend.domain.github.result.GithubRepoResult;
 import kr.co.nogibackend.domain.github.result.GithubUserDetailResult;
 import kr.co.nogibackend.domain.github.result.GithubUserEmailResult;
 import kr.co.nogibackend.environment.GithubTestEnvironment;
+import kr.co.nogibackend.infra.github.client.GithubFeignClient;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 class GithubFeignClientIntegrationTest extends GithubTestEnvironment {
 
 	@Autowired
-	private kr.co.nogibackend.infra.github.GithubClient githubClient;
+	private GithubFeignClient githubClient;
 
 	@Test
 	@DisplayName("저장소의 협력자에 nogi-bot을 추가하고 nogi-bot이 owner에게 이슈를 생성한다.")

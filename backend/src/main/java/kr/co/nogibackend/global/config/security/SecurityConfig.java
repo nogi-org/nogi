@@ -37,27 +37,26 @@ public class SecurityConfig {
 		// ADMIN 권한 설정
 		Map<HttpMethod, List<String>> ADMIN_URL =
 				Map.ofEntries(
-						Map.entry(HttpMethod.GET,
-								List.of("/admin/**", "/notice/{noticeId}/recipients", "/notion/{userId}/pages",
-										"/notion/{userId}/{pageId}/page")),
-						Map.entry(HttpMethod.POST, List.of("/guides", "/notice/publish", "/notice/re-publish")),
-						Map.entry(HttpMethod.PUT, List.of("/guides", "/admin/**")),
-						Map.entry(HttpMethod.DELETE, List.of("/guides"))
+						Map.entry(HttpMethod.GET, List.of("/v1/admin/**")),
+						Map.entry(HttpMethod.POST, List.of("/v1/admin/**")),
+						Map.entry(HttpMethod.PUT, List.of("/v1/admin/**")),
+						Map.entry(HttpMethod.DELETE, List.of("/v1/admin/**"))
 				);
 
 		// USER 권한 설정
 		Map<HttpMethod, List<String>> USER_URL =
 				Map.ofEntries(
-						Map.entry(HttpMethod.GET,
-								List.of(
-										"/users",
-										"/users/validate-repository-name",
-										"/notion/auth-url",
-										"/users/github/validate"
-								)
-						),
-						Map.entry(HttpMethod.PATCH, List.of("/users")),
-						Map.entry(HttpMethod.POST, List.of("/users/manual-nogi", "/notion/connection-test"))
+						Map.entry(HttpMethod.GET, List.of(
+								"/v1/github/validate"
+								, "/v1/notion/connection-check"
+								, "/v1/users/me"
+						)),
+						Map.entry(HttpMethod.PATCH, List.of(
+								"/v1/users/me"
+						)),
+						Map.entry(HttpMethod.POST, List.of(
+								"/v1/sync/manual"
+						))
 				);
 
 		ROLE_PERMISSIONS.put(User.Role.ADMIN.name(), ADMIN_URL);

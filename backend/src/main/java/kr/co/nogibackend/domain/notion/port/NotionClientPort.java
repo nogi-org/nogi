@@ -33,4 +33,6 @@ public interface NotionClientPort {
 	NotionBaseResult<NotionPageResult> createPage
 			(String basicToken, NotionCreateNoticeCommand request);
 
+	NotionDatabaseResult patchDatabase
+			(String botToken, String databaseId, Map<String, Object> request);
 }

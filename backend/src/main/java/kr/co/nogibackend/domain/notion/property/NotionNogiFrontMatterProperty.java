@@ -7,22 +7,23 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NotionNogiTitleProperty extends NotionNogiCommonProperty {
+public class NotionNogiFrontMatterProperty extends NotionNogiCommonProperty {
 
-  private List<NotionRichTextContent> title;
+	private List<NotionRichTextContent> rich_text;
 
-  public static NotionNogiTitleProperty of(List<String> titles) {
-
-    List<NotionRichTextContent> richTexts =
-        titles
-            .stream()
-            .map(NotionRichTextContent::buildText)
-            .toList();
-
-    NotionNogiTitleProperty notionNogiTitleProperty = new NotionNogiTitleProperty();
-    notionNogiTitleProperty.setTitle(richTexts);
-
-    return notionNogiTitleProperty;
-  }
+	// todo: 필요없으면 삭제
+//	public static NotionNogiFrontMatterProperty of(List<String> titles) {
+//
+//		List<NotionRichTextContent> richTexts =
+//				titles
+//						.stream()
+//						.map(NotionRichTextContent::buildText)
+//						.toList();
+//
+//		NotionNogiFrontMatterProperty notionNogiTitleProperty = new NotionNogiFrontMatterProperty();
+//		notionNogiTitleProperty.setTitle(richTexts);
+//
+//		return notionNogiTitleProperty;
+//	}
 
 }

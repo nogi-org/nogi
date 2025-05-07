@@ -11,6 +11,6 @@ import lombok.ToString;
 @ToString
 public class NotionNogiCommitMessageProperty extends NotionNogiCommonProperty {
 
-  private List<NotionRichTextContent> rich_text;
+	private List<NotionRichTextContent> rich_text;
 
 }

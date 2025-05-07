@@ -1,13 +1,15 @@
 package kr.co.nogibackend.domain.notion.property;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
-
-/*
-  Package Name : kr.co.nogibackend.domain.notion.property 
-  File Name    : NotionMultiSelectOptionsProperty 
-  Author       : superpil 
-  Created Date : 25. 5. 3. 
-  Description  : 
- */
+@Getter
+@Setter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionMultiSelectOptionsProperty {
+
+	List<NotionStatusProperty> options;
+
 }

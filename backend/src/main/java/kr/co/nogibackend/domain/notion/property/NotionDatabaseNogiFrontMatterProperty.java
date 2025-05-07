@@ -5,8 +5,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class NotionDatabaseNogiStatusProperty extends NotionNogiCommonProperty {
+public class NotionDatabaseNogiFrontMatterProperty extends NotionNogiCommonProperty {
 
-	private NotionStatusOptionsProperty select;
+	private Object rich_text;
 
 }

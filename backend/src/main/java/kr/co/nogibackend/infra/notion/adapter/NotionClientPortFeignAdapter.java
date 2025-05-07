@@ -116,6 +116,7 @@ public class NotionClientPortFeignAdapter implements NotionClientPort {
 			return
 					notionFeignClient.getDatabase(BotToken, databaseId).getBody();
 		} catch (Exception error) {
+			log.error("Notion Get Database API Fail Message : {}", error.getMessage());
 			throw new GlobalException(F_GET_NOTION_DATABASE);
 		}
 	}
@@ -134,6 +135,15 @@ public class NotionClientPortFeignAdapter implements NotionClientPort {
 			NotionCreateNoticeCommand request
 	) {
 		return notionFeignClient.createPage(basicToken, request).getBody();
+	}
+
+	@Override
+	public NotionDatabaseResult patchDatabase(
+			String botToken
+			, String databaseId
+			, Map<String, Object> request
+	) {
+		return notionFeignClient.patchDatabase(botToken, databaseId, request).getBody();
 	}
 
 }

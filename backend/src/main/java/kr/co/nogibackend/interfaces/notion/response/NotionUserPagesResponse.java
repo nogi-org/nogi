@@ -1,8 +1,8 @@
 package kr.co.nogibackend.interfaces.notion.response;
 
 import static kr.co.nogibackend.domain.notion.content.NotionRichTextContent.sumRichTexts;
+import static kr.co.nogibackend.global.util.DateUtils.convertKoreaDateTimeFromUTC;
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -35,8 +35,8 @@ public record NotionUserPagesResponse(
 	public record NotionUserPagePropertyResponse(
 			String object,
 			String id,
-			LocalDateTime createdTime,
-			LocalDateTime lastEditedTime,
+			String createdTime,
+			String lastEditedTime,
 			boolean inTrash,
 			List<String> categories,
 			String commitDate,
@@ -97,8 +97,8 @@ public record NotionUserPagesResponse(
 										new NotionUserPagePropertyResponse(
 												notionPageInfo.getObject()
 												, notionPageInfo.getId()
-												, notionPageInfo.getCreated_time()
-												, notionPageInfo.getLast_edited_time()
+												, convertKoreaDateTimeFromUTC(notionPageInfo.getCreated_time())
+												, convertKoreaDateTimeFromUTC(notionPageInfo.getLast_edited_time())
 												, notionPageInfo.isIn_trash()
 												, categories
 												, commitDate

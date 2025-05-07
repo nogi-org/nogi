@@ -1,13 +1,10 @@
 package kr.co.nogibackend.interfaces.notion.response;
 
+import java.util.List;
 
+public record NotionDatabasePropertyCreateResponse(
+		List<Long> successIds,
+		List<Long> failIds
+) {
 
-/*
-  Package Name : kr.co.nogibackend.interfaces.notion.response 
-  File Name    : NotionDatabasePropertyCreateResponse 
-  Author       : superpil 
-  Created Date : 25. 5. 6. 
-  Description  : 
- */
-public record NotionDatabasePropertyCreateResponse() {
 }

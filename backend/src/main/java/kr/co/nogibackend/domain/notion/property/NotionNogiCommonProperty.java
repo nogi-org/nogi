@@ -15,7 +15,8 @@ https://developers.notion.com/reference/property-object#date
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class NotionNogiCommonProperty {
 
-  private String id;
-  private String type;
+	private String id;
+	private String type;
+	private String name;
 
 }

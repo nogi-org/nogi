@@ -1,61 +1,49 @@
-package kr.co.nogibackend.domain.notice;
+package kr.co.nogibackend.domain.notion;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.nogibackend.domain.notice.service.NoticeReadService;
+import java.util.Map;
+import kr.co.nogibackend.domain.notion.service.NotionDatabaseService;
 import kr.co.nogibackend.domain.notion.service.NotionPageService;
-import kr.co.nogibackend.interfaces.notice.request.NoticeRecipientsRequest;
-import kr.co.nogibackend.interfaces.notice.response.NoticeRecipientsResponse;
-import kr.co.nogibackend.interfaces.notice.response.NoticesResponse;
-import kr.co.nogibackend.interfaces.notion.response.NotionUserPagesResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("dev")
-public class NoticeDemoTest {
+public class NotionDemoTest {
 
 	@Autowired
-	private NoticeReadService noticeReadService;
-	@Autowired
 	private NotionPageService notionPageService;
+	@Autowired
+	private NotionDatabaseService notionDatabaseService;
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Test
-	@DisplayName("데모4")
-	void test4() throws JsonProcessingException {
-		String page = notionPageService.getPage(29L, "1d8a9cc8-1056-811f-b46c-e16cc083e7eb");
-		System.out.println("pages = " + page);
-	}
-
-	@Test
-	@DisplayName("데모3")
-	void test3() throws JsonProcessingException {
-		NotionUserPagesResponse pages = notionPageService.getPages(29L, null);
-		System.out.println("pages = " + objectMapper.writeValueAsString(pages));
-	}
-
-	@Test
 	@DisplayName("데모2")
-	void test2() {
-		PageRequest pageRequest = PageRequest.of(0, 10);
-		Page<NoticesResponse> page = noticeReadService.getNotices(pageRequest);
-		System.out.println("page content = " + page.getContent());
+	void test2() throws JsonProcessingException {
+		String property = "{\n"
+				+ "  \"properties\": {\n"
+				+ "    \"nogiFM\": {\n"
+				+ "      \"rich_text\": {}\n"
+				+ "    }\n"
+				+ "  }\n"
+				+ "}";
+		Map<String, Object> result = objectMapper.readValue(property,
+				new TypeReference<Map<String, Object>>() {
+				});
+		System.out.println("result  ===>> " + result);
+		// System.out.println("결과!! -> " + notionDatabaseService.createProperty(result));
 	}
 
 	@Test
 	@DisplayName("데모1")
-	void test1() {
-		PageRequest pageRequest = PageRequest.of(0, 10);
-		Page<NoticeRecipientsResponse> recipients =
-				noticeReadService.getRecipients(7L, new NoticeRecipientsRequest(false), pageRequest);
-		System.out.println("recipients = " + recipients.getContent().size());
+	void test1() throws JsonProcessingException {
+		System.out.println("result = " + notionDatabaseService.getDatabase(29L));
 	}
 
 }

@@ -11,9 +11,7 @@ import kr.co.nogibackend.global.config.openfeign.NotionFeignClientConfig;
 import kr.co.nogibackend.interfaces.notion.request.NotionGetAccessTokenRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,14 +21,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "NotionClient", url = "https://api.notion.com/v1", configuration = NotionFeignClientConfig.class)
 public interface NotionFeignClient {
 
-	@PostMapping("/databases/{databaseId}/query")
+	@RequestMapping(method = RequestMethod.POST, value = "/databases/{databaseId}/query")
 	ResponseEntity<NotionBaseResult<NotionPageResult>> getPagesFromDatabase(
 			@RequestHeader("Authorization") String token,
 			@PathVariable(value = "databaseId") String databaseId,
 			Map<String, Object> request
 	);
 
-	@GetMapping("/blocks/{parentBlockId}/children?page_size=100")
+	@RequestMapping(method = RequestMethod.GET, value = "/blocks/{parentBlockId}/children?page_size=100")
 	ResponseEntity<NotionBaseResult<NotionBlockResult>> getBlocksFromParent(
 			@RequestHeader("Authorization") String token,
 			@PathVariable(value = "parentBlockId") String parentBlockId,
@@ -60,6 +58,13 @@ public interface NotionFeignClient {
 	ResponseEntity<NotionBaseResult<NotionPageResult>> createPage(
 			@RequestHeader("Authorization") String token,
 			@RequestBody NotionCreateNoticeCommand request
+	);
+
+	@RequestMapping(method = RequestMethod.PATCH, value = "/databases/{databaseId}")
+	ResponseEntity<NotionDatabaseResult> patchDatabase(
+			@RequestHeader("Authorization") String token,
+			@PathVariable(value = "databaseId") String databaseId,
+			@RequestBody Map<String, Object> request
 	);
 
 }
