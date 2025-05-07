@@ -31,3 +31,14 @@ export const getNotionDatabaseAdminApi = userId => {
     .then(success => success.result)
     .catch(error => handleNotionPage(error));
 };
+
+export const createDatabaseProperty = payload => {
+  return api
+    .post(`/v1/admin/notion/database/property`, payload, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(success => success.result)
+    .catch(error => handleNotionPage(error));
+};

@@ -121,36 +121,6 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
             }
           },
           component: () => import('@/views/mypage/Demo1MyPage.vue')
-
-          // todo: 아래 주석 풀어서 사용하시면 됩니다.
-          // redirect: { name: 'demo1mypage' },
-          // component: () => import('@/views/layout/LSubFrame.vue')
-          // children: [
-          //   {
-          //     path: '/my-page/demo1',
-          //     name: 'demo1mypage',
-          //     meta: {
-          //       subNavigation: {
-          //         title: '다음버전',
-          //         order: 2,
-          //         isActive: false
-          //       }
-          //     },
-          //     component: () => import('@/views/user/mypage/Demo1MyPage.vue')
-          //   },
-          //   {
-          //     path: '/my-page/demo2',
-          //     name: 'demo2mypage',
-          //     meta: {
-          //       subNavigation: {
-          //         title: '기대해주세요 ✨ ',
-          //         order: 2,
-          //         isActive: false
-          //       }
-          //     },
-          //     component: () => import('@/views/user/mypage/Demo2MyPage.vue')
-          //   }
-          // ]
         },
 
         // admin
@@ -216,6 +186,12 @@ export const useNavigationStore = defineStore('useNavigationStore', () => {
                   name: 'userNotionPage',
                   component: () =>
                     import('@/views/user-info/VUserNotionPage.vue')
+                },
+                {
+                  path: 'notion-database-property',
+                  name: 'notionDatabasePropertyPage',
+                  component: () =>
+                    import('@/views/user-info/VNotionDatabaseProperty.vue')
                 }
               ]
             }

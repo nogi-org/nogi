@@ -7,7 +7,6 @@ import SActionButton from '@/shared/buttons/SActionButton.vue';
 import router from '@/router/router.js';
 
 const user = new UserManager();
-const notion = new NotionManager();
 onMounted(async () => {
   await user.getUsers();
 });
@@ -19,24 +18,27 @@ const goToNotionDatabase = user => {
 const goToNotionPages = user => {
   router.push({ name: 'userNotionPages', params: { userId: user.id } });
 };
+
+const goToNotionDatabasePropertyPage = () => {
+  router.push({ name: 'notionDatabasePropertyPage' });
+};
 </script>
 
 <template>
   <div>
     <SMainTitle title="Action" />
     <div class="border border-main p-4 mb-10 flex gap-3">
-      <button
-        class="bg-action px-3 py-1 rounded-md"
-        @click="notion.updateNotionPageId()"
-      >
-        Notion Page ID 업데이트
-      </button>
-      <button
-        class="bg-action px-3 py-1 rounded-md"
-        @click="notion.updateNotionPageId()"
-      >
-        Notion Page 속성 추가(개발 필요)
-      </button>
+      <!--      todo: 동작 안함. 체크 해보기 -->
+      <!--      <button-->
+      <!--        class="bg-action px-3 py-1 rounded-md"-->
+      <!--        @click="notion.updateNotionPageId()"-->
+      <!--      >-->
+      <!--        Notion Page ID 업데이트-->
+      <!--      </button>-->
+      <SActionButton
+        name="Notion Database Property 추가"
+        @action="goToNotionDatabasePropertyPage"
+      />
     </div>
 
     <SMainTitle :title="`User (${user.users.value.length})`" />

@@ -1,6 +1,7 @@
 import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
 import {
+  createDatabaseProperty,
   getConnectedNotionApi,
   getNotionDatabaseAdminApi,
   getNotionDetailPageAdminApi,
@@ -39,6 +40,20 @@ export class NotionManager {
 
   get prevCursors() {
     return this.#prevCursors;
+  }
+
+  setRichTextProperty(value) {
+    const key = value ? value : '값을 입력해주세요.';
+    const property = `{"properties":{"${key}":{"rich_text":{}}}}`;
+    return JSON.parse(property);
+  }
+
+  async createRichTextProperty(value) {
+    const payload = JSON.stringify(value);
+    this.#spinner.on();
+    const response = await createDatabaseProperty(payload);
+    this.#spinner.off();
+    this.#notifyModal.onActive({ message: response });
   }
 
   async getConnectedNotion() {
