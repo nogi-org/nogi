@@ -1,18 +1,20 @@
 import { ref } from 'vue';
-import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import {
   getNoticeApi,
-  getNoticeRecipientsApi,
+  getNoticeRecipientsAdminApi,
   getNoticesApi,
-  noticePublishApi
+  noticePublishAdminApi
 } from '@/api/notice/notice.js';
 import { useRouter } from 'vue-router';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
 
 export class NoticeManager {
-  #spinnerStore = useSpinnerStore();
-  #notifyStore = useNotifyStore();
+  // 스토어
+  #spinner = useSpinnerStore();
+  #notifyModal = useNotifyStore();
 
+  // 변수
   #newNotice = ref({
     title: '',
     content: '',
@@ -34,7 +36,7 @@ export class NoticeManager {
   #router = useRouter();
 
   async loadNotices(page) {
-    this.#spinnerStore.on();
+    this.#spinner.on();
 
     this.#pagination.page = page;
     const response = await getNoticesApi({
@@ -44,19 +46,19 @@ export class NoticeManager {
     this.#notices.value = response.content;
     this.#pagination.total = response.totalElements;
 
-    this.#spinnerStore.off();
+    this.#spinner.off();
   }
 
   async loadNotice(noticeId) {
-    this.#spinnerStore.on();
+    this.#spinner.on();
     this.#notice.value = await getNoticeApi(noticeId);
-    this.#spinnerStore.off();
+    this.#spinner.off();
   }
 
   async loadNoticeRecipients(noticeId, page) {
     // todo: 권한체크 후 어드민 경우만 조회
     this.#recipientsPagination.page = page;
-    const response = await getNoticeRecipientsApi(noticeId, {
+    const response = await getNoticeRecipientsAdminApi(noticeId, {
       size: this.#recipientsPagination.size,
       page: this.#recipientsPagination.page
     });
@@ -82,13 +84,13 @@ export class NoticeManager {
   }
 
   async publish() {
-    this.#spinnerStore.on();
-    const response = await noticePublishApi({
+    this.#spinner.on();
+    const response = await noticePublishAdminApi({
       ...this.#newNotice.value,
       content: this.#newNotice.value.content.html
     });
-    this.#notifyStore.onActive({ message: response.message });
-    this.#spinnerStore.off();
+    this.#notifyModal.onActive({ message: response.message });
+    this.#spinner.off();
     await this.#router.push({ name: 'noticesPage' });
   }
 

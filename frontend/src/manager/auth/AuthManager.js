@@ -1,28 +1,30 @@
 import {
-  apiLogout,
-  getGithubLoginURL,
-  getNotionLoginURL
+  apiLogoutApi,
+  getGithubLoginURLApi,
+  getNotionLoginURLApi
 } from '@/api/auth/auth.js';
-import { useAuthStore } from '@/stores/authStore.js';
 import { useRouter } from 'vue-router';
-import { useSpinnerStore } from '@/stores/spinnerStore.js';
 import { useNotifyStore } from '@/stores/notifyStore.js';
-import { ApiResponse } from '@/api/apiResponse.js';
+import { code } from '@/api/apiResponse.js';
+import { useAuthStore } from '@/stores/authStore.js';
+import { useSpinnerStore } from '@/stores/spinnerStore.js';
 
 export class AuthManager {
+  // 스토어
+  #notifyModal = useNotifyStore();
+  #auth = useAuthStore();
+  #spinner = useSpinnerStore();
+
+  // 변수
   #router = useRouter();
   #routerName = {
     setting: 'settingPage',
     home: 'home'
   };
-  #apiResponseModalStore = useNotifyStore();
-  #authStore = useAuthStore();
-  #spinnerStore = useSpinnerStore();
   #LOGIN_TYPE = {
     GITHUB: 'GITHUB',
     NOTION: 'NOTION'
   };
-
   // [노션 로그인] 또는 [노션 새로연결] case 를 판단하기 위한 플래그값
   #NOTION_AUTH_EVENT = {
     LOGIN: 'login',
@@ -46,7 +48,7 @@ export class AuthManager {
   -> 로그인 -> 서버에서 AuthorizeRedirect 페이지로 리다이렉트 -> 로그인 후 작업처리(프론트)
    */
   async toGithubLoginPage() {
-    const response = await getGithubLoginURL();
+    const response = await getGithubLoginURLApi();
     window.location.href = response.result;
   }
 
@@ -55,7 +57,7 @@ export class AuthManager {
     if (!isRequireNotionInfo) {
       return;
     }
-    const response = await getNotionLoginURL({
+    const response = await getNotionLoginURLApi({
       event: this.#NOTION_AUTH_EVENT.LOGIN
     });
     window.location.href = response.result;
@@ -63,7 +65,7 @@ export class AuthManager {
 
   // 새로운 노션 데이터베이스 생성 페이지로 이동
   async toNotionPageForCreateNewDatabase() {
-    const response = await getNotionLoginURL({
+    const response = await getNotionLoginURLApi({
       event: this.#NOTION_AUTH_EVENT.NEW
     });
     window.location.href = response.result;
@@ -82,7 +84,7 @@ export class AuthManager {
   async processNewNotionDatabaseEvent(isSuccess, message) {
     // 성공, 실패 상관없이 setting 페이지로
     await this.#router.push({ name: 'settingPage' });
-    this.#apiResponseModalStore.onActive({
+    this.#notifyModal.onActive({
       isSuccess: isSuccess,
       message: isSuccess ? '새로운 Notion Database를 연결 완료했어요.' : message
     });
@@ -95,7 +97,7 @@ export class AuthManager {
         ? this.#routerName.home
         : this.#routerName.setting;
     await this.#router.push({ name: routerName });
-    this.#apiResponseModalStore.fail({ message: message });
+    this.#notifyModal.fail({ message: message });
   }
 
   // 깃헙, 노션 리다이렉트 경우 url 파라미터로 정보 추출
@@ -113,17 +115,17 @@ export class AuthManager {
     if (!userId || !role) {
       return;
     }
-    this.#authStore.setAuth({ requireUserInfo, userId, role });
+    this.#auth.setAuth({ requireUserInfo, userId, role });
   }
 
   // 접속 정보 조회
   getAuthInfo() {
-    return this.#authStore.getAuth();
+    return this.#auth.getAuth();
   }
 
   // 접속 정보 삭제
   deleteAuthInfo() {
-    this.#authStore.deleteAuth();
+    this.#auth.deleteAuth();
   }
 
   // 로그인 완료 후 페이지로 이동(노션 로그인 완료 후 최종 페이지로 이동)
@@ -132,7 +134,7 @@ export class AuthManager {
       return;
     }
 
-    const auth = this.#authStore.getAuth().value;
+    const auth = this.#auth.getAuth().value;
     const routeName = auth.isRequireInfo
       ? this.#routerName.setting
       : this.#routerName.home;
@@ -142,22 +144,22 @@ export class AuthManager {
 
   // 로그아웃
   async onLogout() {
-    this.#spinnerStore.on();
-    const response = await apiLogout();
+    this.#spinner.on();
+    const response = await apiLogoutApi();
     this.deleteAuthInfo();
-    this.#spinnerStore.off();
+    this.#spinner.off();
     await this.#router.push({ name: 'home' });
-    this.#apiResponseModalStore.onActive(response);
+    this.#notifyModal.onActive(response);
     return response;
   }
 
   isAdmin() {
-    const auth = this.#authStore.getAuth().value;
+    const auth = this.#auth.getAuth().value;
     return auth !== null && auth.role === AuthManager.ROLE.ADMIN;
   }
 
   isUser() {
-    const auth = this.#authStore.getAuth().value;
+    const auth = this.#auth.getAuth().value;
     return auth !== null && auth.role === AuthManager.ROLE.USER;
   }
 
@@ -166,8 +168,8 @@ export class AuthManager {
       ? '환영합니다!👏\n원활한 서비스 이용을 위해 GitHub Repository 정보를 입력해주세요.'
       : '환영합니다!💫\nNOGI의 멋진 기능들을 마음껏 즐겨보세요!';
 
-    this.#apiResponseModalStore.success({
-      code: ApiResponse.S_0,
+    this.#notifyModal.success({
+      code: code.S_0,
       message: message
     });
   }

@@ -1,5 +1,5 @@
 import {
-  ApiResponse,
+  code,
   convertResponseFormat,
   handleCommonError
 } from '@/api/apiResponse.js';
@@ -11,10 +11,10 @@ import { useSpinnerStore } from '@/stores/spinnerStore.js';
 export function setInterceptors(instance) {
   //요청 인터셉터
   instance.interceptors.request.use(
-    (config) => {
+    config => {
       return config;
     },
-    (error) => {
+    error => {
       //요청 에러 시 수행 로직
       return Promise.reject(error);
     }
@@ -22,10 +22,10 @@ export function setInterceptors(instance) {
 
   //응답 인터셉터
   instance.interceptors.response.use(
-    (response) => {
+    response => {
       return convertResponseFormat(response.data);
     },
-    (error) => {
+    error => {
       const response = convertResponseFormat(error.response.data);
       handleInterceptorCommonError(response);
       return Promise.reject(response);
@@ -45,13 +45,13 @@ async function handleInterceptorCommonError(response) {
   const spinnerStore = useSpinnerStore();
 
   switch (response.code) {
-    case ApiResponse.USER_2: // 401
+    case code.USER_2: // 401
       useAuthStore().deleteAuth();
       await router.push({ name: 'home' });
       notifyStore.onActive(response);
       spinnerStore.off();
       break;
-    case ApiResponse.USER_3: // 403
+    case code.USER_3: // 403
       await router.push({ name: 'home' });
       notifyStore.onActive(response);
       spinnerStore.off();

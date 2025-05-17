@@ -2,16 +2,18 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 export const useSpinnerStore = defineStore('useSpinnerStore', () => {
-  const hasOn = ref(false);
+  const requestCount = ref(0);
 
-  const getStatus = computed(() => hasOn.value);
+  const getStatus = computed(() => requestCount.value > 0);
 
   function on() {
-    hasOn.value = true;
+    requestCount.value += 1;
   }
 
   function off() {
-    hasOn.value = false;
+    if (requestCount.value > 0) {
+      requestCount.value -= 1;
+    }
   }
 
   return { getStatus, on, off };

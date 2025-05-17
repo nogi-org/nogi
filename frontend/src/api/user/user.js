@@ -1,37 +1,25 @@
 import api from '@/api/index.js';
-import {
-  handleUserInfo,
-  handleValidationGithubRepository
-} from '@/api/apiResponse.js';
+import { handleUserInfo } from '@/api/apiResponse.js';
 
-export const getUserInfoApi = () => {
-  return api.get(`/users`).then((success) => success);
+export const getMeApi = () => {
+  return api.get(`/v1/users/me`).then(success => success);
 };
 
-export const updateUserInfoApi = (payload) => {
+export const updateMeApi = payload => {
   return api
-    .patch(`/users`, payload)
-    .then((success) => handleUserInfo(success))
-    .catch((error) => handleUserInfo(error));
+    .patch(`/v1/users/me`, payload)
+    .then(success => handleUserInfo(success))
+    .catch(error => handleUserInfo(error));
 };
 
-// todo: 필요없으면 삭제
-export const checkValidationGithubRepositoryApi = (params) => {
-  return api
-    .get(`/users/validate-repository-name`, { params: params })
-    .then((success) => handleValidationGithubRepository(success))
-    .catch((error) => handleValidationGithubRepository(error));
+export const getUsersAdminApi = () => {
+  return api.get(`/v1/admin/users`).then(success => success.result);
 };
 
 // todo: response 객체 변경
-export const onManualNogiApi = () => {
+export const onManualSyncApi = () => {
   return api
-    .post(`/users/manual-nogi`)
-    .then((success) => handleUserInfo(success))
-    .catch((error) => handleUserInfo(error));
-};
-
-// todo: response 객체 변경
-export const getConnectedGithubInfoApi = () => {
-  return api.get(`/users/github/validate`).then((success) => success.result);
+    .post(`/v1/sync/manual`)
+    .then(success => handleUserInfo(success))
+    .catch(error => handleUserInfo(error));
 };
