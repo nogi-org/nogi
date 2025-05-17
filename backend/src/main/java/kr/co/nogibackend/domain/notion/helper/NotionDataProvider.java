@@ -103,7 +103,7 @@ public class NotionDataProvider {
 			, NotionBlockResult parentBlock
 			, boolean isNumberedList
 	) {
-		if (!parentBlock.isHas_children()) {
+		if (!parentBlock.isHas_children() || parentBlock.getNumbered_list_item() == null) {
 			return;
 		}
 
